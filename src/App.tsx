@@ -140,9 +140,11 @@ export default function App() {
           <Route
             path="/carrito"
             element={
-              <PublicLayout>
-                <CartPage />
-              </PublicLayout>
+              <RequireAuth requireVerifiedEmail>
+                <PublicLayout>
+                  <CartPage />
+                </PublicLayout>
+              </RequireAuth>
             }
           />
           <Route

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { useParams, useSearchParams } from 'react-router-dom'
+import { useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import type { EventItem, Photo, PhotoFilter } from '../lib/types'
 import { getEventById, getEventPhotos, searchPhotosByFace } from '../lib/api'
 import { PhotoCard } from '../components/events/PhotoCard'
@@ -9,7 +9,13 @@ import {
   hasBiometricConsent,
 } from '../components/events/BiometricConsentModal'
 import { CartToast } from '../components/events/CartToast'
+import {
+  EventAIDisclaimerModal,
+  hasEventAIConsent,
+  recordEventAIConsent,
+} from '../components/events/EventAIDisclaimerModal'
 import { useCart } from '../hooks/useCart'
+import { useAuth } from '../hooks/useAuth'
 import { Icon } from '../components/ui/Icon'
 import { Footer } from '../components/layout/Footer'
 import { formatPrice } from '../lib/format'
@@ -30,6 +36,23 @@ const filters: { value: PhotoFilter; label: string; icon: string }[] = [
 export function EventGalleryPage() {
   const { eventId = '' } = useParams()
   const [searchParams, setSearchParams] = useSearchParams()
+  const navigate = useNavigate()
+  const location = useLocation()
+  const { user } = useAuth()
+
+  function requireVerifiedSession(): boolean {
+    if (!user) {
+      navigate('/login', { state: { from: location } })
+      return false
+    }
+    if (user.role === 'customer' && user.emailVerified === false) {
+      navigate('/verificar-email', {
+        state: { email: user.email, needsVerification: true },
+      })
+      return false
+    }
+    return true
+  }
 
   const [event, setEvent] = useState<EventItem | null>(null)
   const [photos, setPhotos] = useState<Photo[]>([])
@@ -116,6 +139,29 @@ export function EventGalleryPage() {
   const [consentOpen, setConsentOpen] = useState(false)
   const [pendingMode, setPendingMode] = useState<'camera' | 'upload' | null>(null)
   const selfieFileRef = useRef<HTMLInputElement>(null)
+  const [aiDisclaimerOpen, setAiDisclaimerOpen] = useState(false)
+
+  // Disclaimer obligatorio al entrar a un evento por primera vez con sesión
+  // verificada. Cubre los términos AI del evento; el consentimiento de la
+  // cámara/selfie es uno aparte que aparece justo antes de capturar.
+  useEffect(() => {
+    if (!user || user.role !== 'customer') return
+    if (user.emailVerified === false) return
+    if (!eventId) return
+    if (!hasEventAIConsent(user.id, eventId)) {
+      setAiDisclaimerOpen(true)
+    }
+  }, [user, eventId])
+
+  function acceptEventAIDisclaimer() {
+    if (user) recordEventAIConsent(user.id, eventId)
+    setAiDisclaimerOpen(false)
+  }
+
+  function declineEventAIDisclaimer() {
+    setAiDisclaimerOpen(false)
+    navigate('/eventos')
+  }
 
   function ensureConsent(mode: 'camera' | 'upload') {
     if (hasBiometricConsent()) {
@@ -149,10 +195,12 @@ export function EventGalleryPage() {
   }
 
   function openSelfieCamera() {
+    if (!requireVerifiedSession()) return
     ensureConsent('camera')
   }
 
   function openSelfieUpload() {
+    if (!requireVerifiedSession()) return
     ensureConsent('upload')
   }
 
@@ -582,6 +630,13 @@ export function EventGalleryPage() {
       />
 
       <CartToast visible={!!toast} photoUrl={toast?.url} />
+
+      <EventAIDisclaimerModal
+        open={aiDisclaimerOpen}
+        eventTitle={event.title}
+        onAccept={acceptEventAIDisclaimer}
+        onDecline={declineEventAIDisclaimer}
+      />
     </>
   )
 }

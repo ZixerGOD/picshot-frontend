@@ -148,6 +148,43 @@ export function listOrders(): Order[] {
   return readOrders()
 }
 
+/**
+ * Marca como `expired` cualquier orden en `awaiting_payment` cuya ventana
+ * de pago (10 min) ya pasó. Devuelve el listado limpio.
+ */
+function sweepExpired(orders: Order[]): Order[] {
+  const now = Date.now()
+  let changed = false
+  const next = orders.map((o) => {
+    if (
+      o.status === 'awaiting_payment' &&
+      new Date(o.expiresAt).getTime() < now
+    ) {
+      changed = true
+      return { ...o, status: 'expired' as OrderStatus }
+    }
+    return o
+  })
+  if (changed) writeOrders(next)
+  return next
+}
+
+/**
+ * Devuelve la orden en curso del comprador (si existe y aún no expira).
+ * Sirve para evitar que el usuario abra dos checkouts a la vez para el
+ * mismo correo (decisions.md: prevent double payment).
+ */
+export function getActivePendingOrderFor(buyerEmail: string): Order | null {
+  const orders = sweepExpired(readOrders())
+  return (
+    orders.find(
+      (o) =>
+        o.buyerEmail.toLowerCase() === buyerEmail.toLowerCase() &&
+        o.status === 'awaiting_payment',
+    ) ?? null
+  )
+}
+
 function patchOrder(orderId: string, patch: Partial<Order>) {
   const orders = readOrders().map((o) =>
     o.id === orderId ? { ...o, ...patch } : o,

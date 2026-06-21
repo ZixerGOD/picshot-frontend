@@ -8,6 +8,7 @@ import { formatPrice } from '../../lib/format'
 const STATUS_OPTIONS: { value: '' | OrderStatus; label: string }[] = [
   { value: '', label: 'Todos los estados' },
   { value: 'awaiting_payment', label: 'Esperando pago' },
+  { value: 'expired', label: 'Expirada' },
   { value: 'confirmed', label: 'Pagada' },
   { value: 'failed', label: 'Fallida' },
   { value: 'reversed', label: 'Reversada' },
@@ -18,6 +19,7 @@ const STATUS_OPTIONS: { value: '' | OrderStatus; label: string }[] = [
 const STATUS_TONE: Record<OrderStatus, string> = {
   pending: 'bg-surface-container text-on-surface-variant',
   awaiting_payment: 'bg-surface-container text-on-surface-variant',
+  expired: 'bg-primary-container/20 text-primary-container',
   confirmed: 'bg-primary-container/30 text-primary',
   failed: 'bg-primary-container/20 text-primary-container',
   reversed: 'bg-primary-container/20 text-primary-container',
@@ -27,6 +29,7 @@ const STATUS_TONE: Record<OrderStatus, string> = {
 const STATUS_LABEL: Record<OrderStatus, string> = {
   pending: 'Pendiente',
   awaiting_payment: 'Esperando pago',
+  expired: 'Expirada',
   confirmed: 'Pagada',
   failed: 'Fallida',
   reversed: 'Reversada',

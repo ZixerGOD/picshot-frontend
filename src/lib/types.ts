@@ -137,9 +137,11 @@ export interface CartTotals {
 
 // ===== ÓRDENES / PAYPHONE =====
 
+/** Estados según docs/checkout.md (líneas 54-66). */
 export type OrderStatus =
   | 'pending'
   | 'awaiting_payment'
+  | 'expired'
   | 'confirmed'
   | 'failed'
   | 'reversed'

@@ -2,7 +2,12 @@ import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useCart } from '../hooks/useCart'
 import { useAuth } from '../hooks/useAuth'
-import { createOrder, simulatePayphone, CHECKOUT_TIMINGS } from '../lib/checkout'
+import {
+  createOrder,
+  getActivePendingOrderFor,
+  simulatePayphone,
+  CHECKOUT_TIMINGS,
+} from '../lib/checkout'
 import { getEvents, USE_MOCKS } from '../lib/api'
 import type { EventItem } from '../lib/types'
 import { Icon } from '../components/ui/Icon'
@@ -19,6 +24,10 @@ export function CheckoutPage() {
 
   const [step, setStep] = useState<CheckoutStep>('review')
   const [outcome, setOutcome] = useState<Outcome>('success')
+
+  // Si el usuario ya tiene una orden en `awaiting_payment` vigente, no le
+  // permitimos crear otra (decisions.md: prevent double payment).
+  const pendingOrder = user ? getActivePendingOrderFor(user.email) : null
 
   // El SRI exige cédula/RUC en comprobantes electrónicos sobre US$50.
   const SRI_THRESHOLD_USD = 50
@@ -54,6 +63,40 @@ export function CheckoutPage() {
       active = false
     }
   }, [])
+
+  if (pendingOrder && step === 'review') {
+    return (
+      <>
+        <main className="pt-32 pb-24 shots-container flex flex-col items-center text-center gap-6">
+          <Icon name="schedule" className="text-6xl text-primary" />
+          <h1 className="font-headline-md text-headline-md text-on-surface uppercase">
+            Tienes un pago en proceso
+          </h1>
+          <p className="font-body-md text-body-md text-on-surface-variant max-w-md">
+            Ya creaste la orden <strong>{pendingOrder.id}</strong> y está
+            esperando confirmación. Termínala o espera a que expire para
+            iniciar otra.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-3">
+            <Link
+              to={`/mis-compras/${pendingOrder.id}`}
+              className="shots-btn-primary px-6 py-3"
+            >
+              <Icon name="visibility" />
+              Ver estado de la orden
+            </Link>
+            <Link
+              to="/carrito"
+              className="inline-flex items-center justify-center gap-2 border border-surface-variant text-on-surface font-label-bold text-label-bold uppercase tracking-widest px-6 py-3 hover:border-primary hover:text-primary transition-colors"
+            >
+              Volver al carrito
+            </Link>
+          </div>
+        </main>
+        <Footer variant="simple" />
+      </>
+    )
+  }
 
   if (items.length === 0 && packs.length === 0 && step === 'review') {
     return (
