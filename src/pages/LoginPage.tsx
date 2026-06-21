@@ -144,16 +144,16 @@ export function LoginPage() {
               <p className="font-caption text-caption text-on-surface-variant uppercase tracking-widest mb-3">
                 Cuentas de demostración
               </p>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+              <div className="grid grid-cols-3 gap-2">
                 {demoAccounts.map((account) => (
                   <button
                     key={account.email}
                     type="button"
                     onClick={() => fillDemo(account)}
-                    className="flex items-center gap-2 border border-surface-variant p-3 text-on-surface hover:border-primary hover:text-primary transition-colors"
+                    className="flex flex-col items-center justify-center gap-1 border border-surface-variant px-2 py-3 text-on-surface hover:border-primary hover:text-primary transition-colors min-w-0"
                   >
-                    <Icon name={account.icon} className="text-lg" />
-                    <span className="font-label-bold text-label-bold uppercase tracking-wider">
+                    <Icon name={account.icon} className="text-xl" />
+                    <span className="font-label-bold text-label-bold text-xs sm:text-sm">
                       {account.label}
                     </span>
                   </button>

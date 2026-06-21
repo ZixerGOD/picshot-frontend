@@ -44,7 +44,7 @@ export function RegisterPage() {
   return (
     <AuthLayout
       title="Crea tu cuenta"
-      subtitle="Compra, descarga y guarda tus fotos de cada evento."
+      subtitle="En menos de un minuto puedes empezar a comprar tus fotos y guardarlas en tu cuenta."
       footer={
         <>
           ¿Ya tienes cuenta?{' '}
@@ -54,59 +54,62 @@ export function RegisterPage() {
         </>
       }
     >
-      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-        <label className="flex flex-col gap-1 font-caption text-caption text-on-surface-variant uppercase tracking-widest">
-          Nombre completo
-          <input
-            type="text"
-            required
-            autoComplete="name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            className="shots-input"
-          />
-        </label>
+      <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+        <div className="flex flex-col gap-4">
+          <Field label="¿Cómo te llamas?">
+            <input
+              type="text"
+              required
+              autoComplete="name"
+              placeholder="Tu nombre completo"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="shots-input"
+            />
+          </Field>
 
-        <label className="flex flex-col gap-1 font-caption text-caption text-on-surface-variant uppercase tracking-widest">
-          Correo electrónico
-          <input
-            type="email"
-            required
-            autoComplete="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="shots-input"
-          />
-        </label>
+          <Field label="Tu correo electrónico">
+            <input
+              type="email"
+              required
+              autoComplete="email"
+              placeholder="tu@correo.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="shots-input"
+            />
+          </Field>
+        </div>
 
-        <label className="flex flex-col gap-1 font-caption text-caption text-on-surface-variant uppercase tracking-widest">
-          Contraseña
-          <input
-            type="password"
-            required
-            minLength={8}
-            autoComplete="new-password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="shots-input"
-          />
-          <span className="font-caption text-caption text-on-surface-variant normal-case tracking-normal">
-            Mínimo 8 caracteres.
-          </span>
-        </label>
-
-        <label className="flex flex-col gap-1 font-caption text-caption text-on-surface-variant uppercase tracking-widest">
-          Confirmar contraseña
-          <input
-            type="password"
-            required
-            minLength={8}
-            autoComplete="new-password"
-            value={confirm}
-            onChange={(e) => setConfirm(e.target.value)}
-            className="shots-input"
-          />
-        </label>
+        <div className="border-t border-surface-variant pt-5 flex flex-col gap-4">
+          <p className="font-caption text-caption text-on-surface-variant uppercase tracking-widest">
+            Crea una contraseña
+          </p>
+          <Field hint="Mínimo 8 caracteres. Usa letras y números.">
+            <input
+              type="password"
+              required
+              minLength={8}
+              autoComplete="new-password"
+              placeholder="Nueva contraseña"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="shots-input"
+            />
+          </Field>
+          <Field>
+            <input
+              type="password"
+              required
+              minLength={8}
+              autoComplete="new-password"
+              placeholder="Confirma tu contraseña"
+              value={confirm}
+              onChange={(e) => setConfirm(e.target.value)}
+              className="shots-input"
+            />
+          </Field>
+        </div>
 
         <label className="flex items-start gap-2 font-body-md text-body-md text-on-surface cursor-pointer">
           <input
@@ -157,5 +160,29 @@ export function RegisterPage() {
         </button>
       </form>
     </AuthLayout>
+  )
+}
+
+interface FieldProps {
+  label?: string
+  hint?: string
+  children: React.ReactNode
+}
+
+function Field({ label, hint, children }: FieldProps) {
+  return (
+    <label className="flex flex-col gap-1">
+      {label && (
+        <span className="font-caption text-caption text-on-surface-variant uppercase tracking-widest">
+          {label}
+        </span>
+      )}
+      {children}
+      {hint && (
+        <span className="font-caption text-caption text-on-surface-variant">
+          {hint}
+        </span>
+      )}
+    </label>
   )
 }
