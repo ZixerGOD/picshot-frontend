@@ -25,13 +25,13 @@ export function PhotographerEarningsPage() {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <StatsCard
           label="Ganancias totales"
-          value={`€${totalEarnings.toLocaleString(undefined, { maximumFractionDigits: 0 })}`}
+          value={`$${totalEarnings.toLocaleString(undefined, { maximumFractionDigits: 0 })}`}
           icon="payments"
         />
         <StatsCard label="Ventas" value={totalSales.toLocaleString()} icon="shopping_cart" />
         <StatsCard
           label="Ganancia promedio"
-          value={`€${totalSales ? (totalEarnings / totalSales).toFixed(2) : '0.00'}`}
+          value={`$${totalSales ? (totalEarnings / totalSales).toFixed(2) : '0.00'}`}
           icon="trending_up"
         />
       </div>
@@ -40,7 +40,7 @@ export function PhotographerEarningsPage() {
         <h2 className="font-headline-md text-headline-md text-on-surface mb-6 uppercase">
           Ganancias por evento
         </h2>
-        <SimpleBarChart data={earningsByEvent} valuePrefix="€" />
+        <SimpleBarChart data={earningsByEvent} valuePrefix="$" />
       </section>
 
       <section className="bg-surface border border-surface-variant p-6">
@@ -59,12 +59,12 @@ export function PhotographerEarningsPage() {
             {
               key: 'amount',
               header: 'Venta',
-              render: (s) => `€${s.finalAmount.toFixed(2)}`,
+              render: (s) => `$${s.finalAmount.toFixed(2)}`,
             },
             {
               key: 'commission',
               header: 'Tu comisión',
-              render: (s) => `€${s.photographerEarnings.toFixed(2)}`,
+              render: (s) => `$${s.photographerEarnings.toFixed(2)}`,
             },
             {
               key: 'date',

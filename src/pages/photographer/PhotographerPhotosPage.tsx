@@ -67,7 +67,7 @@ export function PhotographerPhotosPage() {
                   {events.find((e) => e.id === photo.eventId)?.title ?? photo.eventId}
                 </p>
                 <p className="font-label-bold text-label-bold text-on-surface">
-                  €{photo.price.toFixed(2)}
+                  ${photo.price.toFixed(2)}
                 </p>
                 <span
                   className={`shots-badge mt-2 ${

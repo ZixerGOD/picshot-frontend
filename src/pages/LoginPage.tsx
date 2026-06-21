@@ -88,7 +88,7 @@ export function LoginPage() {
               Iniciar sesión
             </h1>
             <p className="font-body-md text-body-md text-on-surface-variant mt-2">
-              Accede a tu cuenta de SHOTS.
+              Accede a tu cuenta de PicShot.
             </p>
           </div>
 

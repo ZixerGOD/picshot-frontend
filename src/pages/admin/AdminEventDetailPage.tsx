@@ -152,7 +152,7 @@ export function AdminEventDetailPage() {
           <div>
             <p className="font-caption text-caption text-on-surface-variant uppercase">Ingresos</p>
             <p className="font-headline-md text-headline-md text-on-surface">
-              €{totalRevenue.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+              ${totalRevenue.toLocaleString(undefined, { maximumFractionDigits: 0 })}
             </p>
           </div>
           <div>
@@ -160,7 +160,7 @@ export function AdminEventDetailPage() {
               Precio base
             </p>
             <p className="font-headline-md text-headline-md text-on-surface">
-              €{(event.basePrice ?? 0).toFixed(2)}
+              ${(event.basePrice ?? 0).toFixed(2)}
             </p>
           </div>
         </div>
@@ -345,7 +345,7 @@ export function AdminEventDetailPage() {
                 key: 'discount',
                 header: 'Descuento',
                 render: (c) =>
-                  c.discountType === 'percentage' ? `${c.discountValue}%` : `€${c.discountValue}`,
+                  c.discountType === 'percentage' ? `${c.discountValue}%` : `$${c.discountValue}`,
               },
               {
                 key: 'uses',
@@ -385,7 +385,7 @@ export function AdminEventDetailPage() {
               {
                 key: 'amount',
                 header: 'Monto',
-                render: (s) => `€${s.finalAmount.toFixed(2)}`,
+                render: (s) => `$${s.finalAmount.toFixed(2)}`,
               },
               {
                 key: 'date',

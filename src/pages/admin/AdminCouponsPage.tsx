@@ -94,7 +94,7 @@ export function AdminCouponsPage() {
             <Select
               options={[
                 { value: 'percentage', label: 'Porcentaje %' },
-                { value: 'fixed', label: 'Monto fijo €' },
+                { value: 'fixed', label: 'Monto fijo $' },
               ]}
               value={form.discountType}
               onChange={(e) =>
@@ -108,7 +108,7 @@ export function AdminCouponsPage() {
               type="number"
               min="0"
               step={form.discountType === 'percentage' ? '1' : '0.01'}
-              placeholder={form.discountType === 'percentage' ? 'Descuento %' : 'Descuento €'}
+              placeholder={form.discountType === 'percentage' ? 'Descuento %' : 'Descuento $'}
               value={form.discountValue}
               onChange={(e) => setForm({ ...form, discountValue: e.target.value })}
             />
@@ -163,7 +163,7 @@ export function AdminCouponsPage() {
             key: 'discount',
             header: 'Descuento',
             render: (c) =>
-              c.discountType === 'percentage' ? `${c.discountValue}%` : `€${c.discountValue}`,
+              c.discountType === 'percentage' ? `${c.discountValue}%` : `$${c.discountValue}`,
           },
           {
             key: 'uses',

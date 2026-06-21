@@ -9,11 +9,11 @@ import { Icon } from '../components/ui/Icon'
 
 const cities = [
   { value: '', label: 'Todas las ciudades' },
-  { value: 'Madrid', label: 'Madrid' },
-  { value: 'Barcelona', label: 'Barcelona' },
-  { value: 'Valencia', label: 'Valencia' },
-  { value: 'Granada', label: 'Granada' },
-  { value: 'Huesca', label: 'Huesca' },
+  { value: 'Quito', label: 'Quito' },
+  { value: 'Guayaquil', label: 'Guayaquil' },
+  { value: 'Cuenca', label: 'Cuenca' },
+  { value: 'Manta', label: 'Manta' },
+  { value: 'Cotopaxi', label: 'Cotopaxi' },
 ]
 
 const types = [

@@ -36,7 +36,7 @@ export function PhotographerDashboardPage() {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <StatsCard
           label="Tus ganancias"
-          value={`€${totalEarnings.toLocaleString(undefined, { maximumFractionDigits: 0 })}`}
+          value={`$${totalEarnings.toLocaleString(undefined, { maximumFractionDigits: 0 })}`}
           icon="payments"
           trend="8%"
           trendUp
@@ -50,7 +50,7 @@ export function PhotographerDashboardPage() {
           <h2 className="font-headline-md text-headline-md text-on-surface mb-6 uppercase">
             Ganancias por evento
           </h2>
-          <SimpleBarChart data={earningsByEvent} valuePrefix="€" />
+          <SimpleBarChart data={earningsByEvent} valuePrefix="$" />
         </section>
 
         <section className="bg-surface border border-surface-variant p-6">
@@ -75,7 +75,7 @@ export function PhotographerDashboardPage() {
                       </p>
                     </div>
                     <span className="font-label-bold text-label-bold text-primary">
-                      €{earnings.toFixed(2)}
+                      ${earnings.toFixed(2)}
                     </span>
                   </li>
                 )

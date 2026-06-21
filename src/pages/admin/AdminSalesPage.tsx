@@ -34,17 +34,17 @@ export function AdminSalesPage() {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <StatsCard
           label="Ingresos filtrados"
-          value={`€${totalRevenue.toLocaleString(undefined, { maximumFractionDigits: 0 })}`}
+          value={`$${totalRevenue.toLocaleString(undefined, { maximumFractionDigits: 0 })}`}
           icon="payments"
         />
         <StatsCard
           label="Para fotógrafos"
-          value={`€${totalPhotographerEarnings.toLocaleString(undefined, { maximumFractionDigits: 0 })}`}
+          value={`$${totalPhotographerEarnings.toLocaleString(undefined, { maximumFractionDigits: 0 })}`}
           icon="people"
         />
         <StatsCard
           label="Para Picshot"
-          value={`€${totalPlatformEarnings.toLocaleString(undefined, { maximumFractionDigits: 0 })}`}
+          value={`$${totalPlatformEarnings.toLocaleString(undefined, { maximumFractionDigits: 0 })}`}
           icon="account_balance"
         />
       </div>
@@ -91,12 +91,12 @@ export function AdminSalesPage() {
           {
             key: 'amount',
             header: 'Monto',
-            render: (s) => `€${s.finalAmount.toFixed(2)}`,
+            render: (s) => `$${s.finalAmount.toFixed(2)}`,
           },
           {
             key: 'commission',
             header: 'Comisión',
-            render: (s) => `€${s.photographerEarnings.toFixed(2)}`,
+            render: (s) => `$${s.photographerEarnings.toFixed(2)}`,
           },
           {
             key: 'date',

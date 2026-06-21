@@ -145,7 +145,7 @@ export function WorkWithUsPage() {
                   />
                   <Input
                     label="Ciudad de residencia"
-                    placeholder="Ej. Madrid"
+                    placeholder="Ej. Quito"
                     value={form.city}
                     onChange={(e) => updateField('city', e.target.value)}
                     required
@@ -201,7 +201,7 @@ export function WorkWithUsPage() {
           <div className="shots-container">
             <div className="text-center mb-16">
               <h2 className="font-headline-md text-headline-md font-black uppercase text-on-secondary-fixed">
-                Por qué unirte a SHOTS
+                Por qué unirte a PicShot
               </h2>
               <div className="mt-4 h-1 w-16 bg-primary-container mx-auto" />
             </div>

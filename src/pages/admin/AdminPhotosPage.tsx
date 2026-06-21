@@ -121,7 +121,7 @@ export function AdminPhotosPage() {
           {
             key: 'price',
             header: 'Precio',
-            render: (p) => `€${p.price.toFixed(2)}`,
+            render: (p) => `$${p.price.toFixed(2)}`,
           },
           {
             key: 'status',

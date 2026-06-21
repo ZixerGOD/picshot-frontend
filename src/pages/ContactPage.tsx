@@ -110,7 +110,7 @@ export function ContactPage() {
                 />
                 <Input
                   label="Nombre del Evento"
-                  placeholder="Ej. Maratón Ciudad 2024"
+                  placeholder="Ej. Maratón Quito 2026"
                   value={form.eventName}
                   onChange={(e) => updateField('eventName', e.target.value)}
                   required
@@ -128,7 +128,7 @@ export function ContactPage() {
                 <Input
                   label="Teléfono"
                   type="tel"
-                  placeholder="+34 600 000 000"
+                  placeholder="+593 99 000 0000"
                   value={form.phone}
                   onChange={(e) => updateField('phone', e.target.value)}
                 />

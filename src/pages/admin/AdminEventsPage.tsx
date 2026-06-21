@@ -120,7 +120,7 @@ export function AdminEventsPage() {
           {
             key: 'price',
             header: 'Precio base',
-            render: (e) => `€${(e.basePrice ?? 0).toFixed(2)}`,
+            render: (e) => `$${(e.basePrice ?? 0).toFixed(2)}`,
           },
           {
             key: 'actions',

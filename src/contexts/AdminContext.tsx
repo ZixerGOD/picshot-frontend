@@ -34,7 +34,7 @@ const defaultState: AdminState = {
   photos: [
     {
       id: 'photo-initial-1',
-      eventId: 'maraton-madrid-2024',
+      eventId: 'maraton-quito-2026',
       photographerId: 'ph-1',
       url: 'https://picsum.photos/seed/madrid1/800/600',
       price: 24.99,
@@ -43,7 +43,7 @@ const defaultState: AdminState = {
     },
     {
       id: 'photo-initial-2',
-      eventId: 'maraton-madrid-2024',
+      eventId: 'maraton-quito-2026',
       photographerId: 'ph-1',
       url: 'https://picsum.photos/seed/madrid2/800/600',
       price: 24.99,
@@ -52,7 +52,7 @@ const defaultState: AdminState = {
     },
     {
       id: 'photo-initial-3',
-      eventId: 'iron-extreme-valencia',
+      eventId: 'iron-pacifico-manta',
       photographerId: 'ph-1',
       url: 'https://picsum.photos/seed/iron1/800/600',
       price: 29.99,
@@ -61,7 +61,7 @@ const defaultState: AdminState = {
     },
     {
       id: 'photo-initial-4',
-      eventId: 'cronoescalada-mtb-sierra',
+      eventId: 'mtb-cajas-cuenca',
       photographerId: 'ph-2',
       url: 'https://picsum.photos/seed/mtb1/800/600',
       price: 14.99,

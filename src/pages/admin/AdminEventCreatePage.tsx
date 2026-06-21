@@ -98,7 +98,7 @@ export function AdminEventCreatePage() {
             required
             value={form.title}
             onChange={(e) => setForm({ ...form, title: e.target.value })}
-            placeholder="Ej. Maratón de Sevilla 2025"
+            placeholder="Ej. Maratón de Quito 2026"
           />
         </div>
 
@@ -118,7 +118,7 @@ export function AdminEventCreatePage() {
               required
               value={form.location}
               onChange={(e) => setForm({ ...form, location: e.target.value })}
-              placeholder="Ej. Sevilla"
+              placeholder="Ej. Quito"
             />
           </div>
         </div>

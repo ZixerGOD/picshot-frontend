@@ -53,7 +53,7 @@ export function AdminDashboardPage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatsCard
           label="Ingresos totales"
-          value={`€${stats.totalRevenue.toLocaleString(undefined, { maximumFractionDigits: 0 })}`}
+          value={`$${stats.totalRevenue.toLocaleString(undefined, { maximumFractionDigits: 0 })}`}
           icon="payments"
           trend="12%"
           trendUp
@@ -84,7 +84,7 @@ export function AdminDashboardPage() {
           <h2 className="font-headline-md text-headline-md text-on-surface mb-6 uppercase">
             Ingresos últimos 7 días
           </h2>
-          <SimpleBarChart data={last7Days} valuePrefix="€" />
+          <SimpleBarChart data={last7Days} valuePrefix="$" />
         </section>
 
         <section className="bg-surface border border-surface-variant p-6">
@@ -147,7 +147,7 @@ export function AdminDashboardPage() {
               {
                 key: 'revenue',
                 header: 'Ingresos',
-                render: (e) => `€${e.revenue.toLocaleString(undefined, { maximumFractionDigits: 0 })}`,
+                render: (e) => `$${e.revenue.toLocaleString(undefined, { maximumFractionDigits: 0 })}`,
               },
             ]}
           />

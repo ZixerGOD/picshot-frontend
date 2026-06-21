@@ -50,7 +50,7 @@ export function PackEditor({ value, onChange }: PackEditorProps) {
 
             <div className="relative w-32 shrink-0">
               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none">
-                €
+                $
               </span>
               <input
                 type="number"
