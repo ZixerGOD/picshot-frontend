@@ -97,6 +97,11 @@ export const mockEvents: EventItem[] = [
 // Cada evento ofrece sus packs de venta (el admin los configura al crear/editar).
 mockEvents.forEach((event) => {
   event.packs = defaultPacks(event.basePrice ?? 19.99)
+  if (!event.retentionUntil) {
+    const start = new Date(event.date)
+    start.setDate(start.getDate() + 180)
+    event.retentionUntil = start.toISOString().slice(0, 10)
+  }
 })
 
 export const mockPhotographers: Photographer[] = [

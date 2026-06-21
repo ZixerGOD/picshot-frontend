@@ -29,6 +29,20 @@ export function AdminDashboardPage() {
 
   const activePhotographers = photographers.filter((p) => p.isActive).slice(0, 5)
 
+  const now = Date.now()
+  const retentionWatch = events
+    .filter((e) => e.retentionUntil)
+    .map((e) => ({
+      ...e,
+      retentionDays: Math.ceil(
+        (new Date(e.retentionUntil as string).getTime() - now) /
+          (1000 * 60 * 60 * 24),
+      ),
+    }))
+    .filter((e) => e.retentionDays <= 60)
+    .sort((a, b) => a.retentionDays - b.retentionDays)
+    .slice(0, 5)
+
   return (
     <div className="space-y-10">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -85,6 +99,49 @@ export function AdminDashboardPage() {
             Ingresos últimos 7 días
           </h2>
           <SimpleBarChart data={last7Days} valuePrefix="$" />
+        </section>
+
+        <section className="bg-surface border border-surface-variant p-6">
+          <h2 className="font-headline-md text-headline-md text-on-surface mb-6 uppercase">
+            Retención próxima a vencer
+          </h2>
+          {retentionWatch.length === 0 ? (
+            <p className="font-body-md text-body-md text-on-surface-variant">
+              Ningún evento próximo a expirar.
+            </p>
+          ) : (
+            <ul className="space-y-3">
+              {retentionWatch.map((e) => (
+                <li
+                  key={e.id}
+                  className="flex items-center justify-between p-3 bg-surface-container-low"
+                >
+                  <div>
+                    <Link
+                      to={`/admin/eventos/${e.id}`}
+                      className="font-label-bold text-label-bold text-on-surface hover:text-primary"
+                    >
+                      {e.title}
+                    </Link>
+                    <p className="font-caption text-caption text-on-surface-variant">
+                      {e.location} · borra el {e.retentionUntil}
+                    </p>
+                  </div>
+                  <span
+                    className={`font-caption text-caption uppercase ${
+                      e.retentionDays <= 0
+                        ? 'text-primary-container'
+                        : e.retentionDays <= 14
+                          ? 'text-primary-container'
+                          : 'text-primary'
+                    }`}
+                  >
+                    {e.retentionDays <= 0 ? 'Vencido' : `${e.retentionDays}d`}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          )}
         </section>
 
         <section className="bg-surface border border-surface-variant p-6">

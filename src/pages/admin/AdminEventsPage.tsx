@@ -12,6 +12,8 @@ const statusLabels: Record<string, string> = {
   draft: 'Borrador',
   active: 'Activo',
   closed: 'Cerrado',
+  archived: 'Archivado',
+  retention_expired: 'Retención cumplida',
 }
 
 const statusOptions = [
@@ -19,7 +21,16 @@ const statusOptions = [
   { value: 'draft', label: 'Borrador' },
   { value: 'active', label: 'Activo' },
   { value: 'closed', label: 'Cerrado' },
+  { value: 'archived', label: 'Archivado' },
+  { value: 'retention_expired', label: 'Retención cumplida' },
 ]
+
+function daysUntil(dateString?: string): number | null {
+  if (!dateString) return null
+  const diff = new Date(dateString).getTime() - Date.now()
+  if (Number.isNaN(diff)) return null
+  return Math.ceil(diff / (1000 * 60 * 60 * 24))
+}
 
 export function AdminEventsPage() {
   const { events, deleteEvent } = useAdmin()
@@ -121,6 +132,34 @@ export function AdminEventsPage() {
             key: 'price',
             header: 'Precio base',
             render: (e) => `$${(e.basePrice ?? 0).toFixed(2)}`,
+          },
+          {
+            key: 'retention',
+            header: 'Retención',
+            render: (e) => {
+              const days = daysUntil(e.retentionUntil)
+              if (days === null) {
+                return (
+                  <span className="text-on-surface-variant text-xs">—</span>
+                )
+              }
+              if (days <= 0) {
+                return (
+                  <span className="font-caption text-caption text-primary-container">
+                    Vencida
+                  </span>
+                )
+              }
+              return (
+                <span
+                  className={`font-caption text-caption ${
+                    days <= 30 ? 'text-primary-container' : 'text-on-surface-variant'
+                  }`}
+                >
+                  {days}d
+                </span>
+              )
+            },
           },
           {
             key: 'actions',

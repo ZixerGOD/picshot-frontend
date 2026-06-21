@@ -1,8 +1,13 @@
 export interface EventItem {
   id: string
   title: string
+  /** Fecha de inicio del evento (YYYY-MM-DD). */
   date: string
   displayDate: string
+  /** Fecha de fin del evento (YYYY-MM-DD). Opcional para eventos de un día. */
+  endDate?: string
+  /** Fecha hasta la que las fotos quedan disponibles (180 días por defecto). */
+  retentionUntil?: string
   location: string
   type: string
   image: string
@@ -15,7 +20,12 @@ export interface EventItem {
   packs?: PhotoPack[]
 }
 
-export type EventStatus = 'draft' | 'active' | 'closed'
+export type EventStatus =
+  | 'draft'
+  | 'active'
+  | 'closed'
+  | 'archived'
+  | 'retention_expired'
 
 // Packs de venta que el admin configura por evento.
 export type PackKey = 'single' | 'pack3' | 'pack5' | 'pack10' | 'all'

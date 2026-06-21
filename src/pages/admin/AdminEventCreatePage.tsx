@@ -35,6 +35,8 @@ export function AdminEventCreatePage() {
   const [form, setForm] = useState({
     title: '',
     date: '',
+    endDate: '',
+    retentionUntil: '',
     location: '',
     type: 'Maratón',
     runnerCount: '',
@@ -51,10 +53,15 @@ export function AdminEventCreatePage() {
     }
     setPackError('')
     setSaving(true)
+    const retentionUntil =
+      form.retentionUntil || defaultRetentionFrom(form.date)
+
     setTimeout(() => {
       addEvent({
         title: form.title,
         date: form.date,
+        endDate: form.endDate || undefined,
+        retentionUntil,
         displayDate: formatDisplayDate(form.date),
         location: form.location,
         type: form.type,
@@ -69,6 +76,13 @@ export function AdminEventCreatePage() {
       setSaving(false)
       navigate('/admin/eventos')
     }, 600)
+  }
+
+  function defaultRetentionFrom(date: string): string {
+    if (!date) return ''
+    const d = new Date(date)
+    d.setDate(d.getDate() + 180)
+    return d.toISOString().slice(0, 10)
   }
 
   return (
@@ -104,7 +118,7 @@ export function AdminEventCreatePage() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <label className="shots-label">Fecha</label>
+            <label className="shots-label">Fecha de inicio</label>
             <Input
               required
               type="date"
@@ -113,6 +127,17 @@ export function AdminEventCreatePage() {
             />
           </div>
           <div>
+            <label className="shots-label">Fecha de fin (opcional)</label>
+            <Input
+              type="date"
+              value={form.endDate}
+              onChange={(e) => setForm({ ...form, endDate: e.target.value })}
+            />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
             <label className="shots-label">Ciudad / Ubicación</label>
             <Input
               required
@@ -120,6 +145,19 @@ export function AdminEventCreatePage() {
               onChange={(e) => setForm({ ...form, location: e.target.value })}
               placeholder="Ej. Quito"
             />
+          </div>
+          <div>
+            <label className="shots-label">Fin de venta y retención</label>
+            <Input
+              type="date"
+              value={form.retentionUntil}
+              onChange={(e) => setForm({ ...form, retentionUntil: e.target.value })}
+              placeholder={defaultRetentionFrom(form.date)}
+            />
+            <p className="font-caption text-caption text-on-surface-variant mt-1">
+              Después de esta fecha las fotos se eliminan automáticamente. Si lo
+              dejas vacío usamos 6 meses desde la fecha de inicio.
+            </p>
           </div>
         </div>
 
