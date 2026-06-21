@@ -1,8 +1,13 @@
 {
-  "name": "frontend",
+  "name": "picshot-frontend",
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "packageManager": "pnpm@11.1.2",
+  "engines": {
+    "node": ">=20",
+    "pnpm": ">=11"
+  },
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
