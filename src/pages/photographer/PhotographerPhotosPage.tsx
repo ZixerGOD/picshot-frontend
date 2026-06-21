@@ -294,13 +294,30 @@ export function PhotographerPhotosPage() {
         )}
       </section>
 
-      {photos.length === 0 ? (
-        <p className="font-body-md text-body-md text-on-surface-variant py-24 text-center bg-surface border border-surface-variant">
-          Aún no has subido fotos.
-        </p>
-      ) : (
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-          {photos.map((photo) => (
+      {(() => {
+        const visiblePhotos = selectedEvent
+          ? photos.filter((p) => p.eventId === selectedEvent)
+          : photos
+        if (visiblePhotos.length === 0) {
+          return (
+            <p className="font-body-md text-body-md text-on-surface-variant py-24 text-center bg-surface border border-surface-variant">
+              {selectedEvent
+                ? 'No has subido fotos para este evento todavía.'
+                : 'Aún no has subido fotos.'}
+            </p>
+          )
+        }
+        return (
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <p className="font-caption text-caption text-on-surface-variant uppercase tracking-widest">
+                {selectedEvent
+                  ? `${visiblePhotos.length} ${visiblePhotos.length === 1 ? 'foto' : 'fotos'} del evento`
+                  : `${visiblePhotos.length} ${visiblePhotos.length === 1 ? 'foto' : 'fotos'} en total`}
+              </p>
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+              {visiblePhotos.map((photo) => (
             <div key={photo.id} className="group bg-surface border border-surface-variant">
               <div className="aspect-[4/3] overflow-hidden relative">
                 <img
@@ -328,8 +345,10 @@ export function PhotographerPhotosPage() {
               </div>
             </div>
           ))}
-        </div>
-      )}
+            </div>
+          </div>
+        )
+      })()}
     </div>
   )
 }
