@@ -132,7 +132,8 @@ export function MyPurchasesPage() {
               <Icon name="schedule" className="text-primary mt-0.5" />
               <p className="font-body-md text-body-md text-on-surface">
                 Tus fotos quedan disponibles para descargar durante 6 meses
-                desde la fecha de compra. El badge sobre cada foto indica los
+                desde la fecha de compra. Te avisaremos por correo una semana
+                antes de que se borren. El badge sobre cada foto indica los
                 días que faltan.
               </p>
             </aside>

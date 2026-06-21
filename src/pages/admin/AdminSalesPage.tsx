@@ -19,8 +19,15 @@ export function AdminSalesPage() {
   }, [sales, eventFilter, photographerFilter])
 
   const totalRevenue = filtered.reduce((sum, s) => sum + s.finalAmount, 0)
+  const totalPayphone = filtered.reduce(
+    (sum, s) => sum + (s.payphoneFee ?? 0),
+    0,
+  )
+  const totalNet = filtered.reduce(
+    (sum, s) => sum + (s.netAmount ?? s.finalAmount),
+    0,
+  )
   const totalPhotographerEarnings = filtered.reduce((sum, s) => sum + s.photographerEarnings, 0)
-  const totalPlatformEarnings = filtered.reduce((sum, s) => sum + s.platformEarnings, 0)
 
   return (
     <div className="space-y-8">
@@ -31,23 +38,32 @@ export function AdminSalesPage() {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <StatsCard
-          label="Ingresos filtrados"
+          label="Bruto"
           value={`$${totalRevenue.toLocaleString(undefined, { maximumFractionDigits: 0 })}`}
           icon="payments"
+        />
+        <StatsCard
+          label="Comisión Payphone"
+          value={`$${totalPayphone.toLocaleString(undefined, { maximumFractionDigits: 0 })}`}
+          icon="credit_card"
+        />
+        <StatsCard
+          label="Neto post-Payphone"
+          value={`$${totalNet.toLocaleString(undefined, { maximumFractionDigits: 0 })}`}
+          icon="account_balance"
         />
         <StatsCard
           label="Para fotógrafos"
           value={`$${totalPhotographerEarnings.toLocaleString(undefined, { maximumFractionDigits: 0 })}`}
           icon="people"
         />
-        <StatsCard
-          label="Para Picshot"
-          value={`$${totalPlatformEarnings.toLocaleString(undefined, { maximumFractionDigits: 0 })}`}
-          icon="account_balance"
-        />
       </div>
+      <p className="font-caption text-caption text-on-surface-variant">
+        Payphone retiene 5.75% de cada cobro. El neto se reparte entre el
+        fotógrafo (según su % de comisión) y Picshot.
+      </p>
 
       <div className="bg-surface border border-surface-variant p-4 flex flex-col md:flex-row gap-4">
         <Select
@@ -90,18 +106,33 @@ export function AdminSalesPage() {
           { key: 'buyer', header: 'Comprador', render: (s) => s.buyerEmail },
           {
             key: 'amount',
-            header: 'Monto',
+            header: 'Bruto',
             render: (s) => `$${s.finalAmount.toFixed(2)}`,
           },
           {
+            key: 'payphone',
+            header: 'Payphone',
+            render: (s) =>
+              s.payphoneFee != null ? `−$${s.payphoneFee.toFixed(2)}` : '—',
+          },
+          {
+            key: 'net',
+            header: 'Neto',
+            render: (s) =>
+              `$${(s.netAmount ?? s.finalAmount).toFixed(2)}`,
+          },
+          {
             key: 'commission',
-            header: 'Comisión',
+            header: 'Fotógrafo',
             render: (s) => `$${s.photographerEarnings.toFixed(2)}`,
           },
           {
             key: 'date',
             header: 'Fecha',
-            render: (s) => new Date(s.createdAt).toLocaleDateString(),
+            render: (s) =>
+              new Date(s.createdAt).toLocaleDateString('es-EC', {
+                timeZone: 'America/Guayaquil',
+              }),
           },
         ]}
       />

@@ -36,6 +36,9 @@ export function AdminEventCreatePage() {
   // multi-día se modelan como eventos separados; no exponemos endDate.
   const [form, setForm] = useState({
     title: '',
+    description: '',
+    bannerImage: '',
+    coverPhoto: '',
     date: '',
     retentionUntil: '',
     location: '',
@@ -58,14 +61,18 @@ export function AdminEventCreatePage() {
       form.retentionUntil || defaultRetentionFrom(form.date)
 
     setTimeout(() => {
+      const fallback = img('shots-ciudad', 1600, 900)
       addEvent({
         title: form.title,
+        description: form.description || undefined,
+        bannerImage: form.bannerImage || undefined,
+        coverPhoto: form.coverPhoto || undefined,
         date: form.date,
         retentionUntil,
         displayDate: formatDisplayDate(form.date),
         location: form.location,
         type: form.type,
-        image: img('shots-ciudad', 1600, 900),
+        image: form.bannerImage || form.coverPhoto || fallback,
         photoCount: 0,
         runnerCount: parseInt(form.runnerCount, 10) || 0,
         status: 'draft',
@@ -114,6 +121,45 @@ export function AdminEventCreatePage() {
             onChange={(e) => setForm({ ...form, title: e.target.value })}
             placeholder="Ej. Maratón de Quito 2026"
           />
+        </div>
+
+        <div>
+          <label className="shots-label">Descripción</label>
+          <textarea
+            value={form.description}
+            onChange={(e) => setForm({ ...form, description: e.target.value })}
+            placeholder="Recorrido, distancias, premios, horarios… Lo que quieras que vea el participante."
+            rows={4}
+            className="shots-input resize-y"
+          />
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label className="shots-label">Banner del evento</label>
+            <Input
+              type="url"
+              value={form.bannerImage}
+              onChange={(e) => setForm({ ...form, bannerImage: e.target.value })}
+              placeholder="https://… (URL temporal)"
+            />
+            <p className="font-caption text-caption text-on-surface-variant mt-1">
+              Imagen apaisada (~1600×600). El admin podrá subirla cuando se
+              conecte el backend.
+            </p>
+          </div>
+          <div>
+            <label className="shots-label">Foto de portada</label>
+            <Input
+              type="url"
+              value={form.coverPhoto}
+              onChange={(e) => setForm({ ...form, coverPhoto: e.target.value })}
+              placeholder="https://… (URL temporal)"
+            />
+            <p className="font-caption text-caption text-on-surface-variant mt-1">
+              Imagen cuadrada (~800×800) para listados y tarjetas.
+            </p>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

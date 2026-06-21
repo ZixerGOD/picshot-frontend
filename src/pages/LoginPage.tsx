@@ -185,7 +185,7 @@ export function LoginPage() {
             </Button>
           </form>
 
-          {USE_MOCKS && (
+          {USE_MOCKS && !import.meta.env.PROD && (
             <div className="mt-8">
               <p className="font-caption text-caption text-on-surface-variant uppercase tracking-widest mb-3">
                 Cuentas de demostración

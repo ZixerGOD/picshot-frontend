@@ -123,6 +123,15 @@ export function CheckoutPage() {
 
   async function handlePay() {
     if (!user) return
+    // Payphone exige redirect en pestaña/ventana propia: PCI DSS prohíbe
+    // embedding en iframe (docs/payments.md:17,72). Detectamos el caso y
+    // bloqueamos antes de iniciar el flujo.
+    if (typeof window !== 'undefined' && window.self !== window.top) {
+      window.alert(
+        'No podemos abrir Payphone dentro de un iframe. Abre Picshot en una pestaña propia para pagar.',
+      )
+      return
+    }
     if (requiresIdentification) {
       const err = validateIdentification(identification)
       if (err) {
@@ -296,7 +305,7 @@ export function CheckoutPage() {
               </div>
             </div>
 
-            {USE_MOCKS && (
+            {USE_MOCKS && !import.meta.env.PROD && (
             <div className="bg-surface-container-lowest border border-surface-variant p-4 sm:p-6">
               <h2 className="font-headline-md text-headline-md text-on-surface mb-2">
                 Modo demo: simular respuesta de Payphone

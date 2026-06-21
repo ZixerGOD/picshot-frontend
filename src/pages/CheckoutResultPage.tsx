@@ -64,6 +64,12 @@ export function CheckoutResultPage({ variant }: CheckoutResultPageProps) {
           <p className="font-body-md text-body-md text-on-surface-variant max-w-xl">
             {copy.subtitle}
           </p>
+          {variant === 'success' && order?.buyerEmail && (
+            <p className="font-caption text-caption text-on-surface-variant max-w-xl">
+              Te enviamos la confirmación de compra a{' '}
+              <strong className="text-on-surface">{order.buyerEmail}</strong>.
+            </p>
+          )}
         </div>
 
         {order && (

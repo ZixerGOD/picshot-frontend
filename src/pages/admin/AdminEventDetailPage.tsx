@@ -14,6 +14,7 @@ import {
   type PackDraft,
 } from '../../lib/packs'
 import type { Coupon, PhotoPack, Sale } from '../../lib/types'
+import { formatDate } from '../../lib/format'
 
 const tabs = [
   { id: 'info', label: 'Información' },
@@ -234,6 +235,8 @@ export function AdminEventDetailPage() {
               updateEvent(event.id, { packs, basePrice: unitPriceFromPacks(packs) })
             }
           />
+
+          <ShareEventBlock eventId={event.id} eventTitle={event.title} />
         </section>
       )}
 
@@ -390,7 +393,7 @@ export function AdminEventDetailPage() {
               {
                 key: 'date',
                 header: 'Fecha',
-                render: (s) => new Date(s.createdAt).toLocaleDateString(),
+                render: (s) => formatDate(s.createdAt),
               },
             ]}
           />
@@ -446,6 +449,98 @@ function EventPacksSection({ packs, basePrice, onSave }: EventPacksSectionProps)
           <Icon name="save" />
           Guardar packs
         </Button>
+      </div>
+    </div>
+  )
+}
+
+/**
+ * Bloque 'Compartir evento' (business-rules.md:41): muestra la URL pública
+ * y un QR generado por servicio externo (api.qrserver.com) como mock.
+ * En producción se reemplaza por una librería local o un endpoint propio.
+ */
+function ShareEventBlock({
+  eventId,
+  eventTitle,
+}: {
+  eventId: string
+  eventTitle: string
+}) {
+  const publicUrl =
+    typeof window !== 'undefined'
+      ? `${window.location.origin}/eventos/${eventId}`
+      : `/eventos/${eventId}`
+  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(publicUrl)}`
+  const [copied, setCopied] = useState(false)
+
+  function copy() {
+    navigator.clipboard.writeText(publicUrl).then(() => {
+      setCopied(true)
+      window.setTimeout(() => setCopied(false), 2000)
+    })
+  }
+
+  function shareNative() {
+    if (navigator.share) {
+      navigator
+        .share({ title: eventTitle, url: publicUrl })
+        .catch(() => {})
+    } else {
+      copy()
+    }
+  }
+
+  return (
+    <div className="pt-6 border-t border-surface-variant">
+      <h3 className="font-headline-md text-headline-md text-on-surface uppercase mb-2">
+        Compartir el evento
+      </h3>
+      <p className="font-body-md text-body-md text-on-surface-variant mb-4">
+        Comparte la URL con los participantes o imprime el QR para colocarlo
+        en la zona del evento.
+      </p>
+      <div className="flex flex-col md:flex-row gap-4 items-start">
+        <img
+          src={qrUrl}
+          alt={`Código QR de ${eventTitle}`}
+          width={160}
+          height={160}
+          className="border border-surface-variant bg-white p-2 shrink-0"
+        />
+        <div className="flex-1 flex flex-col gap-2 min-w-0">
+          <div className="flex items-center gap-2">
+            <input
+              type="text"
+              readOnly
+              value={publicUrl}
+              className="shots-input flex-1 min-w-0"
+              onClick={(e) => e.currentTarget.select()}
+            />
+            <button
+              type="button"
+              onClick={copy}
+              className="shots-btn-primary px-3 py-2 text-xs shrink-0"
+            >
+              <Icon name={copied ? 'check' : 'content_copy'} />
+              {copied ? 'Copiado' : 'Copiar'}
+            </button>
+          </div>
+          <button
+            type="button"
+            onClick={shareNative}
+            className="inline-flex items-center justify-center gap-2 border border-surface-variant text-on-surface font-label-bold text-label-bold uppercase tracking-widest px-3 py-2 text-xs hover:border-primary hover:text-primary transition-colors w-fit"
+          >
+            <Icon name="share" />
+            Compartir
+          </button>
+          <a
+            href={qrUrl}
+            download={`qr-${eventId}.png`}
+            className="text-primary hover:underline font-caption text-caption uppercase tracking-widest text-xs"
+          >
+            Descargar QR
+          </a>
+        </div>
       </div>
     </div>
   )

@@ -24,6 +24,10 @@ function shortName(name: string, max = 28) {
   return name.length <= max ? name : `${name.slice(0, max - 3)}…`
 }
 
+function fingerprintFor(file: File): string {
+  return `${file.name}::${file.size}::${file.lastModified}`
+}
+
 export function PhotographerPhotosPage() {
   const { photos, events, photographerId } = usePhotographer()
   const admin = useAdmin()
@@ -31,6 +35,13 @@ export function PhotographerPhotosPage() {
   const [selectedEvent, setSelectedEvent] = useState('')
   const [jobs, setJobs] = useState<UploadJob[]>([])
   const [dragging, setDragging] = useState(false)
+  const [pendingJobs, setPendingJobs] = useState<UploadJob[] | null>(null)
+  const [summary, setSummary] = useState<{
+    total: number
+    ok: number
+    failed: string[]
+  } | null>(null)
+  const uploadedFingerprintsRef = useRef<Map<string, Set<string>>>(new Map())
 
   useEffect(() => {
     return () => {
@@ -38,6 +49,21 @@ export function PhotographerPhotosPage() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  // Aviso "no salgas de la página durante la subida" mientras hay trabajos
+  // pendientes en cola/proceso (business-rules.md:93-95).
+  const hasActiveUploads = jobs.some(
+    (j) => j.state === 'queued' || j.state === 'uploading' || j.state === 'processing',
+  )
+  useEffect(() => {
+    if (!hasActiveUploads) return
+    function onBeforeUnload(e: BeforeUnloadEvent) {
+      e.preventDefault()
+      e.returnValue = ''
+    }
+    window.addEventListener('beforeunload', onBeforeUnload)
+    return () => window.removeEventListener('beforeunload', onBeforeUnload)
+  }, [hasActiveUploads])
 
   function patchJob(id: string, patch: Partial<UploadJob>) {
     setJobs((prev) => prev.map((j) => (j.id === id ? { ...j, ...patch } : j)))
@@ -67,6 +93,10 @@ export function PhotographerPhotosPage() {
     const arr = Array.from(files)
     const accepted: UploadJob[] = []
     const warnings: string[] = []
+    const seenInBatch = new Set<string>()
+    const eventFingerprints =
+      uploadedFingerprintsRef.current.get(selectedEvent) ?? new Set<string>()
+
     for (const file of arr) {
       if (accepted.length >= MAX_BATCH) {
         warnings.push(`Solo procesamos las primeras ${MAX_BATCH} fotos.`)
@@ -82,6 +112,15 @@ export function PhotographerPhotosPage() {
         warnings.push(`${file.name} supera ${MAX_FILE_MB} MB.`)
         continue
       }
+      const fp = fingerprintFor(file)
+      if (eventFingerprints.has(fp)) {
+        warnings.push(`${file.name} ya fue subida a este evento.`)
+        continue
+      }
+      if (seenInBatch.has(fp)) {
+        warnings.push(`${file.name} aparece dos veces en esta selección.`)
+        continue
+      }
       try {
         const { width, height } = await measureImage(file)
         if (Math.max(width, height) < MIN_LONG_SIDE_PX) {
@@ -94,6 +133,7 @@ export function PhotographerPhotosPage() {
         warnings.push(`${file.name} no pudo abrirse.`)
         continue
       }
+      seenInBatch.add(fp)
       accepted.push({
         id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
         file,
@@ -116,13 +156,29 @@ export function PhotographerPhotosPage() {
     }
     const newJobs = await buildJobsFromFiles(files)
     if (newJobs.length === 0) return
-    setJobs(newJobs)
-    void runQueue(newJobs)
+    setSummary(null)
+    setPendingJobs(newJobs)
+  }
+
+  function confirmPendingJobs() {
+    if (!pendingJobs) return
+    const jobsToRun = pendingJobs
+    setPendingJobs(null)
+    setJobs(jobsToRun)
+    void runQueue(jobsToRun)
+  }
+
+  function cancelPendingJobs() {
+    pendingJobs?.forEach((j) => URL.revokeObjectURL(j.previewUrl))
+    setPendingJobs(null)
   }
 
   async function runQueue(initialJobs: UploadJob[]) {
     const event = selectedEventObj()
     if (!event) return
+
+    const failed: string[] = []
+    let ok = 0
 
     for (const job of initialJobs) {
       patchJob(job.id, { state: 'uploading', progress: 0 })
@@ -143,6 +199,7 @@ export function PhotographerPhotosPage() {
           state: 'error',
           error: 'No pudimos procesar la foto. Reintenta más tarde.',
         })
+        failed.push(job.file.name)
         continue
       }
 
@@ -157,8 +214,16 @@ export function PhotographerPhotosPage() {
         },
       ])
 
+      const fpSet =
+        uploadedFingerprintsRef.current.get(event.id) ?? new Set<string>()
+      fpSet.add(fingerprintFor(job.file))
+      uploadedFingerprintsRef.current.set(event.id, fpSet)
+
       patchJob(job.id, { state: 'done' })
+      ok++
     }
+
+    setSummary({ total: initialJobs.length, ok, failed })
   }
 
   function handleDrop(e: React.DragEvent<HTMLDivElement>) {
@@ -201,6 +266,84 @@ export function PhotographerPhotosPage() {
           descarga o borrado.
         </p>
       </div>
+
+      {hasActiveUploads && (
+        <div className="sticky top-16 lg:top-0 z-30 -mx-4 lg:mx-0 px-4 py-3 bg-primary-container text-on-primary-container flex items-center gap-3 border-y border-primary">
+          <Icon name="warning" />
+          <p className="font-label-bold text-label-bold uppercase tracking-widest text-xs">
+            No cierres esta pestaña mientras subimos tus fotos.
+          </p>
+        </div>
+      )}
+
+      {summary && (
+        <div className="border border-surface-variant bg-surface-container-lowest p-4">
+          <p className="font-label-bold text-label-bold text-on-surface uppercase tracking-widest">
+            Subida terminada · {summary.ok} de {summary.total} listas
+          </p>
+          {summary.failed.length > 0 ? (
+            <p className="font-body-md text-body-md text-on-surface-variant mt-1">
+              Fallaron {summary.failed.length}:{' '}
+              {summary.failed.slice(0, 3).join(', ')}
+              {summary.failed.length > 3 && '…'}
+            </p>
+          ) : (
+            <p className="font-body-md text-body-md text-primary mt-1">
+              Todas se procesaron correctamente.
+            </p>
+          )}
+        </div>
+      )}
+
+      {pendingJobs && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 animate-fade-in"
+        >
+          <div className="w-full max-w-lg bg-surface-container-lowest border border-surface-variant p-6 flex flex-col gap-4">
+            <div>
+              <h2 className="font-headline-md text-headline-md text-on-surface uppercase">
+                Revisa antes de subir
+              </h2>
+              <p className="font-body-md text-body-md text-on-surface-variant mt-1">
+                {pendingJobs.length}{' '}
+                {pendingJobs.length === 1 ? 'foto' : 'fotos'} para el evento.
+                Una vez subidas no podrás modificarlas ni borrarlas; contacta
+                con Admin si necesitas corregir algo.
+              </p>
+            </div>
+            <div className="grid grid-cols-3 sm:grid-cols-4 gap-2 max-h-64 overflow-y-auto">
+              {pendingJobs.map((j) => (
+                <img
+                  key={j.id}
+                  src={j.previewUrl}
+                  alt=""
+                  className="w-full h-20 object-cover border border-surface-variant"
+                />
+              ))}
+            </div>
+            <div className="flex flex-col sm:flex-row gap-3 pt-2">
+              <button
+                type="button"
+                onClick={cancelPendingJobs}
+                className="flex-1 border border-surface-variant text-on-surface font-label-bold text-label-bold uppercase tracking-widest py-3 hover:border-primary hover:text-primary transition-colors"
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                onClick={confirmPendingJobs}
+                className="flex-1 shots-btn-primary py-3 justify-center"
+              >
+                <Icon name="cloud_upload" />
+                Subir {pendingJobs.length}{' '}
+                {pendingJobs.length === 1 ? 'foto' : 'fotos'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <section className="bg-surface border border-surface-variant p-4 flex flex-col gap-4">
         <Select

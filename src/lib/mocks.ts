@@ -10,6 +10,7 @@ import type {
   Purchase,
   AuthUser,
 } from './types'
+import { PAYPHONE_FEE_RATIO } from './types'
 import { img } from './images'
 import { defaultPacks } from './packs'
 
@@ -304,8 +305,10 @@ export function generateMockSales(): Sale[] {
       const amount = photo.price
       const discount = Math.random() > 0.7 ? amount * 0.15 : 0
       const final = amount - discount
-      const photographerEarnings = final * (photographer.commissionRate / 100)
-      const platformEarnings = final - photographerEarnings
+      const payphoneFee = +(final * PAYPHONE_FEE_RATIO).toFixed(2)
+      const netAmount = +(final - payphoneFee).toFixed(2)
+      const photographerEarnings = netAmount * (photographer.commissionRate / 100)
+      const platformEarnings = netAmount - photographerEarnings
       const date = new Date(event.date)
       date.setDate(date.getDate() - Math.floor(Math.random() * 30))
       sales.push({
@@ -317,6 +320,8 @@ export function generateMockSales(): Sale[] {
         amount,
         discountAmount: discount,
         finalAmount: final,
+        payphoneFee,
+        netAmount,
         photographerEarnings,
         platformEarnings,
         createdAt: date.toISOString(),

@@ -10,7 +10,15 @@ export interface EventItem {
   retentionUntil?: string
   location: string
   type: string
+  /** Imagen principal (legacy / fallback). Hoy banner y cover se pueden
+   *  mostrar separados; este campo se mantiene como fallback. */
   image: string
+  /** Banner amplio para la cabecera del evento. */
+  bannerImage?: string
+  /** Foto de portada cuadrada para listados/cards. */
+  coverPhoto?: string
+  /** Descripción larga editable por el admin. */
+  description?: string
   photoCount: number
   runnerCount?: number
   isNew?: boolean
@@ -269,11 +277,18 @@ export interface Sale {
   amount: number
   discountAmount: number
   finalAmount: number
+  /** Comisión cobrada por Payphone (5.75% por defecto). */
+  payphoneFee?: number
+  /** Neto después de Payphone (finalAmount − payphoneFee). */
+  netAmount?: number
   photographerEarnings: number
   platformEarnings: number
   createdAt: string
   couponCode?: string
 }
+
+/** Comisión Payphone (decisions.md / payments.md). */
+export const PAYPHONE_FEE_RATIO = 0.0575
 
 export interface AnalyticsData {
   date: string

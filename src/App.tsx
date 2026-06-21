@@ -19,6 +19,7 @@ import { ForgotPasswordPage } from './pages/ForgotPasswordPage'
 import { ResetPasswordPage } from './pages/ResetPasswordPage'
 import { VerifyEmailPage } from './pages/VerifyEmailPage'
 import { SetPasswordPage } from './pages/SetPasswordPage'
+import { UnsubscribePage } from './pages/UnsubscribePage'
 import { TermsPage } from './pages/legal/TermsPage'
 import { PrivacyPage } from './pages/legal/PrivacyPage'
 import { CookiesPage } from './pages/legal/CookiesPage'
@@ -136,6 +137,7 @@ export default function App() {
               </PublicLayout>
             }
           />
+          <Route path="/cancelar-suscripcion" element={<UnsubscribePage />} />
           <Route path="/set-password" element={<SetPasswordPage />} />
           <Route
             path="/carrito"

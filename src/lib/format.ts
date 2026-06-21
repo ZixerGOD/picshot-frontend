@@ -11,3 +11,20 @@ export function formatPrice(amount: number): string {
 
 /** Símbolo de la moneda activa, para casos donde no se formatea un número completo. */
 export const CURRENCY_SYMBOL = '$'
+
+/**
+ * Fecha corta en formato ecuatoriano (DD/MM/AAAA) en timezone
+ * America/Guayaquil. decisions.md 170-172 fija ese huso horario.
+ */
+export function formatDate(iso: string): string {
+  return new Date(iso).toLocaleDateString('es-EC', {
+    timeZone: 'America/Guayaquil',
+  })
+}
+
+/** Fecha + hora en formato ecuatoriano (timezone America/Guayaquil). */
+export function formatDateTime(iso: string): string {
+  return new Date(iso).toLocaleString('es-EC', {
+    timeZone: 'America/Guayaquil',
+  })
+}
