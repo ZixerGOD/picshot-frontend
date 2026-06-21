@@ -20,7 +20,12 @@ export function Navbar() {
   const navigate = useNavigate()
 
   const navItems = isAuthenticated
-    ? [...baseNavItems.slice(0, 2), { to: '/mis-compras', label: 'Mis Compras' }, ...baseNavItems.slice(2)]
+    ? [
+        ...baseNavItems.slice(0, 2),
+        { to: '/mis-compras', label: 'Mis Compras' },
+        { to: '/mi-cuenta', label: 'Mi Cuenta' },
+        ...baseNavItems.slice(2),
+      ]
     : baseNavItems
 
   function handleLogout() {

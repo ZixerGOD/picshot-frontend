@@ -161,6 +161,9 @@ export interface AuthUser {
   role: UserRole
   photographerId?: string // presente cuando role === 'photographer'
   avatarUrl?: string
+  marketingOptIn?: boolean
+  /** Fecha en la que el usuario aceptó los términos y condiciones. */
+  termsAcceptedAt?: string
 }
 
 export interface LoginCredentials {

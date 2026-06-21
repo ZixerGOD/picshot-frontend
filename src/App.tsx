@@ -7,6 +7,7 @@ import { ContactPage } from './pages/ContactPage'
 import { WorkWithUsPage } from './pages/WorkWithUsPage'
 import { MyPurchasesPage } from './pages/MyPurchasesPage'
 import { PurchaseDetailPage } from './pages/PurchaseDetailPage'
+import { AccountPage } from './pages/AccountPage'
 import { LoginPage } from './pages/LoginPage'
 import { CartPage } from './pages/CartPage'
 import { CheckoutPage } from './pages/CheckoutPage'
@@ -177,6 +178,16 @@ export default function App() {
               <RequireAuth>
                 <PublicLayout>
                   <CheckoutResultPage variant="pending" />
+                </PublicLayout>
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/mi-cuenta"
+            element={
+              <RequireAuth>
+                <PublicLayout>
+                  <AccountPage />
                 </PublicLayout>
               </RequireAuth>
             }

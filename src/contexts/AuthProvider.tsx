@@ -41,6 +41,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
         setUser(null)
       },
+      updateUser: (patch: Partial<AuthUser>) => {
+        setUser((prev) => {
+          if (!prev) return prev
+          const next = { ...prev, ...patch }
+          try {
+            localStorage.setItem(USER_KEY, JSON.stringify(next))
+          } catch {
+            // ignore
+          }
+          return next
+        })
+      },
     }),
     [user],
   )
