@@ -1,6 +1,7 @@
 import { Routes, Route } from 'react-router-dom'
 import { Navbar } from './components/layout/Navbar'
 import { CookieBanner } from './components/layout/CookieBanner'
+import { ScrollToTop } from './components/layout/ScrollToTop'
 import { HomePage } from './pages/HomePage'
 import { EventsPage } from './pages/EventsPage'
 import { EventGalleryPage } from './pages/EventGalleryPage'
@@ -54,6 +55,7 @@ function PublicLayout({ children }: { children: React.ReactNode }) {
 export default function App() {
   return (
     <div className="min-h-screen flex flex-col bg-background text-on-background">
+     <ScrollToTop />
      <CartProvider>
       <AdminProvider>
         <Routes>

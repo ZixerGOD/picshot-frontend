@@ -8,7 +8,7 @@ interface FooterProps {
 export function Footer({ variant = 'simple' }: FooterProps) {
   const detailed = variant === 'detailed'
   const year = new Date().getFullYear()
-  const copyright = `© ${year} Picshot · Fotografía deportiva profesional. Todos los derechos reservados.`
+  const copyright = `© ${year} Picshot. Todos los derechos reservados.`
 
   return (
     <footer className="bg-surface-container-lowest border-t border-surface-variant w-full py-16">
@@ -16,15 +16,8 @@ export function Footer({ variant = 'simple' }: FooterProps) {
         <div className="flex flex-col gap-4">
           <Logo className="h-7" />
           <p className="font-body-md text-body-md text-on-surface-variant max-w-sm">
-            {detailed
-              ? 'Capturando el momento exacto. Plataforma de fotografía deportiva profesional en Ecuador.'
-              : copyright}
+            {copyright}
           </p>
-          {detailed && (
-            <p className="font-caption text-caption text-tertiary-container mt-4">
-              {copyright}
-            </p>
-          )}
         </div>
 
         {detailed ? (
