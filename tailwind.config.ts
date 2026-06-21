@@ -75,15 +75,20 @@ export default {
         'body-lg': ['18px', { lineHeight: '1.6', fontWeight: '400' }],
       },
       animation: {
-        scan: 'scan 3s ease-in-out infinite',
+        scan: 'scan 2.4s ease-in-out infinite',
         'spin-slow': 'spin 2s linear infinite',
+        'fade-in': 'fadeIn 200ms ease-out',
       },
       keyframes: {
         scan: {
-          '0%': { transform: 'translateY(0)', opacity: '0' },
+          '0%': { top: '0%', opacity: '0' },
           '10%': { opacity: '1' },
           '90%': { opacity: '1' },
-          '100%': { transform: 'translateY(150px)', opacity: '0' },
+          '100%': { top: '100%', opacity: '0' },
+        },
+        fadeIn: {
+          '0%': { opacity: '0', transform: 'translateY(4px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
         },
       },
     },

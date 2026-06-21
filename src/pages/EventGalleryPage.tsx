@@ -3,16 +3,17 @@ import { useParams, useSearchParams } from 'react-router-dom'
 import type { EventItem, Photo, PhotoFilter } from '../lib/types'
 import { getEventById, getEventPhotos, searchPhotosByFace } from '../lib/api'
 import { PhotoCard } from '../components/events/PhotoCard'
+import { SelfieSearchModal } from '../components/events/SelfieSearchModal'
 import { Icon } from '../components/ui/Icon'
 import { Footer } from '../components/layout/Footer'
 import { formatPrice } from '../lib/format'
 import { packLabel, pricePerPhoto } from '../lib/packs'
 
-const filters: { value: PhotoFilter; label: string }[] = [
-  { value: 'all', label: 'Todas las fotos' },
-  { value: 'face', label: 'Coincidencias faciales' },
-  { value: 'bib', label: 'Por dorsal' },
-  { value: 'favorites', label: 'Favoritas' },
+const filters: { value: PhotoFilter; label: string; icon: string }[] = [
+  { value: 'all', label: 'Todas', icon: 'photo_library' },
+  { value: 'face', label: 'Mis coincidencias', icon: 'face' },
+  { value: 'bib', label: 'Por dorsal', icon: 'pin' },
+  { value: 'favorites', label: 'Favoritas', icon: 'favorite' },
 ]
 
 export function EventGalleryPage() {
@@ -23,14 +24,37 @@ export function EventGalleryPage() {
   const [photos, setPhotos] = useState<Photo[]>([])
   const [loading, setLoading] = useState(false)
 
-  const [activeTab, setActiveTab] = useState<'dorsal' | 'face'>(
-    searchParams.get('tab') === 'face' ? 'face' : 'dorsal'
+  const [activeTab, setActiveTab] = useState<'face' | 'dorsal'>(
+    searchParams.get('tab') === 'dorsal' ? 'dorsal' : 'face'
   )
   const [bib, setBib] = useState('')
-  const [scanning, setScanning] = useState(false)
   const [activeFilter, setActiveFilter] = useState<PhotoFilter>('all')
 
-  const fileRef = useRef<HTMLInputElement>(null)
+  const [selfieModalOpen, setSelfieModalOpen] = useState(false)
+  const [pendingSelfie, setPendingSelfie] = useState<File | null>(null)
+  const selfieFileRef = useRef<HTMLInputElement>(null)
+
+  function openSelfieCamera() {
+    setPendingSelfie(null)
+    setSelfieModalOpen(true)
+  }
+
+  function openSelfieUpload() {
+    selfieFileRef.current?.click()
+  }
+
+  function handleSelfieFile(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    e.target.value = ''
+    if (!file) return
+    setPendingSelfie(file)
+    setSelfieModalOpen(true)
+  }
+
+  function closeSelfieModal() {
+    setSelfieModalOpen(false)
+    setPendingSelfie(null)
+  }
 
   useEffect(() => {
     getEventById(eventId).then(setEvent)
@@ -61,21 +85,11 @@ export function EventGalleryPage() {
     loadPhotos({ bib, filter: activeFilter })
   }
 
-  async function handleFaceUpload(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0]
-    if (!file || !eventId) return
-    setScanning(true)
-    try {
-      const data = await searchPhotosByFace(eventId, file)
-      setPhotos(data)
-      setActiveFilter('face')
-    } finally {
-      setScanning(false)
-    }
-  }
-
-  function triggerFile() {
-    fileRef.current?.click()
+  async function handleSelfieSearch(selfie: Blob) {
+    if (!eventId) return
+    const data = await searchPhotosByFace(eventId, selfie)
+    setPhotos(data)
+    setActiveFilter('face')
   }
 
   if (!event) {
@@ -138,34 +152,68 @@ export function EventGalleryPage() {
                 <button
                   type="button"
                   onClick={() => {
-                    setActiveTab('dorsal')
-                    setSearchParams({ tab: 'dorsal' })
-                  }}
-                  className={`pb-2 font-label-bold text-label-bold uppercase tracking-widest transition-colors ${
-                    activeTab === 'dorsal'
-                      ? 'border-b-2 border-primary text-primary'
-                      : 'text-on-surface-variant hover:text-on-surface'
-                  }`}
-                >
-                  Número de Dorsal
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
                     setActiveTab('face')
                     setSearchParams({ tab: 'face' })
                   }}
-                  className={`pb-2 font-label-bold text-label-bold uppercase tracking-widest transition-colors ${
+                  className={`pb-2 inline-flex items-center gap-2 font-label-bold text-label-bold uppercase tracking-widest transition-colors ${
                     activeTab === 'face'
                       ? 'border-b-2 border-primary text-primary'
                       : 'text-on-surface-variant hover:text-on-surface'
                   }`}
                 >
+                  <Icon name="face" fill={activeTab === 'face'} />
                   Reconocimiento Facial
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setActiveTab('dorsal')
+                    setSearchParams({ tab: 'dorsal' })
+                  }}
+                  className={`pb-2 inline-flex items-center gap-2 font-label-bold text-label-bold uppercase tracking-widest transition-colors ${
+                    activeTab === 'dorsal'
+                      ? 'border-b-2 border-primary text-primary'
+                      : 'text-on-surface-variant hover:text-on-surface'
+                  }`}
+                >
+                  <Icon name="pin" fill={activeTab === 'dorsal'} />
+                  Número de Dorsal
                 </button>
               </div>
 
-              {activeTab === 'dorsal' ? (
+              {activeTab === 'face' ? (
+                <div>
+                  <label className="block font-caption text-caption text-on-surface-variant mb-2">
+                    Capturamos tu selfie y buscamos tus fotos del evento.
+                  </label>
+                  <div className="flex flex-col sm:flex-row gap-3">
+                    <button
+                      type="button"
+                      onClick={openSelfieCamera}
+                      className="shots-btn-primary px-6 py-4 sm:flex-1 justify-center"
+                    >
+                      <Icon name="photo_camera" />
+                      Tomar selfie
+                    </button>
+                    <button
+                      type="button"
+                      onClick={openSelfieUpload}
+                      className="inline-flex items-center justify-center gap-2 border border-surface-variant text-on-surface font-label-bold text-label-bold uppercase tracking-widest px-6 py-4 sm:flex-1 hover:border-primary hover:text-primary transition-colors"
+                    >
+                      <Icon name="upload" />
+                      Subir selfie
+                    </button>
+                  </div>
+                  <input
+                    ref={selfieFileRef}
+                    type="file"
+                    accept="image/*"
+                    capture="user"
+                    className="hidden"
+                    onChange={handleSelfieFile}
+                  />
+                </div>
+              ) : (
                 <div>
                   <label className="block font-caption text-caption text-on-surface-variant mb-2">
                     Ingresa tu número de competidor
@@ -188,70 +236,34 @@ export function EventGalleryPage() {
                     </button>
                   </div>
                 </div>
-              ) : (
-                <div>
-                  <label className="block font-caption text-caption text-on-surface-variant mb-2">
-                    Tecnología de escaneo de alta precisión
-                  </label>
-                  <div
-                    onClick={triggerFile}
-                    className={`relative bg-surface-container-lowest border border-surface-variant h-32 flex flex-col items-center justify-center cursor-pointer hover:border-primary-container transition-colors group overflow-hidden ${
-                      scanning ? 'scanning' : ''
-                    }`}
-                  >
-                    <Icon
-                      name="photo_camera"
-                      className="text-4xl text-surface-container-highest group-hover:text-primary transition-colors mb-2"
-                    />
-                    <span className="font-label-bold text-label-bold text-on-surface uppercase tracking-wider">
-                      Subir Selfie
-                    </span>
-                    <input
-                      ref={fileRef}
-                      type="file"
-                      accept="image/*"
-                      className="hidden"
-                      onChange={handleFaceUpload}
-                    />
-                    {scanning && (
-                      <>
-                        <div className="shots-laser-line animate-scan" />
-                        <div className="absolute inset-0 bg-background/80 backdrop-blur-[4px] flex flex-col items-center justify-center">
-                          <Icon
-                            name="autorenew"
-                            className="text-primary text-4xl animate-spin-slow mb-2"
-                          />
-                          <span className="font-label-bold text-label-bold text-primary uppercase tracking-widest">
-                            Analizando rostro...
-                          </span>
-                        </div>
-                      </>
-                    )}
-                  </div>
-                </div>
               )}
             </div>
 
             <div className="w-full md:w-64 pt-6 md:pt-0">
               <h3 className="font-label-bold text-label-bold text-on-surface-variant uppercase tracking-widest mb-4">
-                Filtros Activos
+                Filtros
               </h3>
-              <div className="space-y-2">
-                {filters.map((f) => (
-                  <label key={f.value} className="flex items-center gap-3 cursor-pointer group">
-                    <input
-                      type="radio"
-                      name="filter"
-                      value={f.value}
-                      checked={activeFilter === f.value}
-                      onChange={() => setActiveFilter(f.value)}
-                      className="text-primary bg-surface-container-lowest border-surface-variant focus:ring-primary"
-                    />
-                    <span className="text-on-surface group-hover:text-primary transition-colors">
-                      {f.label}
-                    </span>
-                  </label>
-                ))}
+              <div className="flex flex-col gap-2">
+                {filters.map((f) => {
+                  const active = activeFilter === f.value
+                  return (
+                    <button
+                      key={f.value}
+                      type="button"
+                      onClick={() => setActiveFilter(f.value)}
+                      className={`flex items-center gap-3 px-4 py-3 border text-left transition-colors ${
+                        active
+                          ? 'border-primary bg-primary-container/15 text-primary'
+                          : 'border-surface-variant text-on-surface-variant hover:border-primary/40 hover:text-on-surface'
+                      }`}
+                    >
+                      <Icon name={f.icon} fill={active} className="text-xl" />
+                      <span className="font-label-bold text-label-bold uppercase tracking-widest text-[12px]">
+                        {f.label}
+                      </span>
+                    </button>
+                  )
+                })}
               </div>
             </div>
           </div>
@@ -343,6 +355,13 @@ export function EventGalleryPage() {
       </main>
 
       <Footer variant="simple" />
+
+      <SelfieSearchModal
+        open={selfieModalOpen}
+        onClose={closeSelfieModal}
+        onSearch={handleSelfieSearch}
+        initialFile={pendingSelfie}
+      />
     </>
   )
 }

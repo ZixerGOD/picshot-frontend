@@ -121,13 +121,16 @@ export async function getEventPhotos(
   return fetchJson<Photo[]>(`/events/${eventId}/photos?${query.toString()}`)
 }
 
-export async function searchPhotosByFace(eventId: string, file: File): Promise<Photo[]> {
+export async function searchPhotosByFace(
+  eventId: string,
+  selfie: File | Blob,
+): Promise<Photo[]> {
   if (USE_MOCKS) {
     await sleep(2000)
     return getMockPhotosByEvent(eventId).filter((_, i) => i % 2 === 0)
   }
   const formData = new FormData()
-  formData.append('selfie', file)
+  formData.append('selfie', selfie, 'selfie.jpg')
   const res = await fetch(`${API_URL}/events/${eventId}/face-search`, {
     method: 'POST',
     headers: authHeaders(),
