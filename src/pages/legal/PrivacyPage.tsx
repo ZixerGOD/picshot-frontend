@@ -7,9 +7,9 @@ export function PrivacyPage() {
         Qué datos recolectamos
       </h2>
       <p>
-        Recolectamos nombre, correo, contraseña cifrada, datos del pago y, si lo
-        autorizas, una representación matemática (embedding) de tu rostro para
-        buscar tus fotos.
+        Guardamos tu nombre, correo, tu contraseña cifrada, los datos del pago
+        y, si lo autorizas, lo necesario para reconocer tu rostro en las fotos
+        del evento.
       </p>
 
       <h2 className="font-headline-md text-headline-md text-on-surface">

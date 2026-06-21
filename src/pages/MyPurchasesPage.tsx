@@ -164,7 +164,7 @@ export function MyPurchasesPage() {
                       to={`/eventos/${group.eventId}`}
                       className="shots-btn-outline px-4 py-2"
                     >
-                      Ver evento
+                      Buscar más fotos de este evento
                     </Link>
                   </div>
                 </div>

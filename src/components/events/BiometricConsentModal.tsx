@@ -88,19 +88,18 @@ export function BiometricConsentModal({
               id="biometric-consent-title"
               className="font-headline-md text-headline-md text-on-surface uppercase"
             >
-              Consentimiento biométrico
+              Permítenos reconocerte
             </h2>
             <p className="font-body-md text-body-md text-on-surface-variant mt-2">
-              Antes de buscar tu cara, necesitamos tu autorización para procesar
-              datos biométricos.
+              Antes de buscar tus fotos por tu rostro, necesitamos tu permiso.
             </p>
           </div>
         </div>
 
         <ul className="font-body-md text-body-md text-on-surface space-y-2 list-disc pl-6">
-          <li>Tu selfie se usa solo para generar una representación matemática (embedding).</li>
-          <li>No guardamos la foto original.</li>
-          <li>Puedes eliminar tu embedding cuando quieras desde Mi cuenta.</li>
+          <li>Usaremos tu selfie solo para encontrar tus fotos del evento.</li>
+          <li>No guardamos la imagen original que tomes.</li>
+          <li>Puedes retirar tu permiso cuando quieras desde Mi cuenta.</li>
         </ul>
 
         <label className="flex items-start gap-2 font-body-md text-body-md text-on-surface cursor-pointer">
@@ -118,9 +117,9 @@ export function BiometricConsentModal({
               rel="noreferrer"
               className="text-primary hover:underline"
             >
-              política biométrica
+              política de reconocimiento facial
             </Link>{' '}
-            y autorizo el procesamiento de mi rostro para buscar mis fotos.
+            y autorizo a Picshot a usar mi rostro para encontrar mis fotos.
           </span>
         </label>
 

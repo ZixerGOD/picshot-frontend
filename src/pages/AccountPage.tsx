@@ -177,17 +177,16 @@ export function AccountPage() {
 
         <section className="bg-surface-container-lowest border border-surface-variant p-6">
           <h2 className="font-headline-md text-headline-md text-on-surface uppercase mb-4">
-            Datos biométricos
+            Reconocimiento facial
           </h2>
           {consent ? (
             <>
               <p className="font-body-md text-body-md text-on-surface">
-                Tu consentimiento biométrico está activo. Guardamos una
-                representación matemática de tu rostro para buscar tus fotos.
+                Diste permiso para que usemos tu rostro al buscar tus fotos.
               </p>
               <p className="font-body-md text-body-md text-on-surface-variant mt-2">
-                Puedes eliminar tu embedding en cualquier momento. La eliminación
-                es inmediata y no afecta las fotos ya compradas.
+                Puedes retirar ese permiso cuando quieras. No afecta las fotos
+                que ya hayas comprado.
               </p>
               <button
                 type="button"
@@ -195,13 +194,13 @@ export function AccountPage() {
                 className="mt-4 inline-flex items-center gap-2 border border-primary-container/60 text-primary-container font-label-bold text-label-bold uppercase tracking-widest px-4 py-3 hover:text-primary hover:border-primary transition-colors"
               >
                 <Icon name="delete" />
-                Eliminar mi embedding
+                Retirar mi permiso
               </button>
             </>
           ) : (
             <p className="font-body-md text-body-md text-on-surface-variant">
-              No has autorizado el procesamiento biométrico. Lo puedes activar
-              al usar el reconocimiento facial dentro de un evento.
+              Aún no diste permiso para usar tu rostro al buscar fotos. Puedes
+              activarlo cuando entres a un evento.
             </p>
           )}
         </section>
