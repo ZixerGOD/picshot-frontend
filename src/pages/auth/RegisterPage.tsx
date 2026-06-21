@@ -1,9 +1,9 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { register } from '../lib/api'
-import { PASSWORD_HINT } from '../lib/types'
-import { AuthLayout } from '../components/auth/AuthLayout'
-import { Icon } from '../components/ui/Icon'
+import { register } from '../../lib/api'
+import { PASSWORD_HINT } from '../../lib/types'
+import { AuthLayout } from '../../components/auth/AuthLayout'
+import { Icon } from '../../components/ui/Icon'
 
 export function RegisterPage() {
   const navigate = useNavigate()

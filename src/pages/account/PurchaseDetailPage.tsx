@@ -1,16 +1,16 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import type { EventItem, Order, Purchase } from '../lib/types'
-import { getEvents, getMyPurchases } from '../lib/api'
-import { getOrder } from '../lib/checkout'
+import type { EventItem, Order, Purchase } from '../../lib/types'
+import { getEvents, getMyPurchases } from '../../lib/api'
+import { getOrder } from '../../lib/checkout'
 import {
   daysUntil,
   generateSignedDownload,
   retentionDateFrom,
-} from '../lib/downloads'
-import { Icon } from '../components/ui/Icon'
-import { Footer } from '../components/layout/Footer'
-import { formatPrice } from '../lib/format'
+} from '../../lib/downloads'
+import { Icon } from '../../components/ui/Icon'
+import { Footer } from '../../components/layout/Footer'
+import { formatPrice } from '../../lib/format'
 
 const STATUS_COPY: Record<string, { label: string; tone: string }> = {
   pending: { label: 'Pendiente', tone: 'text-on-surface-variant' },

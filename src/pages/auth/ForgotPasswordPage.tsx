@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { forgotPassword } from '../lib/api'
-import { AuthLayout } from '../components/auth/AuthLayout'
-import { Icon } from '../components/ui/Icon'
+import { forgotPassword } from '../../lib/api'
+import { AuthLayout } from '../../components/auth/AuthLayout'
+import { Icon } from '../../components/ui/Icon'
 
 export function ForgotPasswordPage() {
   const [email, setEmail] = useState('')

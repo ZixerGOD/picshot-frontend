@@ -1,18 +1,18 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { useCart } from '../hooks/useCart'
-import { useAuth } from '../hooks/useAuth'
+import { useCart } from '../../hooks/useCart'
+import { useAuth } from '../../hooks/useAuth'
 import {
   createOrder,
   getActivePendingOrderFor,
   simulatePayphone,
   CHECKOUT_TIMINGS,
-} from '../lib/checkout'
-import { getEvents, USE_MOCKS } from '../lib/api'
-import type { EventItem } from '../lib/types'
-import { Icon } from '../components/ui/Icon'
-import { Footer } from '../components/layout/Footer'
-import { formatPrice } from '../lib/format'
+} from '../../lib/checkout'
+import { getEvents, USE_MOCKS } from '../../lib/api'
+import type { EventItem } from '../../lib/types'
+import { Icon } from '../../components/ui/Icon'
+import { Footer } from '../../components/layout/Footer'
+import { formatPrice } from '../../lib/format'
 
 type CheckoutStep = 'review' | 'redirecting'
 type Outcome = 'success' | 'cancel' | 'pending'

@@ -1,12 +1,12 @@
 import { useState } from 'react'
-import { Input } from '../components/ui/Input'
-import { Select } from '../components/ui/Select'
-import { Textarea } from '../components/ui/Textarea'
-import { Button } from '../components/ui/Button'
-import { Icon } from '../components/ui/Icon'
-import { Footer } from '../components/layout/Footer'
-import { submitContactRequest } from '../lib/api'
-import type { ContactRequest } from '../lib/types'
+import { Input } from '../../components/ui/Input'
+import { Select } from '../../components/ui/Select'
+import { Textarea } from '../../components/ui/Textarea'
+import { Button } from '../../components/ui/Button'
+import { Icon } from '../../components/ui/Icon'
+import { Footer } from '../../components/layout/Footer'
+import { submitContactRequest } from '../../lib/api'
+import type { ContactRequest } from '../../lib/types'
 
 const eventTypes = [
   { value: '', label: 'Selecciona una opción' },

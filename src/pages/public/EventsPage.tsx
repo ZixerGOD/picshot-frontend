@@ -1,12 +1,12 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { getEvents } from '../lib/api'
-import type { EventItem } from '../lib/types'
-import { EventCard } from '../components/events/EventCard'
-import { Input } from '../components/ui/Input'
-import { Select } from '../components/ui/Select'
-import { Footer } from '../components/layout/Footer'
-import { Icon } from '../components/ui/Icon'
+import { getEvents } from '../../lib/api'
+import type { EventItem } from '../../lib/types'
+import { EventCard } from '../../components/events/EventCard'
+import { Input } from '../../components/ui/Input'
+import { Select } from '../../components/ui/Select'
+import { Footer } from '../../components/layout/Footer'
+import { Icon } from '../../components/ui/Icon'
 
 const cities = [
   { value: '', label: 'Todas las ciudades' },

@@ -1,30 +1,30 @@
 import { useEffect, useRef, useState } from 'react'
 import { useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom'
-import type { EventItem, Photo, PhotoFilter } from '../lib/types'
-import { getEventById, getEventPhotos, searchPhotosByFace } from '../lib/api'
-import { PhotoCard } from '../components/events/PhotoCard'
-import { SelfieSearchModal } from '../components/events/SelfieSearchModal'
+import type { EventItem, Photo, PhotoFilter } from '../../lib/types'
+import { getEventById, getEventPhotos, searchPhotosByFace } from '../../lib/api'
+import { PhotoCard } from '../../components/events/PhotoCard'
+import { SelfieSearchModal } from '../../components/events/SelfieSearchModal'
 import {
   BiometricConsentModal,
   hasBiometricConsent,
-} from '../components/events/BiometricConsentModal'
-import { CartToast } from '../components/events/CartToast'
+} from '../../components/events/BiometricConsentModal'
+import { CartToast } from '../../components/events/CartToast'
 import {
   EventAIDisclaimerModal,
   hasEventAIConsent,
   recordEventAIConsent,
-} from '../components/events/EventAIDisclaimerModal'
-import { useCart } from '../hooks/useCart'
-import { useAuth } from '../hooks/useAuth'
-import { Icon } from '../components/ui/Icon'
-import { Footer } from '../components/layout/Footer'
-import { formatPrice } from '../lib/format'
+} from '../../components/events/EventAIDisclaimerModal'
+import { useCart } from '../../hooks/useCart'
+import { useAuth } from '../../hooks/useAuth'
+import { Icon } from '../../components/ui/Icon'
+import { Footer } from '../../components/layout/Footer'
+import { formatPrice } from '../../lib/format'
 import {
   packLabel,
   pricePerPhoto,
   unitPriceFromPacks,
-} from '../lib/packs'
-import type { PhotoPack } from '../lib/types'
+} from '../../lib/packs'
+import type { PhotoPack } from '../../lib/types'
 
 const filters: { value: PhotoFilter; label: string; icon: string }[] = [
   { value: 'all', label: 'Todas', icon: 'photo_library' },

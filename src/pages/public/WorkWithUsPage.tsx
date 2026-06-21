@@ -1,12 +1,12 @@
 import { useState } from 'react'
-import { Input } from '../components/ui/Input'
-import { Textarea } from '../components/ui/Textarea'
-import { Button } from '../components/ui/Button'
-import { Icon } from '../components/ui/Icon'
-import { Footer } from '../components/layout/Footer'
-import { img } from '../lib/images'
-import { submitStaffApplication } from '../lib/api'
-import type { StaffApplication } from '../lib/types'
+import { Input } from '../../components/ui/Input'
+import { Textarea } from '../../components/ui/Textarea'
+import { Button } from '../../components/ui/Button'
+import { Icon } from '../../components/ui/Icon'
+import { Footer } from '../../components/layout/Footer'
+import { img } from '../../lib/images'
+import { submitStaffApplication } from '../../lib/api'
+import type { StaffApplication } from '../../lib/types'
 
 const benefits = [
   {

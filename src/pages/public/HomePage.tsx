@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { getEvents } from '../lib/api'
-import type { EventItem } from '../lib/types'
-import { img } from '../lib/images'
-import { EventCard } from '../components/events/EventCard'
-import { Icon } from '../components/ui/Icon'
-import { Footer } from '../components/layout/Footer'
+import { getEvents } from '../../lib/api'
+import type { EventItem } from '../../lib/types'
+import { img } from '../../lib/images'
+import { EventCard } from '../../components/events/EventCard'
+import { Icon } from '../../components/ui/Icon'
+import { Footer } from '../../components/layout/Footer'
 
 const steps = [
   {

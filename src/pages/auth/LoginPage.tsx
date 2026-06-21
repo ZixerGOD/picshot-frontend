@@ -1,18 +1,18 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import type { Location } from 'react-router-dom'
-import { useAuth } from '../hooks/useAuth'
+import { useAuth } from '../../hooks/useAuth'
 import {
   USE_MOCKS,
   LoginRateLimitError,
   loginRetryAfterSeconds,
-} from '../lib/api'
-import type { UserRole } from '../lib/types'
-import { Input } from '../components/ui/Input'
-import { Button } from '../components/ui/Button'
-import { Icon } from '../components/ui/Icon'
-import { Logo } from '../components/ui/Logo'
-import { ThemeToggle } from '../components/ui/ThemeToggle'
+} from '../../lib/api'
+import type { UserRole } from '../../lib/types'
+import { Input } from '../../components/ui/Input'
+import { Button } from '../../components/ui/Button'
+import { Icon } from '../../components/ui/Icon'
+import { Logo } from '../../components/ui/Logo'
+import { ThemeToggle } from '../../components/ui/ThemeToggle'
 
 interface LoginState {
   from?: Location

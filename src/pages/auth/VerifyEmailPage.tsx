@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, useLocation, useSearchParams } from 'react-router-dom'
-import { resendVerification, verifyEmail } from '../lib/api'
-import { useAuth } from '../hooks/useAuth'
-import { AuthLayout } from '../components/auth/AuthLayout'
-import { Icon } from '../components/ui/Icon'
+import { resendVerification, verifyEmail } from '../../lib/api'
+import { useAuth } from '../../hooks/useAuth'
+import { AuthLayout } from '../../components/auth/AuthLayout'
+import { Icon } from '../../components/ui/Icon'
 
 const RESEND_COOLDOWN_S = 5 * 60
 

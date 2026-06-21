@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
-import type { Order } from '../lib/types'
-import { getOrder } from '../lib/checkout'
-import { Icon } from '../components/ui/Icon'
-import { Footer } from '../components/layout/Footer'
-import { formatPrice } from '../lib/format'
+import type { Order } from '../../lib/types'
+import { getOrder } from '../../lib/checkout'
+import { Icon } from '../../components/ui/Icon'
+import { Footer } from '../../components/layout/Footer'
+import { formatPrice } from '../../lib/format'
 
 type Variant = 'success' | 'error' | 'pending'
 

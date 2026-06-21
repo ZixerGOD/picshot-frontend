@@ -1,10 +1,10 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { useCart } from '../hooks/useCart'
-import { useAuth } from '../hooks/useAuth'
-import { Icon } from '../components/ui/Icon'
-import { Footer } from '../components/layout/Footer'
-import { formatPrice } from '../lib/format'
+import { useCart } from '../../hooks/useCart'
+import { useAuth } from '../../hooks/useAuth'
+import { Icon } from '../../components/ui/Icon'
+import { Footer } from '../../components/layout/Footer'
+import { formatPrice } from '../../lib/format'
 
 export function CartPage() {
   const {

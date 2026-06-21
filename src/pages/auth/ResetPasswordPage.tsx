@@ -1,9 +1,9 @@
 import { useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
-import { resetPassword } from '../lib/api'
-import { PASSWORD_HINT } from '../lib/types'
-import { AuthLayout } from '../components/auth/AuthLayout'
-import { Icon } from '../components/ui/Icon'
+import { resetPassword } from '../../lib/api'
+import { PASSWORD_HINT } from '../../lib/types'
+import { AuthLayout } from '../../components/auth/AuthLayout'
+import { Icon } from '../../components/ui/Icon'
 
 export function ResetPasswordPage() {
   const navigate = useNavigate()

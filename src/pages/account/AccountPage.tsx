@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useAuth } from '../hooks/useAuth'
-import { Icon } from '../components/ui/Icon'
-import { Footer } from '../components/layout/Footer'
+import { useAuth } from '../../hooks/useAuth'
+import { Icon } from '../../components/ui/Icon'
+import { Footer } from '../../components/layout/Footer'
 import {
   hasBiometricConsent,
   revokeBiometricConsent,
-} from '../components/events/BiometricConsentModal'
+} from '../../components/events/BiometricConsentModal'
 
 export function AccountPage() {
   const { user, updateUser, logout } = useAuth()

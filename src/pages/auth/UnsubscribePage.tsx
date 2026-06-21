@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
-import { useAuth } from '../hooks/useAuth'
-import { AuthLayout } from '../components/auth/AuthLayout'
-import { Icon } from '../components/ui/Icon'
+import { useAuth } from '../../hooks/useAuth'
+import { AuthLayout } from '../../components/auth/AuthLayout'
+import { Icon } from '../../components/ui/Icon'
 
 /**
  * Cumple emails.md:39 — "Every marketing email includes an unsubscribe

@@ -1,16 +1,16 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import type { EventItem, Purchase } from '../lib/types'
-import { getEvents, getMyPurchases } from '../lib/api'
+import type { EventItem, Purchase } from '../../lib/types'
+import { getEvents, getMyPurchases } from '../../lib/api'
 import {
   daysUntil,
   generateSignedDownload,
   retentionDateFrom,
-} from '../lib/downloads'
-import { Icon } from '../components/ui/Icon'
-import { Footer } from '../components/layout/Footer'
-import { formatPrice } from '../lib/format'
-import { getOrder } from '../lib/checkout'
+} from '../../lib/downloads'
+import { Icon } from '../../components/ui/Icon'
+import { Footer } from '../../components/layout/Footer'
+import { formatPrice } from '../../lib/format'
+import { getOrder } from '../../lib/checkout'
 
 interface EventGroup {
   eventId: string
