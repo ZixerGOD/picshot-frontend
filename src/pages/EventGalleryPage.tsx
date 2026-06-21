@@ -4,6 +4,7 @@ import type { EventItem, Photo, PhotoFilter } from '../lib/types'
 import { getEventById, getEventPhotos, searchPhotosByFace } from '../lib/api'
 import { PhotoCard } from '../components/events/PhotoCard'
 import { SelfieSearchModal } from '../components/events/SelfieSearchModal'
+import { useCart } from '../hooks/useCart'
 import { Icon } from '../components/ui/Icon'
 import { Footer } from '../components/layout/Footer'
 import { formatPrice } from '../lib/format'
@@ -29,6 +30,8 @@ export function EventGalleryPage() {
   )
   const [bib, setBib] = useState('')
   const [activeFilter, setActiveFilter] = useState<PhotoFilter>('all')
+
+  const { addItem, isInCart } = useCart()
 
   const [selfieModalOpen, setSelfieModalOpen] = useState(false)
   const [pendingSelfie, setPendingSelfie] = useState<File | null>(null)
@@ -330,6 +333,8 @@ export function EventGalleryPage() {
                   key={photo.id}
                   photo={photo}
                   size={idx === 0 ? 'large' : 'normal'}
+                  onAdd={(p) => addItem(p, eventId)}
+                  inCart={isInCart(photo.id)}
                 />
               ))}
             </div>

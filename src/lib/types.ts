@@ -77,6 +77,30 @@ export interface Purchase {
   purchasedAt: string
 }
 
+// ===== CARRITO =====
+
+export interface CartItem {
+  photoId: string
+  eventId: string
+  url: string
+  price: number
+  bib?: string
+  resolution?: string
+  addedAt: string
+}
+
+export interface CartCoupon {
+  code: string
+  discountType: 'percentage' | 'fixed'
+  discountValue: number
+}
+
+export interface CartTotals {
+  subtotal: number
+  discount: number
+  total: number
+}
+
 // ===== AUTH =====
 
 export type UserRole = 'admin' | 'photographer' | 'customer'

@@ -7,7 +7,9 @@ import { ContactPage } from './pages/ContactPage'
 import { WorkWithUsPage } from './pages/WorkWithUsPage'
 import { MyPurchasesPage } from './pages/MyPurchasesPage'
 import { LoginPage } from './pages/LoginPage'
+import { CartPage } from './pages/CartPage'
 import { RequireAuth } from './components/auth/RequireAuth'
+import { CartProvider } from './contexts/CartContext'
 import { AdminProvider } from './contexts/AdminContext'
 import { AdminLayout } from './components/admin/AdminLayout'
 import { AdminDashboardPage } from './pages/admin/AdminDashboardPage'
@@ -37,6 +39,7 @@ function PublicLayout({ children }: { children: React.ReactNode }) {
 export default function App() {
   return (
     <div className="min-h-screen flex flex-col bg-background text-on-background">
+     <CartProvider>
       <AdminProvider>
         <Routes>
           <Route
@@ -80,6 +83,14 @@ export default function App() {
             }
           />
           <Route path="/login" element={<LoginPage />} />
+          <Route
+            path="/carrito"
+            element={
+              <PublicLayout>
+                <CartPage />
+              </PublicLayout>
+            }
+          />
           <Route
             path="/mis-compras"
             element={
@@ -126,6 +137,7 @@ export default function App() {
           </Route>
         </Routes>
       </AdminProvider>
+     </CartProvider>
     </div>
   )
 }

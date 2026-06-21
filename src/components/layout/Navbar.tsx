@@ -4,6 +4,7 @@ import { Icon } from '../ui/Icon'
 import { Logo } from '../ui/Logo'
 import { ThemeToggle } from '../ui/ThemeToggle'
 import { useAuth } from '../../hooks/useAuth'
+import { useCart } from '../../hooks/useCart'
 
 const baseNavItems = [
   { to: '/', label: 'Inicio' },
@@ -15,6 +16,7 @@ const baseNavItems = [
 export function Navbar() {
   const [open, setOpen] = useState(false)
   const { user, isAuthenticated, logout } = useAuth()
+  const { count: cartCount } = useCart()
   const navigate = useNavigate()
 
   const navItems = isAuthenticated
@@ -54,6 +56,18 @@ export function Navbar() {
         </div>
 
         <div className="flex items-center gap-4">
+          <Link
+            to="/carrito"
+            aria-label="Ver carrito"
+            className="relative text-on-surface hover:text-primary transition-colors"
+          >
+            <Icon name="shopping_cart" className="text-2xl" />
+            {cartCount > 0 && (
+              <span className="absolute -top-1 -right-2 bg-primary text-on-primary font-label-bold text-[10px] min-w-[18px] h-[18px] px-1 flex items-center justify-center rounded-full">
+                {cartCount}
+              </span>
+            )}
+          </Link>
           <ThemeToggle className="hidden md:flex" />
           {isAuthenticated ? (
             <div className="hidden md:flex items-center gap-3">
