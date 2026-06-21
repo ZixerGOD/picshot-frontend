@@ -103,10 +103,10 @@ export function VerifyEmailPage() {
       title={state === 'error' ? 'Enlace inválido o expirado' : 'Verifica tu correo'}
       subtitle={
         state === 'error'
-          ? message ?? 'Solicita un nuevo enlace de verificación.'
+          ? `${message ?? 'Solicita un nuevo enlace de verificación.'} El enlace que enviamos por correo dura 24 horas.`
           : fromState.fromRegister
-            ? 'Te enviamos un enlace de verificación. Revisa tu bandeja de entrada.'
-            : 'Ingresa tu correo y te reenviamos el enlace.'
+            ? 'Te enviamos un enlace de verificación. Revisa tu bandeja de entrada — el enlace dura 24 horas.'
+            : 'Ingresa tu correo y te reenviamos el enlace. Dura 24 horas.'
       }
       footer={
         <Link to="/login" className="text-primary hover:underline">

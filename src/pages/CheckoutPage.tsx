@@ -216,6 +216,14 @@ export function CheckoutPage() {
                 Las descargas quedarán asociadas a esta cuenta.
               </p>
 
+              {!requiresIdentification && (
+                <p className="font-caption text-caption text-on-surface-variant mt-2">
+                  Tu comprobante se emitirá como Consumidor Final. Si
+                  necesitas factura con tu cédula o RUC, escríbenos a
+                  soporte@picshotec.com antes del pago.
+                </p>
+              )}
+
               {requiresIdentification && (
                 <div className="mt-6 pt-6 border-t border-surface-variant">
                   <label className="flex flex-col gap-1">

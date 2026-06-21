@@ -292,6 +292,11 @@ export function PhotographerPhotosPage() {
               Todas se procesaron correctamente.
             </p>
           )}
+          {summary.ok > 0 && (
+            <p className="font-caption text-caption text-on-surface-variant mt-1">
+              Avisamos a Admin que terminaste el lote.
+            </p>
+          )}
         </div>
       )}
 
