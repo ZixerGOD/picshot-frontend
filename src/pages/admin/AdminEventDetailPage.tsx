@@ -104,14 +104,6 @@ export function AdminEventDetailPage() {
               <span className="font-caption text-caption text-on-surface-variant uppercase">
                 {event.type}
               </span>
-              <button
-                type="button"
-                onClick={() => setHeaderPosterOpen(true)}
-                className="inline-flex items-center gap-1.5 border border-surface-variant px-2.5 py-1 text-on-surface hover:border-primary hover:text-primary transition-colors font-label-bold text-label-bold uppercase tracking-widest text-[10px]"
-              >
-                <Icon name="qr_code_2" className="text-base" />
-                Generar QR
-              </button>
             </div>
             <h1 className="font-headline-lg text-headline-lg text-on-surface uppercase">
               {event.title}
@@ -195,59 +187,67 @@ export function AdminEventDetailPage() {
       </div>
 
       {activeTab === 'info' && (
-        <section className="bg-surface border border-surface-variant p-6 md:p-8 space-y-6 max-w-3xl">
-          <h2 className="font-headline-md text-headline-md text-on-surface uppercase">
-            Información general
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label className="shots-label">Nombre</label>
-              <Input
-                value={event.title}
-                onChange={(e) => updateEvent(event.id, { title: e.target.value })}
-              />
+        <div className="grid grid-cols-1 xl:grid-cols-[1fr_360px] gap-6">
+          <section className="bg-surface border border-surface-variant p-6 md:p-8 space-y-6 min-w-0">
+            <h2 className="font-headline-md text-headline-md text-on-surface uppercase">
+              Información general
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label className="shots-label">Nombre</label>
+                <Input
+                  value={event.title}
+                  onChange={(e) => updateEvent(event.id, { title: e.target.value })}
+                />
+              </div>
+              <div>
+                <label className="shots-label">Ciudad</label>
+                <Input
+                  value={event.location}
+                  onChange={(e) => updateEvent(event.id, { location: e.target.value })}
+                />
+              </div>
+              <div>
+                <label className="shots-label">Precio base</label>
+                <Input
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={event.basePrice ?? ''}
+                  onChange={(e) => updateEvent(event.id, { basePrice: parseFloat(e.target.value) })}
+                />
+              </div>
+              <div>
+                <label className="shots-label">Participantes estimados</label>
+                <Input
+                  type="number"
+                  min="0"
+                  value={event.runnerCount ?? ''}
+                  onChange={(e) =>
+                    updateEvent(event.id, { runnerCount: parseInt(e.target.value, 10) })
+                  }
+                />
+              </div>
             </div>
-            <div>
-              <label className="shots-label">Ciudad</label>
-              <Input
-                value={event.location}
-                onChange={(e) => updateEvent(event.id, { location: e.target.value })}
-              />
-            </div>
-            <div>
-              <label className="shots-label">Precio base</label>
-              <Input
-                type="number"
-                min="0"
-                step="0.01"
-                value={event.basePrice ?? ''}
-                onChange={(e) => updateEvent(event.id, { basePrice: parseFloat(e.target.value) })}
-              />
-            </div>
-            <div>
-              <label className="shots-label">Participantes estimados</label>
-              <Input
-                type="number"
-                min="0"
-                value={event.runnerCount ?? ''}
-                onChange={(e) =>
-                  updateEvent(event.id, { runnerCount: parseInt(e.target.value, 10) })
-                }
-              />
-            </div>
-          </div>
 
-          <EventPacksSection
-            key={event.id}
-            packs={event.packs}
-            basePrice={event.basePrice}
-            onSave={(packs) =>
-              updateEvent(event.id, { packs, basePrice: unitPriceFromPacks(packs) })
-            }
-          />
+            <EventPacksSection
+              key={event.id}
+              packs={event.packs}
+              basePrice={event.basePrice}
+              onSave={(packs) =>
+                updateEvent(event.id, { packs, basePrice: unitPriceFromPacks(packs) })
+              }
+            />
+          </section>
 
-          <ShareEventBlock eventId={event.id} eventTitle={event.title} />
-        </section>
+          <aside className="flex flex-col gap-6 xl:sticky xl:top-6 xl:self-start">
+            <ShareEventBlock
+              eventId={event.id}
+              eventTitle={event.title}
+              onGenerateQr={() => setHeaderPosterOpen(true)}
+            />
+          </aside>
+        </div>
       )}
 
       {activeTab === 'photos' && (
@@ -487,9 +487,11 @@ function EventPacksSection({ packs, basePrice, onSave }: EventPacksSectionProps)
 function ShareEventBlock({
   eventId,
   eventTitle,
+  onGenerateQr,
 }: {
   eventId: string
   eventTitle: string
+  onGenerateQr: () => void
 }) {
   const publicUrl =
     typeof window !== 'undefined'
@@ -515,39 +517,67 @@ function ShareEventBlock({
   }
 
   return (
-    <div className="pt-6 border-t border-surface-variant">
-      <h3 className="font-label-bold text-label-bold text-on-surface uppercase tracking-widest mb-3">
-        Enlace público del evento
-      </h3>
-      <div className="flex flex-col sm:flex-row gap-2 max-w-2xl">
-        <input
-          type="text"
-          readOnly
-          value={publicUrl}
-          className="shots-input flex-1 min-w-0"
-          onClick={(e) => e.currentTarget.select()}
-        />
+    <div className="bg-surface border border-surface-variant overflow-hidden">
+      {/* CTA principal: imprimir/publicar póster */}
+      <div className="p-5 bg-gradient-to-br from-primary-container/15 via-surface to-surface border-b border-surface-variant">
+        <div className="flex items-start gap-3 mb-4">
+          <div className="w-10 h-10 bg-primary-container/30 text-primary flex items-center justify-center shrink-0">
+            <Icon name="qr_code_2" className="text-2xl" />
+          </div>
+          <div>
+            <h3 className="font-headline-md text-headline-md text-on-surface">
+              Comparte el evento
+            </h3>
+            <p className="font-caption text-caption text-on-surface-variant mt-1">
+              Genera un póster con QR para imprimirlo o publicarlo en redes.
+              Al escanear, el participante llega directo a la galería.
+            </p>
+          </div>
+        </div>
         <button
           type="button"
-          onClick={copy}
-          className="shots-btn-primary px-3 py-2 text-xs shrink-0 justify-center"
+          onClick={onGenerateQr}
+          className="shots-btn-primary w-full justify-center py-3"
         >
-          <Icon name={copied ? 'check' : 'content_copy'} />
-          {copied ? 'Copiado' : 'Copiar enlace'}
+          <Icon name="qr_code_2" />
+          Generar póster con QR
         </button>
+      </div>
+
+      {/* Acción secundaria: enlace público */}
+      <div className="p-5 space-y-3">
+        <div>
+          <p className="font-label-bold text-label-bold text-on-surface-variant uppercase tracking-widest text-xs">
+            Enlace público
+          </p>
+          <div className="flex items-center gap-2 mt-2">
+            <input
+              type="text"
+              readOnly
+              value={publicUrl}
+              className="shots-input flex-1 min-w-0 text-xs"
+              onClick={(e) => e.currentTarget.select()}
+            />
+            <button
+              type="button"
+              onClick={copy}
+              aria-label="Copiar enlace"
+              title={copied ? 'Copiado' : 'Copiar enlace'}
+              className="p-2 border border-surface-variant text-on-surface-variant hover:text-primary hover:border-primary transition-colors shrink-0"
+            >
+              <Icon name={copied ? 'check' : 'content_copy'} />
+            </button>
+          </div>
+        </div>
         <button
           type="button"
           onClick={shareNative}
-          className="inline-flex items-center justify-center gap-2 border border-surface-variant text-on-surface font-label-bold text-label-bold uppercase tracking-widest px-3 py-2 text-xs hover:border-primary hover:text-primary transition-colors"
+          className="w-full inline-flex items-center justify-center gap-2 border border-surface-variant text-on-surface font-label-bold text-label-bold uppercase tracking-widest px-3 py-2 text-xs hover:border-primary hover:text-primary transition-colors"
         >
           <Icon name="share" />
-          Compartir
+          Compartir enlace
         </button>
       </div>
-      <p className="font-caption text-caption text-on-surface-variant mt-2">
-        Para imprimir o publicar el QR usa el botón <strong>Generar QR</strong>{' '}
-        en la cabecera del evento.
-      </p>
     </div>
   )
 }
