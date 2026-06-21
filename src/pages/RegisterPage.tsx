@@ -44,7 +44,7 @@ export function RegisterPage() {
   return (
     <AuthLayout
       title="Crea tu cuenta"
-      subtitle="En menos de un minuto puedes empezar a comprar tus fotos y guardarlas en tu cuenta."
+      subtitle="Tu correo, tu contraseña y listo."
       footer={
         <>
           ¿Ya tienes cuenta?{' '}

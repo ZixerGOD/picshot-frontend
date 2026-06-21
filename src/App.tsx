@@ -1,5 +1,6 @@
 import { Routes, Route } from 'react-router-dom'
 import { Navbar } from './components/layout/Navbar'
+import { CookieBanner } from './components/layout/CookieBanner'
 import { HomePage } from './pages/HomePage'
 import { EventsPage } from './pages/EventsPage'
 import { EventGalleryPage } from './pages/EventGalleryPage'
@@ -248,6 +249,7 @@ export default function App() {
             <Route path="ganancias" element={<PhotographerEarningsPage />} />
           </Route>
         </Routes>
+        <CookieBanner />
       </AdminProvider>
      </CartProvider>
     </div>
