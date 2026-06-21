@@ -49,7 +49,19 @@ export function TermsPage() {
       </p>
 
       <h2 className="font-headline-md text-headline-md text-on-surface uppercase tracking-tight border-l-2 border-primary pl-3 mt-2">
-        6. Cambios
+        6. Fotos de otros participantes
+      </h2>
+      <p>
+        Las galerías de cada evento son públicas: cualquier usuario registrado
+        puede ver, comprar y descargar cualquier foto disponible. Esto incluye
+        fotos en las que aparecen otros participantes. Al usar la plataforma
+        aceptas esta característica y te comprometes a respetar el derecho a la
+        imagen de las demás personas; en particular, no debes usar las fotos
+        con fines difamatorios ni comerciales sin permiso de quienes aparecen.
+      </p>
+
+      <h2 className="font-headline-md text-headline-md text-on-surface uppercase tracking-tight border-l-2 border-primary pl-3 mt-2">
+        7. Cambios
       </h2>
       <p>
         Podemos actualizar estos términos por motivos legales o de servicio.

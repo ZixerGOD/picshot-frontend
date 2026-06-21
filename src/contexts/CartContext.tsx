@@ -124,6 +124,10 @@ function toCartItem(photo: Photo, eventId: string): CartItem {
   }
 }
 
+// Solo sugerimos un pack si el ahorro proyectado vale ≥ 10% del subtotal
+// que el usuario pagaría sin pack. Decidido en decisions.md (254-257).
+const UPSELL_MIN_SAVINGS_RATIO = 0.1
+
 function findUpsell(
   packs: PhotoPack[] | undefined,
   singles: CartItem[],
@@ -137,37 +141,39 @@ function findUpsell(
     .sort((a, b) => a.quantity - b.quantity)
   const count = singles.length
 
-  // 1) Pack con cantidad exacta y precio menor que la suma suelta → ofrecer conversión.
+  // 1) Pack con cantidad exacta y ahorro ≥ 10% sobre la suma suelta.
   const exact = ranked.find((p) => p.quantity === count)
-  if (exact && exact.price < unitTotal) {
-    return {
-      pack: exact,
-      label: packLabel(exact.key),
-      currentSingles: count,
-      missing: 0,
-      savings: +(unitTotal - exact.price).toFixed(2),
-      canConvert: true,
+  if (exact) {
+    const savings = unitTotal - exact.price
+    if (savings >= unitTotal * UPSELL_MIN_SAVINGS_RATIO) {
+      return {
+        pack: exact,
+        label: packLabel(exact.key),
+        currentSingles: count,
+        missing: 0,
+        savings: +savings.toFixed(2),
+        canConvert: true,
+      }
     }
   }
 
-  // 2) Próximo pack con cantidad mayor → sugerir agregar fotos.
+  // 2) Próximo pack con cantidad mayor → sugerir agregar fotos (mismo umbral).
   const next = ranked.find((p) => p.quantity > count)
   if (next) {
     const unitPrice = (() => {
       const single = packs.find((p) => p.key === 'single')
       if (single) return single.price
-      // fallback al promedio de las sueltas existentes
       return unitTotal / count
     })()
     const projectedUnitTotal = unitPrice * next.quantity
-    const savings = +(projectedUnitTotal - next.price).toFixed(2)
-    if (savings > 0) {
+    const savings = projectedUnitTotal - next.price
+    if (savings >= projectedUnitTotal * UPSELL_MIN_SAVINGS_RATIO) {
       return {
         pack: next,
         label: packLabel(next.key),
         currentSingles: count,
         missing: next.quantity - count,
-        savings,
+        savings: +savings.toFixed(2),
         canConvert: false,
       }
     }

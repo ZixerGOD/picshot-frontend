@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import { Icon } from '../components/ui/Icon'
 import { Footer } from '../components/layout/Footer'
@@ -8,7 +9,8 @@ import {
 } from '../components/events/BiometricConsentModal'
 
 export function AccountPage() {
-  const { user, updateUser } = useAuth()
+  const { user, updateUser, logout } = useAuth()
+  const navigate = useNavigate()
   const [name, setName] = useState(user?.name ?? '')
   const [marketingOptIn, setMarketingOptIn] = useState(
     user?.marketingOptIn ?? false,
@@ -53,6 +55,21 @@ export function AccountPage() {
     setCurrentPassword('')
     setNewPassword('')
     setConfirmPassword('')
+  }
+
+  function handleLogoutAllDevices() {
+    if (
+      !window.confirm(
+        'Vamos a cerrar tu sesión en todos los dispositivos. ¿Continuamos?',
+      )
+    )
+      return
+    // En backend real esto invalida todos los refresh tokens; en mock
+    // limpiamos la sesión actual y mostramos confirmación al usuario.
+    logout()
+    navigate('/login', {
+      state: { logoutAll: true, email: user?.email },
+    })
   }
 
   function handleRevokeBiometric() {
@@ -203,6 +220,24 @@ export function AccountPage() {
               activarlo cuando entres a un evento.
             </p>
           )}
+        </section>
+
+        <section className="bg-surface-container-lowest border border-surface-variant p-4 sm:p-6">
+          <h2 className="font-headline-md text-headline-md text-on-surface uppercase mb-4">
+            Seguridad
+          </h2>
+          <p className="font-body-md text-body-md text-on-surface">
+            Si crees que alguien más tiene acceso a tu cuenta, cierra sesión en
+            todos los dispositivos donde la hayas usado.
+          </p>
+          <button
+            type="button"
+            onClick={handleLogoutAllDevices}
+            className="mt-4 inline-flex items-center gap-2 border border-primary-container/60 text-primary-container font-label-bold text-label-bold uppercase tracking-widest px-4 py-3 hover:text-primary hover:border-primary transition-colors"
+          >
+            <Icon name="logout" />
+            Cerrar sesión en todos los dispositivos
+          </button>
         </section>
       </main>
 

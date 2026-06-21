@@ -55,7 +55,7 @@ export function PhotoCard({
             isLarge ? 'font-display-lg text-display-lg' : 'font-headline-md text-headline-md'
           }`}
         >
-          PREVIEW
+          PICSHOT
         </span>
       </div>
 

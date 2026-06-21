@@ -258,9 +258,14 @@ export function EventGalleryPage() {
         <div className="max-w-container-max mx-auto">
           <div className="bg-surface-container-lowest border border-surface-variant p-4 md:p-8 flex flex-col md:flex-row gap-6 md:gap-gutter">
             <div className="flex-1 md:border-r md:border-surface-variant pr-0 md:pr-8">
-              <h2 className="font-headline-md text-headline-md text-on-surface mb-6">
+              <h2 className="font-headline-md text-headline-md text-on-surface mb-2">
                 Encuentra tus fotos
               </h2>
+              <p className="font-caption text-caption text-on-surface-variant mb-6">
+                Picshot publica todas las fotos del evento. Podrías encontrar
+                fotos de otros participantes; respeta su derecho a la imagen al
+                compartirlas.
+              </p>
               <div className="flex gap-4 mb-6 border-b border-surface-variant">
                 <button
                   type="button"
@@ -290,7 +295,10 @@ export function EventGalleryPage() {
                   }`}
                 >
                   <Icon name="pin" fill={activeTab === 'dorsal'} />
-                  Número de Dorsal
+                  <span>Número de Dorsal</span>
+                  <span className="ml-1 font-caption text-caption text-on-surface-variant uppercase tracking-widest text-[10px] border border-surface-variant px-1.5 py-0.5">
+                    Próximamente
+                  </span>
                 </button>
               </div>
 

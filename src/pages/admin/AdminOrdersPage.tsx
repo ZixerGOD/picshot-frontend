@@ -102,8 +102,13 @@ export function AdminOrdersPage() {
 
   function handleRefund(orderId: string) {
     if (!window.confirm('¿Reembolsar esta orden?')) return
-    refundOrder(orderId)
+    const refunded = refundOrder(orderId)
     setOrders(listOrders())
+    if (refunded?.buyerEmail) {
+      window.alert(
+        `Reembolso aplicado. Notificamos al comprador a ${refunded.buyerEmail}.`,
+      )
+    }
   }
 
   function handleExport() {
