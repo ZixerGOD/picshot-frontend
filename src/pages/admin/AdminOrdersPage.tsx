@@ -4,6 +4,7 @@ import { listOrders, refundOrder } from '../../lib/checkout'
 import { Select } from '../../components/ui/Select'
 import { Icon } from '../../components/ui/Icon'
 import { formatPrice } from '../../lib/format'
+import { useToast } from '../../hooks/useToast'
 
 const STATUS_OPTIONS: { value: '' | OrderStatus; label: string }[] = [
   { value: '', label: 'Todos los estados' },
@@ -83,6 +84,7 @@ function downloadFile(name: string, content: string, mime: string) {
 }
 
 export function AdminOrdersPage() {
+  const toast = useToast()
   const [orders, setOrders] = useState<Order[]>(() => listOrders())
   const [statusFilter, setStatusFilter] = useState<'' | OrderStatus>('')
   const [search, setSearch] = useState('')
@@ -108,8 +110,9 @@ export function AdminOrdersPage() {
     const refunded = refundOrder(orderId)
     setOrders(listOrders())
     if (refunded?.buyerEmail) {
-      window.alert(
+      toast.show(
         `Reembolso aplicado. Notificamos al comprador a ${refunded.buyerEmail}.`,
+        'success',
       )
     }
   }

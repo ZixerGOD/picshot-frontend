@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useCart } from '../../hooks/useCart'
 import { useAuth } from '../../hooks/useAuth'
+import { useToast } from '../../hooks/useToast'
 import {
   createOrder,
   getActivePendingOrderFor,
@@ -20,6 +21,7 @@ type Outcome = 'success' | 'cancel' | 'pending'
 export function CheckoutPage() {
   const { items, packs, coupon, totals, clear, eventGroups } = useCart()
   const { user } = useAuth()
+  const toast = useToast()
   const navigate = useNavigate()
 
   const [step, setStep] = useState<CheckoutStep>('review')
@@ -136,8 +138,9 @@ export function CheckoutPage() {
     // embedding en iframe (docs/payments.md:17,72). Detectamos el caso y
     // bloqueamos antes de iniciar el flujo.
     if (typeof window !== 'undefined' && window.self !== window.top) {
-      window.alert(
+      toast.show(
         'No podemos abrir Payphone dentro de un iframe. Abre Picshot en una pestaña propia para pagar.',
+        'error',
       )
       return
     }

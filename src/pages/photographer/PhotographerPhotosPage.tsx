@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { usePhotographer } from '../../hooks/usePhotographer'
 import { useAdmin } from '../../hooks/useAdmin'
+import { useToast } from '../../hooks/useToast'
 import { Select } from '../../components/ui/Select'
 import { Icon } from '../../components/ui/Icon'
 import { formatPrice } from '../../lib/format'
@@ -31,6 +32,7 @@ function fingerprintFor(file: File): string {
 export function PhotographerPhotosPage() {
   const { photos, events, photographerId } = usePhotographer()
   const admin = useAdmin()
+  const toast = useToast()
   const fileRef = useRef<HTMLInputElement>(null)
   const [selectedEvent, setSelectedEvent] = useState('')
   const [jobs, setJobs] = useState<UploadJob[]>([])
@@ -143,7 +145,7 @@ export function PhotographerPhotosPage() {
       })
     }
     if (warnings.length > 0) {
-      window.alert(warnings.join('\n'))
+      toast.show(warnings.join('\n'), 'error')
     }
     return accepted
   }
@@ -151,7 +153,7 @@ export function PhotographerPhotosPage() {
   async function handleFiles(files: FileList | File[]) {
     if (!selectedEvent) {
       setJobs([])
-      alert('Selecciona un evento antes de subir fotos.')
+      toast.show('Selecciona un evento antes de subir fotos.', 'error')
       return
     }
     const newJobs = await buildJobsFromFiles(files)
