@@ -1,0 +1,48 @@
+import type { Photographer } from '../types'
+
+export const mockPhotographers: Photographer[] = [
+  {
+    id: 'ph-1',
+    name: 'Carlos Ruiz',
+    email: 'carlos@picshot.com',
+    phone: '+593 99 612 3456',
+    city: 'Quito',
+    joinedAt: '2025-05-12',
+    isActive: true,
+    commissionRate: 40,
+    eventIds: ['maraton-quito-2026', 'iron-pacifico-manta'],
+  },
+  {
+    id: 'ph-2',
+    name: 'María Gómez',
+    email: 'maria@picshot.com',
+    phone: '+593 98 623 4567',
+    city: 'Guayaquil',
+    joinedAt: '2025-08-20',
+    isActive: true,
+    commissionRate: 45,
+    eventIds: ['maraton-quito-2026', 'mtb-cajas-cuenca'],
+  },
+  {
+    id: 'ph-3',
+    name: 'Luis Torres',
+    email: 'luis@picshot.com',
+    phone: '+593 96 634 5678',
+    city: 'Cuenca',
+    joinedAt: '2026-01-10',
+    isActive: true,
+    commissionRate: 35,
+    eventIds: ['ruta-de-los-volcanes', 'iron-pacifico-manta'],
+  },
+  {
+    id: 'ph-4',
+    name: 'Ana Martínez',
+    email: 'ana@picshot.com',
+    phone: '+593 99 645 6789',
+    city: 'Manta',
+    joinedAt: '2026-03-15',
+    isActive: false,
+    commissionRate: 38,
+    eventIds: ['iron-pacifico-manta', 'media-nocturna-guayaquil'],
+  },
+]
