@@ -7,7 +7,7 @@ export function CookiesPage() {
         Usamos cookies para mantener tu sesión iniciada, recordar tus
         preferencias visuales y medir el uso de la plataforma.
       </p>
-      <h2 className="font-headline-md text-headline-md text-on-surface">
+      <h2 className="font-headline-md text-headline-md text-on-surface uppercase tracking-tight border-l-2 border-primary pl-3 mt-2">
         Tipos de cookies
       </h2>
       <ul className="list-disc pl-6 space-y-2">

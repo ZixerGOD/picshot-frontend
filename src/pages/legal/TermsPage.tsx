@@ -3,7 +3,7 @@ import { LegalLayout } from './LegalLayout'
 export function TermsPage() {
   return (
     <LegalLayout title="Términos y condiciones" lastUpdated="20 de junio de 2026">
-      <h2 className="font-headline-md text-headline-md text-on-surface">
+      <h2 className="font-headline-md text-headline-md text-on-surface uppercase tracking-tight border-l-2 border-primary pl-3 mt-2">
         1. Aceptación de los términos
       </h2>
       <p>
@@ -12,7 +12,7 @@ export function TermsPage() {
         servicio o aplicación operados por PicShot.
       </p>
 
-      <h2 className="font-headline-md text-headline-md text-on-surface">
+      <h2 className="font-headline-md text-headline-md text-on-surface uppercase tracking-tight border-l-2 border-primary pl-3 mt-2">
         2. Quiénes somos
       </h2>
       <p>
@@ -21,7 +21,7 @@ export function TermsPage() {
         compren y descarguen sus fotos oficiales.
       </p>
 
-      <h2 className="font-headline-md text-headline-md text-on-surface">
+      <h2 className="font-headline-md text-headline-md text-on-surface uppercase tracking-tight border-l-2 border-primary pl-3 mt-2">
         3. Cuentas
       </h2>
       <p>
@@ -30,7 +30,7 @@ export function TermsPage() {
         cuenta. Notifícanos si detectas un acceso no autorizado.
       </p>
 
-      <h2 className="font-headline-md text-headline-md text-on-surface">
+      <h2 className="font-headline-md text-headline-md text-on-surface uppercase tracking-tight border-l-2 border-primary pl-3 mt-2">
         4. Compras y pagos
       </h2>
       <p>
@@ -39,7 +39,7 @@ export function TermsPage() {
         cinco minutos, se reversa automáticamente.
       </p>
 
-      <h2 className="font-headline-md text-headline-md text-on-surface">
+      <h2 className="font-headline-md text-headline-md text-on-surface uppercase tracking-tight border-l-2 border-primary pl-3 mt-2">
         5. Propiedad intelectual
       </h2>
       <p>
@@ -48,7 +48,7 @@ export function TermsPage() {
         comercializarlas sin autorización.
       </p>
 
-      <h2 className="font-headline-md text-headline-md text-on-surface">
+      <h2 className="font-headline-md text-headline-md text-on-surface uppercase tracking-tight border-l-2 border-primary pl-3 mt-2">
         6. Cambios
       </h2>
       <p>

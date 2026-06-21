@@ -3,7 +3,7 @@ import { LegalLayout } from './LegalLayout'
 export function PrivacyPage() {
   return (
     <LegalLayout title="Política de privacidad" lastUpdated="20 de junio de 2026">
-      <h2 className="font-headline-md text-headline-md text-on-surface">
+      <h2 className="font-headline-md text-headline-md text-on-surface uppercase tracking-tight border-l-2 border-primary pl-3 mt-2">
         Qué datos recolectamos
       </h2>
       <p>
@@ -12,7 +12,7 @@ export function PrivacyPage() {
         del evento.
       </p>
 
-      <h2 className="font-headline-md text-headline-md text-on-surface">
+      <h2 className="font-headline-md text-headline-md text-on-surface uppercase tracking-tight border-l-2 border-primary pl-3 mt-2">
         Para qué los usamos
       </h2>
       <ul className="list-disc pl-6 space-y-2">
@@ -25,7 +25,7 @@ export function PrivacyPage() {
         </li>
       </ul>
 
-      <h2 className="font-headline-md text-headline-md text-on-surface">
+      <h2 className="font-headline-md text-headline-md text-on-surface uppercase tracking-tight border-l-2 border-primary pl-3 mt-2">
         Tus derechos
       </h2>
       <p>
@@ -34,7 +34,7 @@ export function PrivacyPage() {
         política específica.
       </p>
 
-      <h2 className="font-headline-md text-headline-md text-on-surface">
+      <h2 className="font-headline-md text-headline-md text-on-surface uppercase tracking-tight border-l-2 border-primary pl-3 mt-2">
         Contacto
       </h2>
       <p>

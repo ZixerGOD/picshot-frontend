@@ -12,7 +12,7 @@ export function BiometricPolicyPage() {
         si tú la autorizas.
       </p>
 
-      <h2 className="font-headline-md text-headline-md text-on-surface">
+      <h2 className="font-headline-md text-headline-md text-on-surface uppercase tracking-tight border-l-2 border-primary pl-3 mt-2">
         Cómo funciona
       </h2>
       <ul className="list-disc pl-6 space-y-2">
@@ -30,7 +30,7 @@ export function BiometricPolicyPage() {
         </li>
       </ul>
 
-      <h2 className="font-headline-md text-headline-md text-on-surface">
+      <h2 className="font-headline-md text-headline-md text-on-surface uppercase tracking-tight border-l-2 border-primary pl-3 mt-2">
         Tu control
       </h2>
       <p>
@@ -39,7 +39,7 @@ export function BiometricPolicyPage() {
         afecta a las fotos que ya hayas comprado.
       </p>
 
-      <h2 className="font-headline-md text-headline-md text-on-surface">
+      <h2 className="font-headline-md text-headline-md text-on-surface uppercase tracking-tight border-l-2 border-primary pl-3 mt-2">
         Si dejas de usarlo
       </h2>
       <p>
