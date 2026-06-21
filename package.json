@@ -5,11 +5,11 @@
   "type": "module",
   "packageManager": "pnpm@11.1.2",
   "engines": {
-    "node": ">=20",
+    "node": ">=22",
     "pnpm": ">=11"
   },
   "scripts": {
-    "preinstall": "npx --yes only-allow pnpm",
+    "preinstall": "node -e \"var a=(process.env.npm_config_user_agent||'')+(process.env.npm_execpath||'');if(!/pnpm/.test(a))throw new Error('Este proyecto usa pnpm. Instala con: pnpm install')\"",
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
