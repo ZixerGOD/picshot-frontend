@@ -5,10 +5,17 @@ import { formatPrice } from '../../lib/format'
 interface PhotoCardProps {
   photo: Photo
   size?: 'large' | 'normal'
+  onAdd?: (photo: Photo) => void
 }
 
-export function PhotoCard({ photo, size = 'normal' }: PhotoCardProps) {
+export function PhotoCard({ photo, size = 'normal', onAdd }: PhotoCardProps) {
   const isLarge = size === 'large'
+
+  function handleAdd(e: React.MouseEvent<HTMLButtonElement>) {
+    e.preventDefault()
+    e.stopPropagation()
+    onAdd?.(photo)
+  }
 
   return (
     <div
@@ -59,6 +66,8 @@ export function PhotoCard({ photo, size = 'normal' }: PhotoCardProps) {
           </div>
           <button
             type="button"
+            onClick={handleAdd}
+            aria-label={`Añadir foto ${photo.id} al carrito`}
             className={`flex items-center gap-2 bg-primary-container text-on-primary-container hover:bg-inverse-primary transition-colors font-label-bold text-label-bold ${
               isLarge ? 'px-6 py-3' : 'px-4 py-2 border-2 border-primary-container'
             }`}

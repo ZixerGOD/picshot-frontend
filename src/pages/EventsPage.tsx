@@ -1,9 +1,11 @@
 import { useMemo, useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { mockEvents } from '../lib/mocks'
 import { EventCard } from '../components/events/EventCard'
 import { Input } from '../components/ui/Input'
 import { Select } from '../components/ui/Select'
 import { Footer } from '../components/layout/Footer'
+import { Icon } from '../components/ui/Icon'
 
 const cities = [
   { value: '', label: 'Todas las ciudades' },
@@ -23,6 +25,9 @@ const types = [
 ]
 
 export function EventsPage() {
+  const [searchParams] = useSearchParams()
+  const faceHintVisible = searchParams.get('tab') === 'face'
+
   const [search, setSearch] = useState('')
   const [city, setCity] = useState('')
   const [date, setDate] = useState('')
@@ -50,6 +55,19 @@ export function EventsPage() {
               Explora las carreras y encuentra tus fotos oficiales.
             </p>
           </header>
+
+          {faceHintVisible && (
+            <aside
+              role="status"
+              className="flex items-start gap-3 border border-primary-container bg-surface-container-lowest p-4"
+            >
+              <Icon name="face" className="text-primary mt-0.5" />
+              <p className="font-body-md text-body-md text-on-surface">
+                Para buscar con selfie, abre uno de los eventos y entra en la
+                pestaña <span className="font-label-bold">Reconocimiento facial</span>.
+              </p>
+            </aside>
+          )}
 
           <section className="bg-surface-container-lowest border border-surface-variant p-6 flex flex-col md:flex-row gap-4">
             <Input

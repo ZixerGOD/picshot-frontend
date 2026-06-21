@@ -8,10 +8,10 @@ import { Footer } from '../components/layout/Footer'
 import { formatPrice } from '../lib/format'
 import { packLabel, pricePerPhoto } from '../lib/packs'
 
-const filters: { value: PhotoFilter; label: string; count?: number }[] = [
+const filters: { value: PhotoFilter; label: string }[] = [
   { value: 'all', label: 'Todas las fotos' },
-  { value: 'face', label: 'Coincidencias faciales', count: 0 },
-  { value: 'bib', label: 'Por dorsal', count: 0 },
+  { value: 'face', label: 'Coincidencias faciales' },
+  { value: 'bib', label: 'Por dorsal' },
   { value: 'favorites', label: 'Favoritas' },
 ]
 
@@ -100,10 +100,8 @@ export function EventGalleryPage() {
                 <Icon name="location_on" fill />
                 <span>{event.location}</span>
               </div>
-              <h1 className="font-display-lg text-display-lg uppercase text-on-surface">
-                {event.title.split(' ').slice(0, 2).join(' ')}
-                <br />
-                {event.title.split(' ').slice(2).join(' ')}
+              <h1 className="font-display-lg text-display-lg uppercase text-on-surface text-balance max-w-2xl">
+                {event.title}
               </h1>
             </div>
             <div className="flex gap-4">
@@ -252,11 +250,6 @@ export function EventGalleryPage() {
                     <span className="text-on-surface group-hover:text-primary transition-colors">
                       {f.label}
                     </span>
-                    {typeof f.count === 'number' && (
-                      <span className="bg-surface-container-highest text-on-surface font-caption text-caption px-2 py-0.5 ml-auto">
-                        {f.count}
-                      </span>
-                    )}
                   </label>
                 ))}
               </div>
@@ -309,14 +302,7 @@ export function EventGalleryPage() {
               / {photos.length.toLocaleString()}
             </span>
           </h2>
-          <div className="flex gap-2">
-            <button className="p-2 border border-surface-variant text-on-surface hover:border-primary hover:text-primary transition-colors">
-              <Icon name="grid_view" />
-            </button>
-            <button className="p-2 border border-surface-variant text-surface-container-highest hover:text-on-surface transition-colors">
-              <Icon name="view_list" />
-            </button>
-          </div>
+          {/* TODO(frontend): vista lista pendiente — se reactivará junto a la paginación real. */}
         </div>
 
         {loading ? (
@@ -344,8 +330,9 @@ export function EventGalleryPage() {
               <div className="mt-12 text-center">
                 <button
                   type="button"
-                  className="shots-btn-outline px-8 py-4"
-                  onClick={() => alert('Cargar más: conectar con paginación del backend')}
+                  className="shots-btn-outline px-8 py-4 opacity-60 cursor-not-allowed"
+                  disabled
+                  title="Disponible cuando se conecte la paginación del backend"
                 >
                   Cargar Más Resultados
                 </button>
