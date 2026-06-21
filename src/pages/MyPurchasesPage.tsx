@@ -193,22 +193,32 @@ function PurchaseGroup({ group }: { group: EventGroup }) {
   async function downloadSelected() {
     const targets = group.purchases.filter((p) => selected.has(p.id))
     if (targets.length === 0) return
+    if (
+      targets.length >= 4 &&
+      !window.confirm(
+        `Vamos a descargar ${targets.length} fotos. Es posible que tu navegador te pida permitir varias descargas. ¿Continuamos?`,
+      )
+    ) {
+      return
+    }
     setDownloading(true)
     for (const purchase of targets) {
-      // Las fotos se descargan una a una; el backend devuelve la versión en
-      // alta resolución vía signed URL — esta pantalla solo carga previews.
+      // Una descarga por foto. El backend devuelve la versión original vía
+      // signed URL; aquí en mock reutilizamos la preview.
       const signed = generateSignedDownload(purchase.url)
       const a = document.createElement('a')
       a.href = signed.url
       a.download = `${purchase.photoId}.jpg`
       a.rel = 'noreferrer'
-      a.target = '_blank'
+      // No usamos target=_blank para que el browser no abra pestañas y
+      // dispare el pop-up blocker en lotes grandes.
       document.body.appendChild(a)
       a.click()
       document.body.removeChild(a)
-      await new Promise((r) => setTimeout(r, 350))
+      await new Promise((r) => setTimeout(r, 600))
     }
     setDownloading(false)
+    setSelected(new Set())
   }
 
   return (
@@ -247,17 +257,17 @@ function PurchaseGroup({ group }: { group: EventGroup }) {
         </div>
       </div>
 
-      <div className="flex flex-wrap items-center gap-3 mb-4">
-        <button
-          type="button"
-          onClick={toggleAll}
-          className="inline-flex items-center gap-2 border border-surface-variant text-on-surface font-label-bold text-label-bold uppercase tracking-widest px-3 py-2 text-xs hover:border-primary hover:text-primary transition-colors"
-        >
-          <Icon name={allVisibleSelected ? 'deselect' : 'select_all'} />
-          {allVisibleSelected ? 'Quitar selección' : 'Seleccionar todas'}
-        </button>
-        {selected.size > 0 && (
-          <>
+      <div className="mb-4 flex flex-col sm:flex-row sm:items-center gap-3">
+        <div className="flex items-center gap-3 flex-wrap">
+          <button
+            type="button"
+            onClick={toggleAll}
+            className="inline-flex items-center gap-2 border border-surface-variant text-on-surface font-label-bold text-label-bold uppercase tracking-widest px-3 py-2 text-xs hover:border-primary hover:text-primary transition-colors"
+          >
+            <Icon name={allVisibleSelected ? 'deselect' : 'select_all'} />
+            {allVisibleSelected ? 'Quitar selección' : 'Seleccionar todas'}
+          </button>
+          {selected.size > 0 && (
             <button
               type="button"
               onClick={clear}
@@ -265,25 +275,27 @@ function PurchaseGroup({ group }: { group: EventGroup }) {
             >
               Limpiar ({selected.size})
             </button>
-            <button
-              type="button"
-              onClick={downloadSelected}
-              disabled={downloading}
-              className="shots-btn-primary px-3 py-2 text-xs disabled:opacity-60 ml-auto"
-            >
-              <Icon
-                name={downloading ? 'autorenew' : 'download'}
-                className={downloading ? 'animate-spin' : ''}
-              />
-              {downloading
-                ? 'Descargando…'
-                : `Descargar ${selected.size} ${selected.size === 1 ? 'foto' : 'fotos'}`}
-            </button>
-          </>
+          )}
+        </div>
+        {selected.size > 0 && (
+          <button
+            type="button"
+            onClick={downloadSelected}
+            disabled={downloading}
+            className="shots-btn-primary px-3 py-2 text-xs disabled:opacity-60 w-full sm:w-auto sm:ml-auto justify-center"
+          >
+            <Icon
+              name={downloading ? 'autorenew' : 'download'}
+              className={downloading ? 'animate-spin' : ''}
+            />
+            {downloading
+              ? 'Descargando…'
+              : `Descargar ${selected.size} ${selected.size === 1 ? 'foto' : 'fotos'}`}
+          </button>
         )}
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-base">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-base">
         {visible.map((purchase) => {
           const retention =
             purchase.retentionUntil ?? retentionDateFrom(purchase.purchasedAt)
@@ -292,67 +304,65 @@ function PurchaseGroup({ group }: { group: EventGroup }) {
           return (
             <article
               key={purchase.id}
-              className={`group relative bg-surface-container-lowest border overflow-hidden aspect-[4/3] cursor-pointer transition-colors ${
+              className={`group bg-surface-container-lowest border overflow-hidden transition-colors flex flex-col ${
                 isSelected ? 'border-primary' : 'border-surface-variant'
               }`}
-              onClick={() => toggle(purchase.id)}
             >
-              <img
-                src={purchase.url}
-                alt={`Foto comprada ${purchase.photoId}`}
-                className="absolute inset-0 w-full h-full object-cover"
-                loading="lazy"
-              />
-              <div className="absolute top-3 left-3 z-10">
-                <span
-                  className={`flex items-center justify-center w-6 h-6 border-2 ${
-                    isSelected
-                      ? 'bg-primary border-primary text-on-primary'
-                      : 'bg-background/70 border-surface-variant text-transparent'
-                  }`}
-                >
-                  <Icon name="check" className="text-base" />
-                </span>
-              </div>
-              <div className="absolute top-3 right-3 shots-badge bg-primary-container/90 text-on-primary-container">
-                <Icon name="schedule" className="text-base mr-1" />
-                {daysLeft}d
-              </div>
-              <div className="absolute inset-0 bg-background/85 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-between p-4 pointer-events-none">
-                <div className="flex justify-between items-start">
-                  {purchase.bib && (
-                    <span className="font-label-bold text-label-bold text-on-surface-variant uppercase tracking-widest">
-                      Dorsal {purchase.bib}
-                    </span>
-                  )}
-                </div>
-                <div className="flex justify-between items-end gap-4">
-                  <div>
-                    {purchase.resolution && (
-                      <div className="font-body-md text-body-md text-on-background">
-                        {purchase.resolution}
-                      </div>
-                    )}
-                    <Link
-                      to={`/mis-compras/${purchase.orderId}`}
-                      onClick={(e) => e.stopPropagation()}
-                      className="font-caption text-caption text-primary hover:underline pointer-events-auto"
-                    >
-                      Orden {purchase.orderId}
-                    </Link>
-                  </div>
-                  <a
-                    href={generateSignedDownload(purchase.url).url}
-                    download={`${purchase.photoId}.jpg`}
-                    target="_blank"
-                    rel="noreferrer"
-                    onClick={(e) => e.stopPropagation()}
-                    className="flex items-center gap-2 bg-primary-container text-on-primary-container hover:bg-inverse-primary transition-colors font-label-bold text-label-bold px-4 py-2 pointer-events-auto"
+              <div
+                className="relative aspect-[4/3] cursor-pointer"
+                onClick={() => toggle(purchase.id)}
+              >
+                <img
+                  src={purchase.url}
+                  alt={`Foto comprada ${purchase.photoId}`}
+                  className="absolute inset-0 w-full h-full object-cover"
+                  loading="lazy"
+                />
+                <div className="absolute top-3 left-3 z-10">
+                  <span
+                    className={`flex items-center justify-center w-7 h-7 border-2 backdrop-blur-sm ${
+                      isSelected
+                        ? 'bg-primary border-primary text-on-primary'
+                        : 'bg-background/70 border-surface-variant text-transparent'
+                    }`}
                   >
-                    <Icon name="download" />
-                    Descargar
-                  </a>
+                    <Icon name="check" className="text-base" />
+                  </span>
                 </div>
+                <div className="absolute top-3 right-3 shots-badge bg-primary-container/90 text-on-primary-container">
+                  <Icon name="schedule" className="text-base mr-1" />
+                  {daysLeft}d
+                </div>
+              </div>
+
+              <div className="p-3 flex items-center justify-between gap-3 border-t border-surface-variant">
+                <div className="min-w-0 flex-1">
+                  {purchase.bib ? (
+                    <p className="font-label-bold text-label-bold text-on-surface uppercase tracking-widest text-xs truncate">
+                      Dorsal {purchase.bib}
+                    </p>
+                  ) : (
+                    <p className="font-label-bold text-label-bold text-on-surface uppercase tracking-widest text-xs truncate">
+                      Foto {purchase.photoId}
+                    </p>
+                  )}
+                  <Link
+                    to={`/mis-compras/${purchase.orderId}`}
+                    className="font-caption text-caption text-on-surface-variant hover:text-primary truncate block"
+                  >
+                    Orden {purchase.orderId}
+                  </Link>
+                </div>
+                <a
+                  href={generateSignedDownload(purchase.url).url}
+                  download={`${purchase.photoId}.jpg`}
+                  rel="noreferrer"
+                  aria-label="Descargar foto"
+                  className="inline-flex items-center gap-1 bg-primary-container text-on-primary-container hover:bg-inverse-primary transition-colors font-label-bold text-label-bold px-3 py-2 shrink-0"
+                >
+                  <Icon name="download" />
+                  <span className="hidden sm:inline text-xs">Descargar</span>
+                </a>
               </div>
             </article>
           )
