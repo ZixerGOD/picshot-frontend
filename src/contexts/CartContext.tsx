@@ -1,4 +1,11 @@
-import { createContext, useCallback, useEffect, useMemo, useState } from 'react'
+import {
+  createContext,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react'
 import type { ReactNode } from 'react'
 import type {
   CartCoupon,
@@ -12,8 +19,14 @@ import type {
 } from '../lib/types'
 import { mockCoupons, mockEvents } from '../lib/mocks'
 import { packLabel } from '../lib/packs'
+import { useAuth } from '../hooks/useAuth'
 
-const STORAGE_KEY = 'picshot-cart-v2'
+const GUEST_STORAGE_KEY = 'picshot-cart-v2'
+const USER_STORAGE_PREFIX = 'picshot-cart-v2:'
+
+function storageKeyFor(userId: string | null): string {
+  return userId ? `${USER_STORAGE_PREFIX}${userId}` : GUEST_STORAGE_KEY
+}
 
 interface StoredCart {
   items: CartItem[]
@@ -75,10 +88,10 @@ interface CartContextValue {
 
 export const CartContext = createContext<CartContextValue | null>(null)
 
-function readStoredCart(): StoredCart {
+function readStoredCart(key: string): StoredCart {
   if (typeof window === 'undefined') return { items: [], packs: [], coupon: null }
   try {
-    const raw = window.localStorage.getItem(STORAGE_KEY)
+    const raw = window.localStorage.getItem(key)
     if (!raw) return { items: [], packs: [], coupon: null }
     const parsed = JSON.parse(raw) as StoredCart
     return {
@@ -88,6 +101,14 @@ function readStoredCart(): StoredCart {
     }
   } catch {
     return { items: [], packs: [], coupon: null }
+  }
+}
+
+function clearStoredCart(key: string) {
+  try {
+    window.localStorage.removeItem(key)
+  } catch {
+    // ignore
   }
 }
 
@@ -181,15 +202,51 @@ function generatePackId() {
 }
 
 export function CartProvider({ children }: { children: ReactNode }) {
-  const initial = readStoredCart()
+  const { user } = useAuth()
+  const userId = user?.id ?? null
+  const currentKey = storageKeyFor(userId)
+
+  const initial = readStoredCart(currentKey)
   const [items, setItems] = useState<CartItem[]>(initial.items)
   const [packs, setPacks] = useState<CartPack[]>(initial.packs)
   const [coupon, setCoupon] = useState<CartCoupon | null>(initial.coupon)
 
+  // Cambiar de usuario (login / logout): cargar el carrito del nuevo scope.
+  // Si pasamos de guest → user, fundimos el guest cart en el carrito del usuario.
+  const previousUserIdRef = useRef<string | null>(userId)
+  useEffect(() => {
+    if (previousUserIdRef.current === userId) return
+    const newKey = storageKeyFor(userId)
+    const userCart = readStoredCart(newKey)
+    const wasGuest = previousUserIdRef.current === null
+    if (userId && wasGuest) {
+      const guestCart = readStoredCart(GUEST_STORAGE_KEY)
+      const mergedItemIds = new Set(userCart.items.map((it) => it.photoId))
+      const mergedPackIds = new Set(userCart.packs.map((p) => p.id))
+      const mergedItems = [
+        ...userCart.items,
+        ...guestCart.items.filter((it) => !mergedItemIds.has(it.photoId)),
+      ]
+      const mergedPacks = [
+        ...userCart.packs,
+        ...guestCart.packs.filter((p) => !mergedPackIds.has(p.id)),
+      ]
+      setItems(mergedItems)
+      setPacks(mergedPacks)
+      setCoupon(userCart.coupon ?? guestCart.coupon)
+      clearStoredCart(GUEST_STORAGE_KEY)
+    } else {
+      setItems(userCart.items)
+      setPacks(userCart.packs)
+      setCoupon(userCart.coupon)
+    }
+    previousUserIdRef.current = userId
+  }, [userId])
+
   useEffect(() => {
     const payload: StoredCart = { items, packs, coupon }
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(payload))
-  }, [items, packs, coupon])
+    window.localStorage.setItem(currentKey, JSON.stringify(payload))
+  }, [items, packs, coupon, currentKey])
 
   const eventIndex = useMemo(() => {
     const map = new Map<string, EventItem>()

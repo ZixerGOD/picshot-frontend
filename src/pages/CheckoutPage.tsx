@@ -20,6 +20,23 @@ export function CheckoutPage() {
   const [step, setStep] = useState<CheckoutStep>('review')
   const [outcome, setOutcome] = useState<Outcome>('success')
 
+  // El SRI exige cédula/RUC en comprobantes electrónicos sobre US$50.
+  const SRI_THRESHOLD_USD = 50
+  const requiresIdentification = totals.total > SRI_THRESHOLD_USD
+  const [identification, setIdentification] = useState('')
+  const [identificationError, setIdentificationError] = useState<string | null>(
+    null,
+  )
+
+  function validateIdentification(value: string): string | null {
+    const cleaned = value.trim()
+    if (!cleaned) return 'Ingresa tu cédula o RUC.'
+    if (!/^\d{10}(\d{3})?$/.test(cleaned)) {
+      return 'Debe tener 10 dígitos (cédula) o 13 (RUC).'
+    }
+    return null
+  }
+
 
   const [eventTitles, setEventTitles] = useState<Record<string, string>>({})
 
@@ -63,6 +80,14 @@ export function CheckoutPage() {
 
   async function handlePay() {
     if (!user) return
+    if (requiresIdentification) {
+      const err = validateIdentification(identification)
+      if (err) {
+        setIdentificationError(err)
+        return
+      }
+    }
+    setIdentificationError(null)
     setStep('redirecting')
     const order = createOrder({
       buyerEmail: user.email,
@@ -128,6 +153,43 @@ export function CheckoutPage() {
               <p className="font-caption text-caption text-on-surface-variant mt-4">
                 Las descargas quedarán asociadas a esta cuenta.
               </p>
+
+              {requiresIdentification && (
+                <div className="mt-6 pt-6 border-t border-surface-variant">
+                  <label className="flex flex-col gap-1">
+                    <span className="font-label-bold text-label-bold text-on-surface uppercase tracking-widest text-xs">
+                      Cédula o RUC para tu comprobante
+                    </span>
+                    <input
+                      type="text"
+                      inputMode="numeric"
+                      pattern="\d{10}(\d{3})?"
+                      maxLength={13}
+                      required
+                      value={identification}
+                      onChange={(e) => {
+                        setIdentification(e.target.value.replace(/\D/g, ''))
+                        if (identificationError) setIdentificationError(null)
+                      }}
+                      placeholder="10 dígitos (cédula) o 13 (RUC)"
+                      className="shots-input"
+                    />
+                    <span className="font-caption text-caption text-on-surface-variant">
+                      Obligatorio cuando el total supera ${SRI_THRESHOLD_USD}{' '}
+                      USD: el SRI exige cédula o RUC en el comprobante
+                      electrónico.
+                    </span>
+                    {identificationError && (
+                      <span
+                        role="alert"
+                        className="font-caption text-caption text-primary-container"
+                      >
+                        {identificationError}
+                      </span>
+                    )}
+                  </label>
+                </div>
+              )}
             </div>
 
             <div className="bg-surface-container-lowest border border-surface-variant p-4 sm:p-6">

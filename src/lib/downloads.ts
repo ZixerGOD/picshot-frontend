@@ -3,7 +3,8 @@
  * con expiración corta (5-15 min) y validación por cuenta.
  */
 
-const SIGNED_URL_TTL_MIN = 15
+// Conforme docs/security.md (Signed URL TTL = 5 minutos)
+const SIGNED_URL_TTL_MIN = 5
 
 export interface SignedDownload {
   url: string
