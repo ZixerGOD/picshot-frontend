@@ -9,9 +9,13 @@ import { formatPrice } from '../lib/format'
 export function CartPage() {
   const {
     items,
+    packs,
+    count,
     totals,
     coupon,
     removeItem,
+    removePack,
+    convertSinglesToPack,
     applyCoupon,
     removeCoupon,
     clear,
@@ -40,7 +44,7 @@ export function CartPage() {
     navigate('/checkout')
   }
 
-  if (items.length === 0) {
+  if (items.length === 0 && packs.length === 0) {
     return (
       <>
         <main className="pt-32 pb-24 shots-container flex flex-col items-center text-center gap-6">
@@ -70,8 +74,7 @@ export function CartPage() {
               Tu carrito
             </h1>
             <p className="font-body-md text-body-md text-on-surface-variant mt-2">
-              {items.length} {items.length === 1 ? 'foto' : 'fotos'} listas para
-              comprar.
+              {count} {count === 1 ? 'foto' : 'fotos'} listas para comprar.
             </p>
           </div>
           <button
@@ -91,85 +94,157 @@ export function CartPage() {
                   <h2 className="font-label-bold text-label-bold text-on-surface uppercase tracking-widest">
                     {group.eventTitle}
                   </h2>
-                  <span className="font-caption text-caption text-on-surface-variant">
-                    {group.items.length}{' '}
-                    {group.items.length === 1 ? 'foto' : 'fotos'}
-                  </span>
-                </div>
-
-                {group.activePackLabel && (
-                  <div className="flex items-center gap-2 border border-primary bg-primary-container/15 px-3 py-2 mb-3 font-body-md text-body-md text-primary">
-                    <Icon name="check_circle" fill />
-                    Pack {group.activePackLabel} aplicado · ahorras{' '}
-                    {formatPrice(group.packSavings)}
-                  </div>
-                )}
-
-                {!group.activePackLabel && group.nextPackHint && (
                   <Link
                     to={`/eventos/${group.eventId}`}
-                    className="flex items-center gap-2 border border-primary/40 bg-surface-container-lowest px-3 py-2 mb-3 font-body-md text-body-md text-on-surface hover:border-primary transition-colors"
+                    className="font-caption text-caption text-primary hover:underline"
                   >
-                    <Icon name="sell" className="text-primary" />
-                    Suma {group.nextPackHint.missing}{' '}
-                    {group.nextPackHint.missing === 1 ? 'foto' : 'fotos'} más
-                    para el {group.nextPackHint.label} y ahorra{' '}
-                    {formatPrice(group.nextPackHint.savings)}
+                    Ver evento
                   </Link>
-                )}
+                </div>
 
-                <ul className="flex flex-col gap-3">
-                  {group.items.map((it) => (
-                    <li
-                      key={it.photoId}
-                      className="flex gap-4 bg-surface-container-lowest border border-surface-variant p-3"
-                    >
-                      <img
-                        src={it.url}
-                        alt={`Foto ${it.photoId}`}
-                        className="w-24 h-20 object-cover border border-surface-variant"
-                      />
-                      <div className="flex-1 flex flex-col justify-center min-w-0">
-                        {it.bib && (
-                          <span className="font-label-bold text-label-bold text-on-surface-variant uppercase tracking-widest text-xs">
-                            Dorsal {it.bib}
-                          </span>
-                        )}
-                        {it.resolution && (
-                          <span className="font-body-md text-body-md text-on-surface">
-                            {it.resolution}
-                          </span>
-                        )}
-                        <span
-                          className={`font-headline-md text-headline-md mt-1 ${
-                            group.activePackLabel
-                              ? 'text-on-surface-variant line-through'
-                              : 'text-primary'
-                          }`}
-                        >
-                          {formatPrice(it.price)}
-                        </span>
+                {/* Bloques de pack */}
+                {group.packs.map((pack) => (
+                  <div
+                    key={pack.id}
+                    className="border border-primary bg-primary-container/10 mb-4"
+                  >
+                    <div className="flex items-center justify-between gap-3 px-4 py-3 border-b border-primary/30">
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-2">
+                          <Icon name="sell" className="text-primary" fill />
+                          <p className="font-label-bold text-label-bold text-primary uppercase tracking-widest">
+                            {pack.label}
+                          </p>
+                        </div>
+                        <p className="font-caption text-caption text-on-surface-variant mt-0.5">
+                          {pack.quantity == null
+                            ? 'Acceso a todas las fotos del evento'
+                            : `${pack.photos.length} fotos incluidas`}
+                        </p>
                       </div>
-                      <button
-                        type="button"
-                        onClick={() => removeItem(it.photoId)}
-                        aria-label="Quitar del carrito"
-                        className="self-start p-2 text-on-surface-variant hover:text-primary"
-                      >
-                        <Icon name="close" />
-                      </button>
-                    </li>
-                  ))}
-                </ul>
+                      <div className="flex items-center gap-3">
+                        <span className="font-headline-md text-headline-md text-primary">
+                          {formatPrice(pack.price)}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => removePack(pack.id)}
+                          aria-label="Quitar pack"
+                          className="p-1 text-on-surface-variant hover:text-primary-container"
+                        >
+                          <Icon name="close" />
+                        </button>
+                      </div>
+                    </div>
+                    {pack.photos.length > 0 && (
+                      <div className="flex gap-2 overflow-x-auto px-4 py-3">
+                        {pack.photos.map((ph) => (
+                          <img
+                            key={ph.photoId}
+                            src={ph.url}
+                            alt=""
+                            className="w-16 h-16 object-cover border border-surface-variant shrink-0"
+                          />
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                ))}
 
-                {group.activePackLabel && (
-                  <p className="font-caption text-caption text-on-surface-variant mt-2 text-right">
-                    Subtotal evento:{' '}
-                    <span className="text-primary font-label-bold">
-                      {formatPrice(group.chargedTotal)}
-                    </span>
-                  </p>
+                {/* Upsell: convertir o sumar fotos */}
+                {group.upsell &&
+                  (group.upsell.canConvert ? (
+                    <button
+                      type="button"
+                      onClick={() =>
+                        convertSinglesToPack(group.eventId, group.upsell!.pack.key)
+                      }
+                      className="w-full flex items-center justify-between gap-3 border border-primary px-3 py-3 mb-4 bg-primary-container/15 hover:bg-primary-container/25 transition-colors text-left"
+                    >
+                      <div>
+                        <p className="font-label-bold text-label-bold text-primary uppercase tracking-widest text-xs">
+                          Mejor opción: {group.upsell.label}
+                        </p>
+                        <p className="font-body-md text-body-md text-on-surface">
+                          Cambia tus {group.upsell.currentSingles} fotos sueltas
+                          al pack por {formatPrice(group.upsell.pack.price)} y
+                          ahorra {formatPrice(group.upsell.savings)}.
+                        </p>
+                      </div>
+                      <span className="shrink-0 shots-btn-primary px-3 py-2 text-xs">
+                        Cambiar a pack
+                      </span>
+                    </button>
+                  ) : (
+                    <Link
+                      to={`/eventos/${group.eventId}`}
+                      className="w-full flex items-center justify-between gap-3 border border-primary/40 px-3 py-3 mb-4 bg-surface-container-lowest hover:border-primary transition-colors"
+                    >
+                      <div>
+                        <p className="font-label-bold text-label-bold text-primary uppercase tracking-widest text-xs">
+                          ¿Llevas más?
+                        </p>
+                        <p className="font-body-md text-body-md text-on-surface">
+                          Suma {group.upsell.missing}{' '}
+                          {group.upsell.missing === 1 ? 'foto' : 'fotos'} más
+                          para el {group.upsell.label} y ahorra{' '}
+                          {formatPrice(group.upsell.savings)}.
+                        </p>
+                      </div>
+                      <Icon
+                        name="arrow_forward"
+                        className="text-primary shrink-0"
+                      />
+                    </Link>
+                  ))}
+
+                {/* Fotos sueltas */}
+                {group.singles.length > 0 && (
+                  <ul className="flex flex-col gap-3">
+                    {group.singles.map((it) => (
+                      <li
+                        key={it.photoId}
+                        className="flex gap-4 bg-surface-container-lowest border border-surface-variant p-3"
+                      >
+                        <img
+                          src={it.url}
+                          alt={`Foto ${it.photoId}`}
+                          className="w-24 h-20 object-cover border border-surface-variant"
+                        />
+                        <div className="flex-1 flex flex-col justify-center min-w-0">
+                          {it.bib && (
+                            <span className="font-label-bold text-label-bold text-on-surface-variant uppercase tracking-widest text-xs">
+                              Dorsal {it.bib}
+                            </span>
+                          )}
+                          {it.resolution && (
+                            <span className="font-body-md text-body-md text-on-surface">
+                              {it.resolution}
+                            </span>
+                          )}
+                          <span className="font-headline-md text-headline-md text-primary mt-1">
+                            {formatPrice(it.price)}
+                          </span>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => removeItem(it.photoId)}
+                          aria-label="Quitar del carrito"
+                          className="self-start p-2 text-on-surface-variant hover:text-primary"
+                        >
+                          <Icon name="close" />
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
                 )}
+
+                <p className="font-caption text-caption text-on-surface-variant mt-3 text-right">
+                  Subtotal evento:{' '}
+                  <span className="text-primary font-label-bold">
+                    {formatPrice(group.total)}
+                  </span>
+                </p>
               </div>
             ))}
           </section>
@@ -231,17 +306,22 @@ export function CartPage() {
               )}
             </div>
 
-            {eventGroups.some((g) => g.activePackLabel) && (
+            {eventGroups.some((g) => g.packs.length > 0) && (
               <div className="border-t border-surface-variant pt-3 space-y-1">
                 {eventGroups
-                  .filter((g) => g.activePackLabel)
-                  .map((g) => (
+                  .flatMap((g) =>
+                    g.packs.map((p) => ({
+                      key: p.id,
+                      label: p.label,
+                      price: p.price,
+                    })),
+                  )
+                  .map((row) => (
                     <p
-                      key={g.eventId}
+                      key={row.key}
                       className="font-caption text-caption text-primary"
                     >
-                      Pack {g.activePackLabel} activo · ahorro{' '}
-                      {formatPrice(g.packSavings)}
+                      {row.label} · {formatPrice(row.price)}
                     </p>
                   ))}
               </div>

@@ -103,6 +103,26 @@ export interface CartItem {
   addedAt: string
 }
 
+/**
+ * Un paquete adquirido por el usuario en el carrito. Es un bloque con
+ * precio fijo que incluye N fotos del evento (o todas, si quantity es
+ * null). Las fotos viven en `photos[]` y NO se cobran sueltas: solo
+ * cuenta el precio del paquete.
+ */
+export interface CartPack {
+  /** ID local del bloque pack dentro del carrito. */
+  id: string
+  eventId: string
+  packKey: PackKey
+  /** Etiqueta legible para mostrar (ej. 'Pack 5 fotos'). */
+  label: string
+  /** Cantidad de fotos del paquete, o null para 'Todas las fotos'. */
+  quantity: number | null
+  price: number
+  photos: CartItem[]
+  addedAt: string
+}
+
 export interface CartCoupon {
   code: string
   discountType: 'percentage' | 'fixed'

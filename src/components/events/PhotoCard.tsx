@@ -7,6 +7,8 @@ interface PhotoCardProps {
   size?: 'large' | 'normal'
   onAdd?: (photo: Photo) => void
   inCart?: boolean
+  /** Cuando se pasa, sobrescribe los textos del botón (modo pack). */
+  packLabel?: string
 }
 
 export function PhotoCard({
@@ -14,13 +16,16 @@ export function PhotoCard({
   size = 'normal',
   onAdd,
   inCart = false,
+  packLabel,
 }: PhotoCardProps) {
   const isLarge = size === 'large'
+  const inPackMode = packLabel !== undefined
 
   function handleAdd(e: React.MouseEvent<HTMLButtonElement>) {
     e.preventDefault()
     e.stopPropagation()
-    if (inCart) return
+    // En modo pack, el toggle se permite siempre (selección/deselección).
+    if (inCart && !inPackMode) return
     onAdd?.(photo)
   }
 
@@ -74,18 +79,41 @@ export function PhotoCard({
           <button
             type="button"
             onClick={handleAdd}
-            disabled={inCart}
+            disabled={inCart && !inPackMode}
             aria-label={
-              inCart ? 'Foto ya en el carrito' : `Añadir foto ${photo.id} al carrito`
+              inPackMode
+                ? inCart
+                  ? 'Quitar del pack'
+                  : 'Sumar al pack'
+                : inCart
+                  ? 'Foto ya en el carrito'
+                  : `Añadir foto ${photo.id} al carrito`
             }
             className={`flex items-center gap-2 transition-colors font-label-bold text-label-bold ${
-              inCart
+              inCart && !inPackMode
                 ? 'bg-surface-container text-on-surface-variant cursor-default'
-                : 'bg-primary-container text-on-primary-container hover:bg-inverse-primary'
+                : inCart && inPackMode
+                  ? 'bg-primary text-on-primary'
+                  : 'bg-primary-container text-on-primary-container hover:bg-inverse-primary'
             } ${isLarge ? 'px-6 py-3' : 'px-4 py-2 border-2 border-primary-container'}`}
           >
-            <Icon name={inCart ? 'check' : 'shopping_cart'} />
-            {isLarge && (inCart ? 'AÑADIDA' : 'AÑADIR')}
+            <Icon
+              name={
+                inPackMode
+                  ? inCart
+                    ? 'check_circle'
+                    : 'radio_button_unchecked'
+                  : inCart
+                    ? 'check'
+                    : 'shopping_cart'
+              }
+            />
+            {isLarge &&
+              (inPackMode
+                ? packLabel
+                : inCart
+                  ? 'AÑADIDA'
+                  : 'AÑADIR')}
           </button>
         </div>
       </div>

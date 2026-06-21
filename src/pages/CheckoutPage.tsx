@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useCart } from '../hooks/useCart'
 import { useAuth } from '../hooks/useAuth'
@@ -13,19 +13,13 @@ type CheckoutStep = 'review' | 'redirecting'
 type Outcome = 'success' | 'cancel' | 'pending'
 
 export function CheckoutPage() {
-  const { items, coupon, totals, clear } = useCart()
+  const { items, packs, coupon, totals, clear, eventGroups } = useCart()
   const { user } = useAuth()
   const navigate = useNavigate()
 
   const [step, setStep] = useState<CheckoutStep>('review')
   const [outcome, setOutcome] = useState<Outcome>('success')
 
-  const itemsByEvent = useMemo(() => {
-    return items.reduce<Record<string, typeof items>>((acc, it) => {
-      ;(acc[it.eventId] ??= []).push(it)
-      return acc
-    }, {})
-  }, [items])
 
   const [eventTitles, setEventTitles] = useState<Record<string, string>>({})
 
@@ -44,7 +38,7 @@ export function CheckoutPage() {
     }
   }, [])
 
-  if (items.length === 0 && step === 'review') {
+  if (items.length === 0 && packs.length === 0 && step === 'review') {
     return (
       <>
         <main className="pt-32 pb-24 shots-container flex flex-col items-center text-center gap-6">
@@ -141,33 +135,57 @@ export function CheckoutPage() {
                 Fotos a pagar
               </h2>
               <div className="space-y-6">
-                {Object.entries(itemsByEvent).map(([eventId, eventItems]) => (
-                  <div key={eventId}>
+                {eventGroups.map((group) => (
+                  <div key={group.eventId}>
                     <p className="font-label-bold text-label-bold text-on-surface-variant uppercase tracking-widest mb-3">
-                      {eventTitles[eventId] ?? 'Evento'}
+                      {eventTitles[group.eventId] ?? group.eventTitle}
                     </p>
-                    <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                      {eventItems.map((it) => (
-                        <li
-                          key={it.photoId}
-                          className="flex items-center gap-3 border border-surface-variant px-3 py-2 min-w-0"
-                        >
-                          <img
-                            src={it.url}
-                            alt=""
-                            className="w-12 h-12 object-cover shrink-0"
-                          />
-                          <div className="flex flex-col min-w-0 flex-1">
-                            <span className="font-caption text-caption text-on-surface-variant uppercase tracking-widest truncate">
-                              {it.bib ? `Dorsal ${it.bib}` : it.photoId}
-                            </span>
-                            <span className="font-body-md text-body-md text-primary">
-                              {formatPrice(it.price)}
-                            </span>
-                          </div>
-                        </li>
-                      ))}
-                    </ul>
+
+                    {group.packs.map((pack) => (
+                      <div
+                        key={pack.id}
+                        className="border border-primary/40 bg-primary-container/10 px-3 py-2 mb-2 flex items-center justify-between gap-3"
+                      >
+                        <div className="min-w-0">
+                          <p className="font-label-bold text-label-bold text-primary uppercase tracking-widest text-xs">
+                            {pack.label}
+                          </p>
+                          <p className="font-caption text-caption text-on-surface-variant">
+                            {pack.quantity == null
+                              ? 'Todas las fotos del evento'
+                              : `${pack.photos.length} fotos incluidas`}
+                          </p>
+                        </div>
+                        <span className="font-body-md text-body-md text-primary">
+                          {formatPrice(pack.price)}
+                        </span>
+                      </div>
+                    ))}
+
+                    {group.singles.length > 0 && (
+                      <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        {group.singles.map((it) => (
+                          <li
+                            key={it.photoId}
+                            className="flex items-center gap-3 border border-surface-variant px-3 py-2 min-w-0"
+                          >
+                            <img
+                              src={it.url}
+                              alt=""
+                              className="w-12 h-12 object-cover shrink-0"
+                            />
+                            <div className="flex flex-col min-w-0 flex-1">
+                              <span className="font-caption text-caption text-on-surface-variant uppercase tracking-widest truncate">
+                                {it.bib ? `Dorsal ${it.bib}` : it.photoId}
+                              </span>
+                              <span className="font-body-md text-body-md text-primary">
+                                {formatPrice(it.price)}
+                              </span>
+                            </div>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
                   </div>
                 ))}
               </div>
