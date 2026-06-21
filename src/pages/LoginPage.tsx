@@ -159,12 +159,23 @@ export function LoginPage() {
             </div>
           </div>
 
-          <p className="mt-8 text-center font-body-md text-body-md text-on-surface-variant">
-            ¿Eres fotógrafo y aún no estás en la red?{' '}
-            <Link to="/trabaja-con-nosotros" className="text-primary hover:underline">
-              Postúlate aquí
+          <div className="mt-6 flex flex-col gap-2 text-center font-body-md text-body-md text-on-surface-variant">
+            <Link to="/recuperar-contrasena" className="text-primary hover:underline">
+              ¿Olvidaste tu contraseña?
             </Link>
-          </p>
+            <p>
+              ¿No tienes cuenta?{' '}
+              <Link to="/registro" className="text-primary hover:underline">
+                Regístrate
+              </Link>
+            </p>
+            <p>
+              ¿Eres fotógrafo y aún no estás en la red?{' '}
+              <Link to="/trabaja-con-nosotros" className="text-primary hover:underline">
+                Postúlate aquí
+              </Link>
+            </p>
+          </div>
         </div>
       </main>
     </div>

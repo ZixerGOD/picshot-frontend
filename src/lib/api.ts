@@ -1,5 +1,6 @@
 import type {
   AuthSession,
+  AuthUser,
   ContactRequest,
   EventItem,
   LoginCredentials,
@@ -14,6 +15,12 @@ import {
   mockEvents,
   mockPurchases,
 } from './mocks'
+import {
+  consumeToken,
+  findToken,
+  issueToken,
+  TOKEN_PURPOSE,
+} from './auth-tokens'
 
 const API_URL = import.meta.env.VITE_API_URL || ''
 const USE_MOCKS = !API_URL
@@ -82,6 +89,136 @@ export async function login(credentials: LoginCredentials): Promise<AuthSession>
   return fetchJson<AuthSession>('/auth/login', {
     method: 'POST',
     body: JSON.stringify(credentials),
+  })
+}
+
+export interface RegisterPayload {
+  name: string
+  email: string
+  password: string
+  marketingOptIn: boolean
+  acceptedTerms: boolean
+}
+
+export interface RegisterResult {
+  /** El usuario queda pendiente de verificación; devolvemos el token mock visible para QA. */
+  pendingVerificationToken: string
+  email: string
+}
+
+export async function register(payload: RegisterPayload): Promise<RegisterResult> {
+  if (USE_MOCKS) {
+    await sleep(700)
+    const email = payload.email.trim().toLowerCase()
+    if (!payload.acceptedTerms) {
+      throw new Error('Debes aceptar los términos y condiciones para continuar.')
+    }
+    if (mockAuthUsers.some((u) => u.email.toLowerCase() === email)) {
+      throw new Error('Ya existe una cuenta con ese correo.')
+    }
+    if (payload.password.length < 8) {
+      throw new Error('La contraseña debe tener al menos 8 caracteres.')
+    }
+    const newUser: AuthUser & { password: string } = {
+      id: `cu-${Math.random().toString(36).slice(2, 8)}`,
+      name: payload.name.trim(),
+      email,
+      role: 'customer',
+      password: payload.password,
+    }
+    mockAuthUsers.push(newUser)
+    const token = issueToken(TOKEN_PURPOSE.VERIFY_EMAIL, email).token
+    return { pendingVerificationToken: token, email }
+  }
+  return fetchJson<RegisterResult>('/auth/register', {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  })
+}
+
+export async function forgotPassword(email: string): Promise<{ token: string }> {
+  if (USE_MOCKS) {
+    await sleep(500)
+    const normalized = email.trim().toLowerCase()
+    // Por seguridad no diferenciamos si existe o no, pero generamos el token solo si existe.
+    const exists = mockAuthUsers.some((u) => u.email.toLowerCase() === normalized)
+    const token = exists
+      ? issueToken(TOKEN_PURPOSE.RESET_PASSWORD, normalized).token
+      : 'noop'
+    return { token }
+  }
+  return fetchJson<{ token: string }>('/auth/forgot-password', {
+    method: 'POST',
+    body: JSON.stringify({ email }),
+  })
+}
+
+export async function resetPassword(
+  token: string,
+  newPassword: string,
+): Promise<void> {
+  if (USE_MOCKS) {
+    await sleep(500)
+    const record = findToken(token, TOKEN_PURPOSE.RESET_PASSWORD)
+    if (!record) throw new Error('El enlace es inválido o ya expiró.')
+    if (newPassword.length < 8)
+      throw new Error('La contraseña debe tener al menos 8 caracteres.')
+    const user = mockAuthUsers.find((u) => u.email.toLowerCase() === record.email)
+    if (user) user.password = newPassword
+    consumeToken(token)
+    return
+  }
+  await fetchJson<void>('/auth/reset-password', {
+    method: 'POST',
+    body: JSON.stringify({ token, password: newPassword }),
+  })
+}
+
+export async function verifyEmail(token: string): Promise<{ email: string }> {
+  if (USE_MOCKS) {
+    await sleep(400)
+    const record = findToken(token, TOKEN_PURPOSE.VERIFY_EMAIL)
+    if (!record) throw new Error('El enlace es inválido o ya expiró.')
+    consumeToken(token)
+    return { email: record.email }
+  }
+  return fetchJson<{ email: string }>('/auth/verify-email', {
+    method: 'POST',
+    body: JSON.stringify({ token }),
+  })
+}
+
+export async function resendVerification(email: string): Promise<{ token: string }> {
+  if (USE_MOCKS) {
+    await sleep(400)
+    const normalized = email.trim().toLowerCase()
+    const token = issueToken(TOKEN_PURPOSE.VERIFY_EMAIL, normalized).token
+    return { token }
+  }
+  return fetchJson<{ token: string }>('/auth/resend-verification', {
+    method: 'POST',
+    body: JSON.stringify({ email }),
+  })
+}
+
+export async function setPasswordWithInvite(
+  token: string,
+  password: string,
+): Promise<{ email: string }> {
+  if (USE_MOCKS) {
+    await sleep(500)
+    const record = findToken(token, TOKEN_PURPOSE.INVITE)
+    if (!record) throw new Error('La invitación es inválida o ya expiró.')
+    if (password.length < 8)
+      throw new Error('La contraseña debe tener al menos 8 caracteres.')
+    const user = mockAuthUsers.find((u) => u.email.toLowerCase() === record.email)
+    if (user) user.password = password
+    consumeToken(token)
+    return { email: record.email }
+  }
+  return fetchJson<{ email: string }>('/auth/set-password', {
+    method: 'POST',
+    body: JSON.stringify({ token, password }),
   })
 }
 

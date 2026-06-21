@@ -11,6 +11,11 @@ import { LoginPage } from './pages/LoginPage'
 import { CartPage } from './pages/CartPage'
 import { CheckoutPage } from './pages/CheckoutPage'
 import { CheckoutResultPage } from './pages/CheckoutResultPage'
+import { RegisterPage } from './pages/RegisterPage'
+import { ForgotPasswordPage } from './pages/ForgotPasswordPage'
+import { ResetPasswordPage } from './pages/ResetPasswordPage'
+import { VerifyEmailPage } from './pages/VerifyEmailPage'
+import { SetPasswordPage } from './pages/SetPasswordPage'
 import { RequireAuth } from './components/auth/RequireAuth'
 import { CartProvider } from './contexts/CartContext'
 import { AdminProvider } from './contexts/AdminContext'
@@ -86,6 +91,11 @@ export default function App() {
             }
           />
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/registro" element={<RegisterPage />} />
+          <Route path="/recuperar-contrasena" element={<ForgotPasswordPage />} />
+          <Route path="/reset-password" element={<ResetPasswordPage />} />
+          <Route path="/verificar-email" element={<VerifyEmailPage />} />
+          <Route path="/set-password" element={<SetPasswordPage />} />
           <Route
             path="/carrito"
             element={
