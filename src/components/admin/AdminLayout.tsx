@@ -13,6 +13,7 @@ const navItems = [
   { to: '/admin/fotografos', label: 'Fotógrafos', icon: 'people' },
   { to: '/admin/cupones', label: 'Cupones', icon: 'local_offer' },
   { to: '/admin/ventas', label: 'Ventas', icon: 'attach_money' },
+  { to: '/admin/ordenes', label: 'Órdenes', icon: 'receipt_long' },
   { to: '/admin/metricas', label: 'Métricas', icon: 'bar_chart' },
 ]
 

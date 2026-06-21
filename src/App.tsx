@@ -33,6 +33,7 @@ import { AdminPhotographersPage } from './pages/admin/AdminPhotographersPage'
 import { AdminCouponsPage } from './pages/admin/AdminCouponsPage'
 import { AdminSalesPage } from './pages/admin/AdminSalesPage'
 import { AdminMetricsPage } from './pages/admin/AdminMetricsPage'
+import { AdminOrdersPage } from './pages/admin/AdminOrdersPage'
 import { PhotographerProvider } from './contexts/PhotographerContext'
 import { PhotographerLayout } from './components/photographer/PhotographerLayout'
 import { PhotographerDashboardPage } from './pages/photographer/PhotographerDashboardPage'
@@ -216,6 +217,7 @@ export default function App() {
             <Route path="fotos" element={<AdminPhotosPage />} />
             <Route path="fotografos" element={<AdminPhotographersPage />} />
             <Route path="cupones" element={<AdminCouponsPage />} />
+            <Route path="ordenes" element={<AdminOrdersPage />} />
             <Route path="ventas" element={<AdminSalesPage />} />
             <Route path="metricas" element={<AdminMetricsPage />} />
           </Route>
