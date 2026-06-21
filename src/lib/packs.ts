@@ -90,3 +90,81 @@ export function unitPriceFromPacks(packs: PhotoPack[], fallback = 19.99): number
   const perPhoto = packs.map(pricePerPhoto).find((v): v is number => v != null)
   return perPhoto ?? fallback
 }
+
+// ===== Resolución del pack vs carrito =====
+
+export interface PackResolution {
+  /** Cuántas fotos del evento hay en el carrito. */
+  count: number
+  /** Suma de los precios unitarios de las fotos seleccionadas. */
+  unitTotal: number
+  /** Pack activo: el carrito ya cumple su umbral exacto (o el "Todas"). */
+  activePack: PhotoPack | null
+  /** Precio final cobrado por este evento (con pack si aplica). */
+  chargedTotal: number
+  /** Diferencia entre unitTotal y chargedTotal cuando hay pack activo. */
+  savings: number
+  /** Próximo pack alcanzable y cuánto falta para llegar. */
+  nextPack: { pack: PhotoPack; missing: number; savingsIfReached: number } | null
+}
+
+export function resolvePack(
+  packs: PhotoPack[] | undefined,
+  count: number,
+  unitTotal: number,
+): PackResolution {
+  const base: PackResolution = {
+    count,
+    unitTotal: round2(unitTotal),
+    activePack: null,
+    chargedTotal: round2(unitTotal),
+    savings: 0,
+    nextPack: null,
+  }
+  if (!packs || packs.length === 0 || count === 0) return base
+
+  // 1) Pack 'all' siempre activo si existe (cobra precio fijo, omite todo)
+  const allPack = packs.find((p) => p.key === 'all')
+  if (allPack && allPack.price < unitTotal) {
+    return {
+      ...base,
+      activePack: allPack,
+      chargedTotal: round2(allPack.price),
+      savings: round2(unitTotal - allPack.price),
+    }
+  }
+
+  // 2) Pack con quantity exactamente igual al count: aplica
+  const exact = packs
+    .filter((p) => p.quantity != null)
+    .find((p) => p.quantity === count)
+  if (exact && exact.price < unitTotal) {
+    return {
+      ...base,
+      activePack: exact,
+      chargedTotal: round2(exact.price),
+      savings: round2(unitTotal - exact.price),
+    }
+  }
+
+  // 3) No hay pack activo. Sugerimos el siguiente cuyo umbral está por encima del count.
+  const candidates = packs
+    .filter((p): p is PhotoPack & { quantity: number } => p.quantity != null)
+    .filter((p) => p.quantity > count)
+    .sort((a, b) => a.quantity - b.quantity)
+  if (candidates.length === 0) return base
+
+  const next = candidates[0]
+  const unit = unitPriceFromPacks(packs)
+  const projectedUnitTotal = round2(unit * next.quantity)
+  const savingsIfReached = round2(projectedUnitTotal - next.price)
+  if (savingsIfReached <= 0) return base
+  return {
+    ...base,
+    nextPack: {
+      pack: next,
+      missing: next.quantity - count,
+      savingsIfReached,
+    },
+  }
+}

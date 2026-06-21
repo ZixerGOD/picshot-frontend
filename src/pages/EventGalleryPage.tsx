@@ -13,7 +13,12 @@ import { useCart } from '../hooks/useCart'
 import { Icon } from '../components/ui/Icon'
 import { Footer } from '../components/layout/Footer'
 import { formatPrice } from '../lib/format'
-import { packLabel, pricePerPhoto } from '../lib/packs'
+import {
+  packLabel,
+  pricePerPhoto,
+  resolvePack,
+  unitPriceFromPacks,
+} from '../lib/packs'
 
 const filters: { value: PhotoFilter; label: string; icon: string }[] = [
   { value: 'all', label: 'Todas', icon: 'photo_library' },
@@ -36,7 +41,15 @@ export function EventGalleryPage() {
   const [bib, setBib] = useState('')
   const [activeFilter, setActiveFilter] = useState<PhotoFilter>('all')
 
-  const { addItem, isInCart } = useCart()
+  const { addItem, isInCart, items: cartItems } = useCart()
+
+  const cartCountForEvent = cartItems.filter((it) => it.eventId === eventId).length
+  const cartUnitTotalForEvent = cartItems
+    .filter((it) => it.eventId === eventId)
+    .reduce((sum, it) => sum + it.price, 0)
+  const packResolution = event?.packs
+    ? resolvePack(event.packs, cartCountForEvent, cartUnitTotalForEvent)
+    : null
   const [toast, setToast] = useState<{ url: string } | null>(null)
   const toastTimerRef = useRef<number | null>(null)
 
@@ -330,19 +343,73 @@ export function EventGalleryPage() {
       {/* Packs */}
       {event.packs && event.packs.length > 0 && (
         <section className="shots-container mt-16">
-          <div className="flex items-center gap-2 text-primary font-label-bold text-label-bold mb-6 uppercase tracking-widest">
-            <Icon name="sell" fill />
-            <span>Packs disponibles</span>
+          <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-6">
+            <div>
+              <div className="flex items-center gap-2 text-primary font-label-bold text-label-bold mb-2 uppercase tracking-widest">
+                <Icon name="sell" fill />
+                <span>Paga menos comprando en pack</span>
+              </div>
+              <p className="font-body-md text-body-md text-on-surface-variant max-w-xl">
+                Elige más de una foto y obtén precios mejores. Al llegar al
+                número exacto del pack se aplica solo, sin códigos.
+              </p>
+            </div>
+            {packResolution && (
+              <div className="bg-surface-container-lowest border border-surface-variant px-4 py-3 min-w-[220px]">
+                {packResolution.activePack ? (
+                  <p className="font-body-md text-body-md text-primary">
+                    Pack <strong>{packLabel(packResolution.activePack.key)}</strong>{' '}
+                    activo · ahorras {formatPrice(packResolution.savings)}
+                  </p>
+                ) : packResolution.nextPack ? (
+                  <p className="font-body-md text-body-md text-on-surface">
+                    Llevas {packResolution.count}{' '}
+                    {packResolution.count === 1 ? 'foto' : 'fotos'}. Suma{' '}
+                    <strong>
+                      {packResolution.nextPack.missing} más
+                    </strong>{' '}
+                    y ahorra{' '}
+                    {formatPrice(packResolution.nextPack.savingsIfReached)} con el{' '}
+                    {packLabel(packResolution.nextPack.pack.key)}.
+                  </p>
+                ) : (
+                  <p className="font-body-md text-body-md text-on-surface-variant">
+                    Añade fotos al carrito para ver tu progreso por pack.
+                  </p>
+                )}
+              </div>
+            )}
           </div>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-base">
             {event.packs.map((pack) => {
               const perPhoto = pricePerPhoto(pack)
+              const unitPrice = unitPriceFromPacks(event.packs ?? [])
+              const savingsLabel =
+                pack.quantity != null && perPhoto != null && perPhoto < unitPrice
+                  ? `Ahorras ${Math.round((1 - perPhoto / unitPrice) * 100)}%`
+                  : null
+              const isActive =
+                packResolution?.activePack?.key === pack.key
+              const isNext =
+                packResolution?.nextPack?.pack.key === pack.key
+              const highlight = isActive || isNext
               return (
                 <div
                   key={pack.key}
-                  className="bg-surface-container-lowest border border-surface-variant p-5 flex flex-col gap-2 hover:border-primary-container transition-colors"
+                  className={`relative bg-surface-container-lowest border p-5 flex flex-col gap-2 transition-colors ${
+                    isActive
+                      ? 'border-primary'
+                      : isNext
+                        ? 'border-primary/50'
+                        : 'border-surface-variant hover:border-primary/30'
+                  }`}
                 >
-                  <span className="font-label-bold text-label-bold text-on-surface-variant uppercase tracking-wider">
+                  {highlight && (
+                    <span className="absolute -top-3 left-3 bg-primary text-on-primary font-label-bold text-label-bold uppercase tracking-widest text-[10px] px-2 py-0.5">
+                      {isActive ? 'Activo' : 'Siguiente meta'}
+                    </span>
+                  )}
+                  <span className="font-label-bold text-label-bold text-on-surface uppercase tracking-wider">
                     {packLabel(pack.key)}
                   </span>
                   <span className="font-headline-md text-headline-md text-primary">
@@ -350,11 +417,16 @@ export function EventGalleryPage() {
                   </span>
                   <span className="font-caption text-caption text-on-surface-variant">
                     {pack.quantity === null
-                      ? 'Todas tus fotos'
+                      ? 'Todas las fotos del evento'
                       : perPhoto != null
-                        ? `${formatPrice(perPhoto)} / foto`
+                        ? `${formatPrice(perPhoto)} por foto`
                         : `${pack.quantity} fotos`}
                   </span>
+                  {savingsLabel && (
+                    <span className="font-caption text-caption text-primary uppercase tracking-widest">
+                      {savingsLabel}
+                    </span>
+                  )}
                 </div>
               )
             })}

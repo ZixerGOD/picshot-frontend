@@ -1,7 +1,14 @@
 import { createContext, useCallback, useEffect, useMemo, useState } from 'react'
 import type { ReactNode } from 'react'
-import type { CartCoupon, CartItem, CartTotals, Photo } from '../lib/types'
-import { mockCoupons } from '../lib/mocks'
+import type {
+  CartCoupon,
+  CartItem,
+  CartTotals,
+  EventItem,
+  Photo,
+} from '../lib/types'
+import { mockCoupons, mockEvents } from '../lib/mocks'
+import { packLabel, resolvePack } from '../lib/packs'
 
 const STORAGE_KEY = 'picshot-cart'
 
@@ -10,11 +17,25 @@ interface StoredCart {
   coupon: CartCoupon | null
 }
 
+export interface CartEventGroup {
+  eventId: string
+  eventTitle: string
+  items: CartItem[]
+  unitTotal: number
+  /** Total cobrado por el evento aplicando packs si corresponde. */
+  chargedTotal: number
+  packSavings: number
+  activePackLabel: string | null
+  nextPackHint: { label: string; missing: number; savings: number } | null
+}
+
 interface CartContextValue {
   items: CartItem[]
   coupon: CartCoupon | null
   totals: CartTotals
   count: number
+  /** Items agrupados por evento, con cálculo de pack aplicado. */
+  eventGroups: CartEventGroup[]
   isInCart: (photoId: string) => boolean
   addItem: (photo: Photo, eventId?: string) => void
   removeItem: (photoId: string) => void
@@ -40,8 +61,46 @@ function readStoredCart(): StoredCart {
   }
 }
 
-function calcTotals(items: CartItem[], coupon: CartCoupon | null): CartTotals {
-  const subtotal = items.reduce((sum, it) => sum + it.price, 0)
+function buildEventGroups(
+  items: CartItem[],
+  eventIndex: Map<string, EventItem>,
+): CartEventGroup[] {
+  const byEvent = new Map<string, CartItem[]>()
+  for (const it of items) {
+    const list = byEvent.get(it.eventId) ?? []
+    list.push(it)
+    byEvent.set(it.eventId, list)
+  }
+  return Array.from(byEvent.entries()).map(([eventId, evItems]) => {
+    const event = eventIndex.get(eventId)
+    const unitTotal = evItems.reduce((sum, it) => sum + it.price, 0)
+    const resolution = resolvePack(event?.packs, evItems.length, unitTotal)
+    return {
+      eventId,
+      eventTitle: event?.title ?? 'Evento',
+      items: evItems,
+      unitTotal: +resolution.unitTotal.toFixed(2),
+      chargedTotal: +resolution.chargedTotal.toFixed(2),
+      packSavings: +resolution.savings.toFixed(2),
+      activePackLabel: resolution.activePack
+        ? packLabel(resolution.activePack.key)
+        : null,
+      nextPackHint: resolution.nextPack
+        ? {
+            label: packLabel(resolution.nextPack.pack.key),
+            missing: resolution.nextPack.missing,
+            savings: +resolution.nextPack.savingsIfReached.toFixed(2),
+          }
+        : null,
+    }
+  })
+}
+
+function calcTotals(
+  groups: CartEventGroup[],
+  coupon: CartCoupon | null,
+): CartTotals {
+  const subtotal = groups.reduce((sum, g) => sum + g.chargedTotal, 0)
   let discount = 0
   if (coupon) {
     discount =
@@ -109,7 +168,23 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const removeCoupon = useCallback(() => setCoupon(null), [])
 
-  const totals = useMemo(() => calcTotals(items, coupon), [items, coupon])
+  // En modo mock leemos los eventos directo; cuando se conecte el API,
+  // este Map se puede llenar con un fetch a /events o cache local.
+  const eventIndex = useMemo(() => {
+    const map = new Map<string, EventItem>()
+    mockEvents.forEach((e) => map.set(e.id, e))
+    return map
+  }, [])
+
+  const eventGroups = useMemo(
+    () => buildEventGroups(items, eventIndex),
+    [items, eventIndex],
+  )
+
+  const totals = useMemo(
+    () => calcTotals(eventGroups, coupon),
+    [eventGroups, coupon],
+  )
 
   const isInCart = useCallback(
     (photoId: string) => items.some((it) => it.photoId === photoId),
@@ -121,6 +196,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     coupon,
     totals,
     count: items.length,
+    eventGroups,
     isInCart,
     addItem,
     removeItem,

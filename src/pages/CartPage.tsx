@@ -1,40 +1,30 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useCart } from '../hooks/useCart'
 import { useAuth } from '../hooks/useAuth'
-import { getEvents } from '../lib/api'
-import type { EventItem } from '../lib/types'
 import { Icon } from '../components/ui/Icon'
 import { Footer } from '../components/layout/Footer'
 import { formatPrice } from '../lib/format'
 
 export function CartPage() {
-  const { items, totals, coupon, removeItem, applyCoupon, removeCoupon, clear } =
-    useCart()
+  const {
+    items,
+    totals,
+    coupon,
+    removeItem,
+    applyCoupon,
+    removeCoupon,
+    clear,
+    eventGroups,
+  } = useCart()
   const { isAuthenticated } = useAuth()
   const navigate = useNavigate()
 
-  const [events, setEvents] = useState<Record<string, EventItem>>({})
   const [couponInput, setCouponInput] = useState('')
   const [couponMsg, setCouponMsg] = useState<{
     ok: boolean
     message: string
   } | null>(null)
-
-  useEffect(() => {
-    let active = true
-    getEvents()
-      .then((data) => {
-        if (!active) return
-        const map: Record<string, EventItem> = {}
-        data.forEach((e) => (map[e.id] = e))
-        setEvents(map)
-      })
-      .catch(() => {})
-    return () => {
-      active = false
-    }
-  }, [])
 
   function handleApplyCoupon() {
     const res = applyCoupon(couponInput)
@@ -71,11 +61,6 @@ export function CartPage() {
     )
   }
 
-  const itemsByEvent = items.reduce<Record<string, typeof items>>((acc, it) => {
-    ;(acc[it.eventId] ??= []).push(it)
-    return acc
-  }, {})
-
   return (
     <>
       <main className="pt-32 pb-24 shots-container">
@@ -100,13 +85,41 @@ export function CartPage() {
 
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-gutter">
           <section className="flex flex-col gap-8">
-            {Object.entries(itemsByEvent).map(([eventId, eventItems]) => (
-              <div key={eventId}>
-                <h2 className="font-label-bold text-label-bold text-on-surface-variant uppercase tracking-widest mb-4">
-                  {events[eventId]?.title ?? 'Evento'}
-                </h2>
+            {eventGroups.map((group) => (
+              <div key={group.eventId}>
+                <div className="flex flex-wrap items-end justify-between gap-2 mb-3">
+                  <h2 className="font-label-bold text-label-bold text-on-surface uppercase tracking-widest">
+                    {group.eventTitle}
+                  </h2>
+                  <span className="font-caption text-caption text-on-surface-variant">
+                    {group.items.length}{' '}
+                    {group.items.length === 1 ? 'foto' : 'fotos'}
+                  </span>
+                </div>
+
+                {group.activePackLabel && (
+                  <div className="flex items-center gap-2 border border-primary bg-primary-container/15 px-3 py-2 mb-3 font-body-md text-body-md text-primary">
+                    <Icon name="check_circle" fill />
+                    Pack {group.activePackLabel} aplicado · ahorras{' '}
+                    {formatPrice(group.packSavings)}
+                  </div>
+                )}
+
+                {!group.activePackLabel && group.nextPackHint && (
+                  <Link
+                    to={`/eventos/${group.eventId}`}
+                    className="flex items-center gap-2 border border-primary/40 bg-surface-container-lowest px-3 py-2 mb-3 font-body-md text-body-md text-on-surface hover:border-primary transition-colors"
+                  >
+                    <Icon name="sell" className="text-primary" />
+                    Suma {group.nextPackHint.missing}{' '}
+                    {group.nextPackHint.missing === 1 ? 'foto' : 'fotos'} más
+                    para el {group.nextPackHint.label} y ahorra{' '}
+                    {formatPrice(group.nextPackHint.savings)}
+                  </Link>
+                )}
+
                 <ul className="flex flex-col gap-3">
-                  {eventItems.map((it) => (
+                  {group.items.map((it) => (
                     <li
                       key={it.photoId}
                       className="flex gap-4 bg-surface-container-lowest border border-surface-variant p-3"
@@ -127,7 +140,13 @@ export function CartPage() {
                             {it.resolution}
                           </span>
                         )}
-                        <span className="font-headline-md text-headline-md text-primary mt-1">
+                        <span
+                          className={`font-headline-md text-headline-md mt-1 ${
+                            group.activePackLabel
+                              ? 'text-on-surface-variant line-through'
+                              : 'text-primary'
+                          }`}
+                        >
                           {formatPrice(it.price)}
                         </span>
                       </div>
@@ -142,6 +161,15 @@ export function CartPage() {
                     </li>
                   ))}
                 </ul>
+
+                {group.activePackLabel && (
+                  <p className="font-caption text-caption text-on-surface-variant mt-2 text-right">
+                    Subtotal evento:{' '}
+                    <span className="text-primary font-label-bold">
+                      {formatPrice(group.chargedTotal)}
+                    </span>
+                  </p>
+                )}
               </div>
             ))}
           </section>
@@ -203,13 +231,29 @@ export function CartPage() {
               )}
             </div>
 
+            {eventGroups.some((g) => g.activePackLabel) && (
+              <div className="border-t border-surface-variant pt-3 space-y-1">
+                {eventGroups
+                  .filter((g) => g.activePackLabel)
+                  .map((g) => (
+                    <p
+                      key={g.eventId}
+                      className="font-caption text-caption text-primary"
+                    >
+                      Pack {g.activePackLabel} activo · ahorro{' '}
+                      {formatPrice(g.packSavings)}
+                    </p>
+                  ))}
+              </div>
+            )}
+
             <dl className="space-y-2 text-on-surface">
-              <div className="flex justify-between font-body-md text-body-md">
+              <div className="flex justify-between gap-4 font-body-md text-body-md">
                 <dt className="text-on-surface-variant">Subtotal</dt>
                 <dd>{formatPrice(totals.subtotal)}</dd>
               </div>
               {totals.discount > 0 && (
-                <div className="flex justify-between font-body-md text-body-md text-primary">
+                <div className="flex justify-between gap-4 font-body-md text-body-md text-primary">
                   <dt>Descuento</dt>
                   <dd>− {formatPrice(totals.discount)}</dd>
                 </div>
