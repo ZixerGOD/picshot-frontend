@@ -51,7 +51,7 @@ export function CookieBanner() {
       aria-label="Aviso de cookies"
       className="fixed inset-x-0 bottom-0 z-40 p-4 pointer-events-none"
     >
-      <div className="pointer-events-auto max-w-3xl mx-auto bg-surface-container-lowest border border-surface-variant shadow-2xl p-5 flex flex-col md:flex-row gap-4 md:items-center">
+      <div className="pointer-events-auto max-w-3xl mx-auto bg-surface-container-lowest border border-surface-variant shadow-2xl p-4 sm:p-5 flex flex-col md:flex-row gap-4 md:items-center">
         <Icon name="cookie" className="text-primary text-3xl shrink-0" />
         <div className="flex-1 font-body-md text-body-md text-on-surface">
           <p>

@@ -56,7 +56,7 @@ export function AccountPage() {
   }
 
   function handleRevokeBiometric() {
-    if (!window.confirm('¿Eliminar el consentimiento y tu embedding facial?')) return
+    if (!window.confirm('¿Retirar tu permiso y eliminar los datos de tu rostro?')) return
     revokeBiometricConsent()
     setConsent(false)
   }
@@ -76,7 +76,7 @@ export function AccountPage() {
           </p>
         </header>
 
-        <section className="bg-surface-container-lowest border border-surface-variant p-6">
+        <section className="bg-surface-container-lowest border border-surface-variant p-4 sm:p-6">
           <h2 className="font-headline-md text-headline-md text-on-surface uppercase mb-4">
             Datos personales
           </h2>
@@ -125,7 +125,7 @@ export function AccountPage() {
           </form>
         </section>
 
-        <section className="bg-surface-container-lowest border border-surface-variant p-6">
+        <section className="bg-surface-container-lowest border border-surface-variant p-4 sm:p-6">
           <h2 className="font-headline-md text-headline-md text-on-surface uppercase mb-4">
             Cambiar contraseña
           </h2>
@@ -175,7 +175,7 @@ export function AccountPage() {
           </form>
         </section>
 
-        <section className="bg-surface-container-lowest border border-surface-variant p-6">
+        <section className="bg-surface-container-lowest border border-surface-variant p-4 sm:p-6">
           <h2 className="font-headline-md text-headline-md text-on-surface uppercase mb-4">
             Reconocimiento facial
           </h2>

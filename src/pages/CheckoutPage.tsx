@@ -1,8 +1,10 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useCart } from '../hooks/useCart'
 import { useAuth } from '../hooks/useAuth'
 import { createOrder, simulatePayphone, CHECKOUT_TIMINGS } from '../lib/checkout'
+import { getEvents, USE_MOCKS } from '../lib/api'
+import type { EventItem } from '../lib/types'
 import { Icon } from '../components/ui/Icon'
 import { Footer } from '../components/layout/Footer'
 import { formatPrice } from '../lib/format'
@@ -24,6 +26,23 @@ export function CheckoutPage() {
       return acc
     }, {})
   }, [items])
+
+  const [eventTitles, setEventTitles] = useState<Record<string, string>>({})
+
+  useEffect(() => {
+    let active = true
+    getEvents()
+      .then((events) => {
+        if (!active) return
+        const map: Record<string, string> = {}
+        events.forEach((e: EventItem) => (map[e.id] = e.title))
+        setEventTitles(map)
+      })
+      .catch(() => {})
+    return () => {
+      active = false
+    }
+  }, [])
 
   if (items.length === 0 && step === 'review') {
     return (
@@ -98,7 +117,7 @@ export function CheckoutPage() {
 
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-gutter">
           <section className="flex flex-col gap-8">
-            <div className="bg-surface-container-lowest border border-surface-variant p-6">
+            <div className="bg-surface-container-lowest border border-surface-variant p-4 sm:p-6">
               <h2 className="font-headline-md text-headline-md text-on-surface mb-4">
                 Detalles del comprador
               </h2>
@@ -117,7 +136,7 @@ export function CheckoutPage() {
               </p>
             </div>
 
-            <div className="bg-surface-container-lowest border border-surface-variant p-6">
+            <div className="bg-surface-container-lowest border border-surface-variant p-4 sm:p-6">
               <h2 className="font-headline-md text-headline-md text-on-surface mb-4">
                 Fotos a pagar
               </h2>
@@ -125,21 +144,21 @@ export function CheckoutPage() {
                 {Object.entries(itemsByEvent).map(([eventId, eventItems]) => (
                   <div key={eventId}>
                     <p className="font-label-bold text-label-bold text-on-surface-variant uppercase tracking-widest mb-3">
-                      Evento {eventId}
+                      {eventTitles[eventId] ?? 'Evento'}
                     </p>
-                    <ul className="flex flex-wrap gap-3">
+                    <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                       {eventItems.map((it) => (
                         <li
                           key={it.photoId}
-                          className="flex items-center gap-3 border border-surface-variant px-3 py-2"
+                          className="flex items-center gap-3 border border-surface-variant px-3 py-2 min-w-0"
                         >
                           <img
                             src={it.url}
                             alt=""
-                            className="w-12 h-12 object-cover"
+                            className="w-12 h-12 object-cover shrink-0"
                           />
-                          <div className="flex flex-col">
-                            <span className="font-caption text-caption text-on-surface-variant uppercase tracking-widest">
+                          <div className="flex flex-col min-w-0 flex-1">
+                            <span className="font-caption text-caption text-on-surface-variant uppercase tracking-widest truncate">
                               {it.bib ? `Dorsal ${it.bib}` : it.photoId}
                             </span>
                             <span className="font-body-md text-body-md text-primary">
@@ -154,7 +173,8 @@ export function CheckoutPage() {
               </div>
             </div>
 
-            <div className="bg-surface-container-lowest border border-surface-variant p-6">
+            {USE_MOCKS && (
+            <div className="bg-surface-container-lowest border border-surface-variant p-4 sm:p-6">
               <h2 className="font-headline-md text-headline-md text-on-surface mb-2">
                 Modo demo: simular respuesta de Payphone
               </h2>
@@ -191,9 +211,10 @@ export function CheckoutPage() {
                 })}
               </div>
             </div>
+            )}
           </section>
 
-          <aside className="bg-surface-container-lowest border border-surface-variant p-6 flex flex-col gap-5 h-fit sticky top-28">
+          <aside className="bg-surface-container-lowest border border-surface-variant p-4 sm:p-6 flex flex-col gap-5 h-fit lg:sticky lg:top-28">
             <h3 className="font-headline-md text-headline-md text-on-surface uppercase">
               Resumen
             </h3>

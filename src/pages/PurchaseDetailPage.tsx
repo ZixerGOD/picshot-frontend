@@ -113,7 +113,7 @@ export function PurchaseDetailPage() {
         </header>
 
         {order?.payphone && (
-          <section className="bg-surface-container-lowest border border-surface-variant p-6 mb-8">
+          <section className="bg-surface-container-lowest border border-surface-variant p-4 sm:p-6 mb-8">
             <h2 className="font-headline-md text-headline-md text-on-surface uppercase mb-4">
               Transacción Payphone
             </h2>

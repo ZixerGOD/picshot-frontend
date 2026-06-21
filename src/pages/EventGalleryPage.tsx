@@ -171,7 +171,7 @@ export function EventGalleryPage() {
                 <Icon name="location_on" fill />
                 <span>{event.location}</span>
               </div>
-              <h1 className="font-display-lg text-display-lg uppercase text-on-surface text-balance max-w-2xl">
+              <h1 className="font-headline-lg-mobile md:font-display-lg text-headline-lg-mobile md:text-display-lg uppercase text-on-surface text-balance max-w-2xl">
                 {event.title}
               </h1>
             </div>
@@ -200,7 +200,7 @@ export function EventGalleryPage() {
       {/* Search Panel */}
       <section className="px-margin-mobile md:px-margin-desktop -mt-8 relative z-10">
         <div className="max-w-container-max mx-auto">
-          <div className="bg-surface-container-lowest border border-surface-variant p-6 md:p-8 flex flex-col md:flex-row gap-gutter">
+          <div className="bg-surface-container-lowest border border-surface-variant p-4 md:p-8 flex flex-col md:flex-row gap-6 md:gap-gutter">
             <div className="flex-1 md:border-r md:border-surface-variant pr-0 md:pr-8">
               <h2 className="font-headline-md text-headline-md text-on-surface mb-6">
                 Encuentra tus fotos

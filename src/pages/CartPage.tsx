@@ -146,7 +146,7 @@ export function CartPage() {
             ))}
           </section>
 
-          <aside className="bg-surface-container-lowest border border-surface-variant p-6 flex flex-col gap-5 h-fit sticky top-28">
+          <aside className="bg-surface-container-lowest border border-surface-variant p-4 sm:p-6 flex flex-col gap-5 h-fit lg:sticky lg:top-28">
             <h3 className="font-headline-md text-headline-md text-on-surface uppercase">
               Resumen
             </h3>

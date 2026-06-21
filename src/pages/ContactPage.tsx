@@ -83,7 +83,7 @@ export function ContactPage() {
           </p>
         </div>
 
-        <div className="lg:col-span-7 bg-surface-container-low border border-surface-variant p-8 md:p-12 relative overflow-hidden group">
+        <div className="lg:col-span-7 bg-surface-container-low border border-surface-variant p-5 sm:p-8 md:p-12 relative overflow-hidden group">
           <div className="absolute top-0 left-0 w-full h-1 bg-primary-container opacity-50 group-hover:opacity-100 transition-opacity duration-300" />
 
           {sent ? (
@@ -167,7 +167,7 @@ export function ContactPage() {
           {benefits.map((b) => (
             <div
               key={b.title}
-              className="bg-surface-container-highest border border-surface-variant p-8 flex items-start gap-4 hover:border-surface-variant/80 transition-colors"
+              className="bg-surface-container-highest border border-surface-variant p-5 sm:p-8 flex items-start gap-4 hover:border-surface-variant/80 transition-colors"
             >
               <div className="bg-surface-container-low p-3 shrink-0">
                 <Icon name={b.icon} className="text-primary-container text-3xl" fill />
@@ -183,7 +183,7 @@ export function ContactPage() {
             </div>
           ))}
 
-          <div className="bg-surface-container-lowest border border-primary-container/30 p-8 flex items-start gap-4 relative overflow-hidden group mt-auto">
+          <div className="bg-surface-container-lowest border border-primary-container/30 p-5 sm:p-8 flex items-start gap-4 relative overflow-hidden group mt-auto">
             <div className="shots-laser-line animate-scan" />
             <div className="bg-surface p-3 shrink-0 z-10">
               <Icon name="face" className="text-primary-container text-3xl" fill />

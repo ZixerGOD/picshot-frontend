@@ -66,7 +66,7 @@ export function MyPurchasesPage() {
             <Icon name="receipt_long" fill />
             <span>Mi cuenta</span>
           </div>
-          <h1 className="font-display-lg text-display-lg uppercase text-on-surface">
+          <h1 className="font-headline-lg-mobile md:font-display-lg text-headline-lg-mobile md:text-display-lg uppercase text-on-surface">
             Mis Compras
           </h1>
           {!loading && totalPhotos > 0 && (
@@ -228,8 +228,8 @@ function PurchaseGroup({ group }: { group: EventGroup }) {
             {group.event?.title ?? 'Evento'}
           </h2>
         </div>
-        <div className="flex items-center gap-4">
-          <div className="text-right">
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div className="text-left md:text-right">
             <div className="font-headline-md text-headline-md text-primary">
               {formatPrice(group.total)}
             </div>
@@ -240,9 +240,9 @@ function PurchaseGroup({ group }: { group: EventGroup }) {
           </div>
           <Link
             to={`/eventos/${group.eventId}`}
-            className="shots-btn-outline px-4 py-2"
+            className="shots-btn-outline px-4 py-2 text-xs sm:text-sm"
           >
-            Buscar más fotos de este evento
+            Buscar más fotos
           </Link>
         </div>
       </div>

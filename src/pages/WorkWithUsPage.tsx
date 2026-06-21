@@ -107,7 +107,7 @@ export function WorkWithUsPage() {
               </div>
             </div>
 
-            <div className="lg:col-span-8 bg-surface-container-low border border-surface-variant p-6 md:p-8">
+            <div className="lg:col-span-8 bg-surface-container-low border border-surface-variant p-4 sm:p-6 md:p-8">
               {sent ? (
                 <div className="flex flex-col items-center justify-center text-center py-12 gap-4">
                   <Icon
