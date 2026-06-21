@@ -1,14 +1,18 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link, useLocation, useSearchParams } from 'react-router-dom'
 import { resendVerification, verifyEmail } from '../lib/api'
+import { useAuth } from '../hooks/useAuth'
 import { AuthLayout } from '../components/auth/AuthLayout'
 import { Icon } from '../components/ui/Icon'
+
+const RESEND_COOLDOWN_S = 5 * 60
 
 type State = 'idle' | 'verifying' | 'success' | 'error'
 
 export function VerifyEmailPage() {
   const [params] = useSearchParams()
   const location = useLocation()
+  const { user, updateUser } = useAuth()
   const token = params.get('token') ?? ''
   const fromState = (location.state ?? {}) as {
     fromRegister?: boolean
@@ -17,14 +21,23 @@ export function VerifyEmailPage() {
   const [state, setState] = useState<State>(token ? 'verifying' : 'idle')
   const [message, setMessage] = useState<string | null>(null)
   const [resentToken, setResentToken] = useState<string | null>(null)
-  const [resendEmail, setResendEmail] = useState(fromState.email ?? '')
+  const [resendEmail, setResendEmail] = useState(
+    fromState.email ?? user?.email ?? '',
+  )
+  const [cooldown, setCooldown] = useState(0)
+  const cooldownRef = useRef<number | null>(null)
 
   useEffect(() => {
     if (!token) return
     let cancelled = false
     verifyEmail(token)
-      .then(() => {
-        if (!cancelled) setState('success')
+      .then(({ email }) => {
+        if (cancelled) return
+        // Si el usuario en sesión coincide con el correo verificado, refrescar
+        if (user && user.email.toLowerCase() === email.toLowerCase()) {
+          updateUser({ emailVerified: true })
+        }
+        setState('success')
       })
       .catch((err) => {
         if (cancelled) return
@@ -34,14 +47,23 @@ export function VerifyEmailPage() {
     return () => {
       cancelled = true
     }
-  }, [token])
+  }, [token, user, updateUser])
+
+  useEffect(() => {
+    if (cooldown <= 0) return
+    cooldownRef.current = window.setTimeout(() => setCooldown((c) => c - 1), 1000)
+    return () => {
+      if (cooldownRef.current) window.clearTimeout(cooldownRef.current)
+    }
+  }, [cooldown])
 
   async function handleResend(e: React.FormEvent) {
     e.preventDefault()
-    if (!resendEmail) return
+    if (!resendEmail || cooldown > 0) return
     setResentToken(null)
     const res = await resendVerification(resendEmail)
     setResentToken(res.token)
+    setCooldown(RESEND_COOLDOWN_S)
   }
 
   if (state === 'success') {
@@ -105,10 +127,13 @@ export function VerifyEmailPage() {
         </label>
         <button
           type="submit"
-          className="shots-btn-primary py-3 justify-center"
+          disabled={cooldown > 0}
+          className="shots-btn-primary py-3 justify-center disabled:opacity-60 disabled:cursor-not-allowed"
         >
           <Icon name="mail" />
-          Reenviar enlace
+          {cooldown > 0
+            ? `Espera ${Math.floor(cooldown / 60)}:${String(cooldown % 60).padStart(2, '0')}`
+            : 'Reenviar enlace'}
         </button>
         {resentToken && (
           <div className="border border-primary/40 bg-primary-container/15 p-4 text-center">

@@ -1,8 +1,12 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import type { Location } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
-import { USE_MOCKS } from '../lib/api'
+import {
+  USE_MOCKS,
+  LoginRateLimitError,
+  loginRetryAfterSeconds,
+} from '../lib/api'
 import type { UserRole } from '../lib/types'
 import { Input } from '../components/ui/Input'
 import { Button } from '../components/ui/Button'
@@ -31,9 +35,9 @@ function areaForPath(path: string): UserRole {
 
 // Atajos de demo (modo mock). En backend real se eliminan.
 const demoAccounts: { label: string; email: string; password: string; icon: string }[] = [
-  { label: 'Administrador', email: 'admin@picshot.com', password: 'admin123', icon: 'shield_person' },
-  { label: 'Fotógrafo', email: 'fotografo@picshot.com', password: 'foto123', icon: 'photo_camera' },
-  { label: 'Comprador', email: 'comprador@email.com', password: 'demo123', icon: 'shopping_bag' },
+  { label: 'Administrador', email: 'admin@picshot.com', password: 'Admin123!', icon: 'shield_person' },
+  { label: 'Fotógrafo', email: 'fotografo@picshot.com', password: 'Foto1234', icon: 'photo_camera' },
+  { label: 'Comprador', email: 'comprador@email.com', password: 'Demo1234', icon: 'shopping_bag' },
 ]
 
 export function LoginPage() {
@@ -44,15 +48,32 @@ export function LoginPage() {
 
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [rememberMe, setRememberMe] = useState(false)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [lockoutSeconds, setLockoutSeconds] = useState(() =>
+    loginRetryAfterSeconds(),
+  )
+  const lockoutTimerRef = useRef<number | null>(null)
+
+  useEffect(() => {
+    if (lockoutSeconds <= 0) return
+    lockoutTimerRef.current = window.setTimeout(
+      () => setLockoutSeconds((s) => Math.max(0, s - 1)),
+      1000,
+    )
+    return () => {
+      if (lockoutTimerRef.current) window.clearTimeout(lockoutTimerRef.current)
+    }
+  }, [lockoutSeconds])
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
+    if (lockoutSeconds > 0) return
     setError('')
     setLoading(true)
     try {
-      const user = await login({ email, password })
+      const user = await login({ email, password, rememberMe })
       const from = state.from?.pathname
       // Volver a la página de origen solo si es del área del propio rol; si no, a su home.
       const target =
@@ -61,7 +82,16 @@ export function LoginPage() {
           : homeForRole(user.role)
       navigate(target, { replace: true })
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'No se pudo iniciar sesión')
+      if (err instanceof LoginRateLimitError) {
+        setLockoutSeconds(err.retryInSeconds)
+        setError(
+          `Demasiados intentos. Espera ${err.retryInSeconds} segundos antes de reintentar.`,
+        )
+      } else {
+        setError(err instanceof Error ? err.message : 'No se pudo iniciar sesión')
+        const next = loginRetryAfterSeconds()
+        if (next > 0) setLockoutSeconds(next)
+      }
     } finally {
       setLoading(false)
     }
@@ -126,6 +156,15 @@ export function LoginPage() {
               required
             />
 
+            <label className="flex items-center gap-2 font-body-md text-body-md text-on-surface cursor-pointer">
+              <input
+                type="checkbox"
+                checked={rememberMe}
+                onChange={(e) => setRememberMe(e.target.checked)}
+              />
+              <span>Recuérdame en este dispositivo</span>
+            </label>
+
             {error && (
               <p className="flex items-center gap-2 font-caption text-caption text-error">
                 <Icon name="error" className="text-base" />
@@ -133,9 +172,16 @@ export function LoginPage() {
               </p>
             )}
 
-            <Button type="submit" isLoading={loading} className="w-full py-4">
+            <Button
+              type="submit"
+              isLoading={loading}
+              disabled={lockoutSeconds > 0}
+              className="w-full py-4"
+            >
               <Icon name="login" />
-              Entrar
+              {lockoutSeconds > 0
+                ? `Espera ${lockoutSeconds}s`
+                : 'Entrar'}
             </Button>
           </form>
 

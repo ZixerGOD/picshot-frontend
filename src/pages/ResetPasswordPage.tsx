@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { resetPassword } from '../lib/api'
+import { PASSWORD_HINT } from '../lib/types'
 import { AuthLayout } from '../components/auth/AuthLayout'
 import { Icon } from '../components/ui/Icon'
 
@@ -66,11 +67,15 @@ export function ResetPasswordPage() {
             type="password"
             required
             minLength={8}
+            maxLength={128}
             autoComplete="new-password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             className="shots-input"
           />
+          <span className="font-caption text-caption text-on-surface-variant normal-case tracking-normal">
+            {PASSWORD_HINT}
+          </span>
         </label>
         <label className="flex flex-col gap-1 font-caption text-caption text-on-surface-variant uppercase tracking-widest">
           Confirmar

@@ -1,12 +1,14 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { register } from '../lib/api'
+import { PASSWORD_HINT } from '../lib/types'
 import { AuthLayout } from '../components/auth/AuthLayout'
 import { Icon } from '../components/ui/Icon'
 
 export function RegisterPage() {
   const navigate = useNavigate()
-  const [name, setName] = useState('')
+  const [firstName, setFirstName] = useState('')
+  const [lastName, setLastName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirm, setConfirm] = useState('')
@@ -25,7 +27,8 @@ export function RegisterPage() {
     setLoading(true)
     try {
       const result = await register({
-        name,
+        firstName,
+        lastName,
         email,
         password,
         marketingOptIn,
@@ -56,17 +59,30 @@ export function RegisterPage() {
     >
       <form onSubmit={handleSubmit} className="flex flex-col gap-5">
         <div className="flex flex-col gap-4">
-          <Field label="¿Cómo te llamas?">
-            <input
-              type="text"
-              required
-              autoComplete="name"
-              placeholder="Tu nombre completo"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              className="shots-input"
-            />
-          </Field>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <Field label="Nombres">
+              <input
+                type="text"
+                required
+                autoComplete="given-name"
+                placeholder="Ej. María Fernanda"
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+                className="shots-input"
+              />
+            </Field>
+            <Field label="Apellidos">
+              <input
+                type="text"
+                required
+                autoComplete="family-name"
+                placeholder="Ej. Pérez Cordero"
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
+                className="shots-input"
+              />
+            </Field>
+          </div>
 
           <Field label="Tu correo electrónico">
             <input
@@ -85,11 +101,12 @@ export function RegisterPage() {
           <p className="font-caption text-caption text-on-surface-variant uppercase tracking-widest">
             Crea una contraseña
           </p>
-          <Field hint="Mínimo 8 caracteres. Usa letras y números.">
+          <Field hint={PASSWORD_HINT}>
             <input
               type="password"
               required
               minLength={8}
+              maxLength={128}
               autoComplete="new-password"
               placeholder="Nueva contraseña"
               value={password}
@@ -102,6 +119,7 @@ export function RegisterPage() {
               type="password"
               required
               minLength={8}
+              maxLength={128}
               autoComplete="new-password"
               placeholder="Confirma tu contraseña"
               value={confirm}

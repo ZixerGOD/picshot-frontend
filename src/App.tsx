@@ -148,7 +148,7 @@ export default function App() {
           <Route
             path="/checkout"
             element={
-              <RequireAuth>
+              <RequireAuth requireVerifiedEmail>
                 <PublicLayout>
                   <CheckoutPage />
                 </PublicLayout>
