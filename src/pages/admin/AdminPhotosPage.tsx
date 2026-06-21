@@ -1,7 +1,6 @@
 import { useMemo, useState } from 'react'
 import { useAdmin } from '../../hooks/useAdmin'
 import { AdminTable } from '../../components/admin/AdminTable'
-import { Button } from '../../components/ui/Button'
 import { Icon } from '../../components/ui/Icon'
 import { Select } from '../../components/ui/Select'
 import type { Photo } from '../../lib/types'
@@ -14,11 +13,10 @@ const statusOptions = [
 ]
 
 export function AdminPhotosPage() {
-  const { photos, events, photographers, addPhotos, deletePhoto } = useAdmin()
+  const { photos, events, photographers, deletePhoto } = useAdmin()
   const [eventFilter, setEventFilter] = useState('')
   const [photographerFilter, setPhotographerFilter] = useState('')
   const [statusFilter, setStatusFilter] = useState('')
-  const [uploading, setUploading] = useState(false)
 
   const filtered = useMemo(() => {
     return photos.filter((p) => {
@@ -29,40 +27,15 @@ export function AdminPhotosPage() {
     })
   }, [photos, eventFilter, photographerFilter, statusFilter])
 
-  function handleSimulateUpload() {
-    if (!eventFilter || !photographerFilter) {
-      alert('Selecciona un evento y un fotógrafo para simular la subida.')
-      return
-    }
-    setUploading(true)
-    setTimeout(() => {
-      const event = events.find((e) => e.id === eventFilter)
-      const newPhotos: Omit<Photo, 'id'>[] = Array.from({ length: 6 }).map((_, i) => ({
-        eventId: eventFilter,
-        photographerId: photographerFilter,
-        url: `https://picsum.photos/seed/${Date.now()}-${i}/800/600`,
-        price: event?.basePrice ?? 19.99,
-        status: 'published',
-        createdAt: new Date().toISOString(),
-      }))
-      addPhotos(newPhotos)
-      setUploading(false)
-    }, 1200)
-  }
-
   return (
     <div className="space-y-8">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 className="font-headline-lg text-headline-lg text-on-surface uppercase">Fotos</h1>
           <p className="font-body-md text-body-md text-on-surface-variant mt-1">
-            Gestiona todas las fotos subidas por evento y fotógrafo.
+            Gestiona y modera todas las fotos subidas por evento y fotógrafo.
           </p>
         </div>
-        <Button onClick={handleSimulateUpload} isLoading={uploading}>
-          <Icon name="cloud_upload" />
-          Simular subida
-        </Button>
       </div>
 
       <div className="bg-surface border border-surface-variant p-4 flex flex-col md:flex-row gap-4">

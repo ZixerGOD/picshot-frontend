@@ -6,7 +6,8 @@ import { Icon } from '../../components/ui/Icon'
 import { formatPrice } from '../../lib/format'
 
 const MAX_BATCH = 10
-const MAX_FILE_MB = 25
+const MAX_FILE_MB = 30
+const MIN_LONG_SIDE_PX = 1920
 
 type JobState = 'queued' | 'uploading' | 'processing' | 'done' | 'error'
 
@@ -46,17 +47,51 @@ export function PhotographerPhotosPage() {
     return events.find((e) => e.id === selectedEvent)
   }
 
-  function buildJobsFromFiles(files: FileList | File[]): UploadJob[] {
+  function measureImage(file: File): Promise<{ width: number; height: number }> {
+    return new Promise((resolve, reject) => {
+      const url = URL.createObjectURL(file)
+      const img = new Image()
+      img.onload = () => {
+        resolve({ width: img.naturalWidth, height: img.naturalHeight })
+        URL.revokeObjectURL(url)
+      }
+      img.onerror = () => {
+        URL.revokeObjectURL(url)
+        reject(new Error('No pudimos leer la imagen.'))
+      }
+      img.src = url
+    })
+  }
+
+  async function buildJobsFromFiles(files: FileList | File[]): Promise<UploadJob[]> {
     const arr = Array.from(files)
     const accepted: UploadJob[] = []
-    let dropped = 0
+    const warnings: string[] = []
     for (const file of arr) {
       if (accepted.length >= MAX_BATCH) {
-        dropped++
+        warnings.push(`Solo procesamos las primeras ${MAX_BATCH} fotos.`)
+        break
+      }
+      // HEIC suele venir como image/heic o sin tipo desde iPhone
+      if (file.type === 'image/heic' || /\.heic$/i.test(file.name)) {
+        warnings.push(`${file.name} es HEIC. Exporta como JPEG antes de subir.`)
         continue
       }
       if (!file.type.startsWith('image/')) continue
       if (file.size > MAX_FILE_MB * 1024 * 1024) {
+        warnings.push(`${file.name} supera ${MAX_FILE_MB} MB.`)
+        continue
+      }
+      try {
+        const { width, height } = await measureImage(file)
+        if (Math.max(width, height) < MIN_LONG_SIDE_PX) {
+          warnings.push(
+            `${file.name} tiene ${Math.max(width, height)} px. Necesitamos al menos ${MIN_LONG_SIDE_PX} px en el lado más largo (Full HD).`,
+          )
+          continue
+        }
+      } catch {
+        warnings.push(`${file.name} no pudo abrirse.`)
         continue
       }
       accepted.push({
@@ -67,19 +102,20 @@ export function PhotographerPhotosPage() {
         progress: 0,
       })
     }
-    if (dropped > 0) {
-      console.warn(`Se descartaron ${dropped} fotos: el batch máximo es ${MAX_BATCH}.`)
+    if (warnings.length > 0) {
+      window.alert(warnings.join('\n'))
     }
     return accepted
   }
 
-  function handleFiles(files: FileList | File[]) {
+  async function handleFiles(files: FileList | File[]) {
     if (!selectedEvent) {
       setJobs([])
       alert('Selecciona un evento antes de subir fotos.')
       return
     }
-    const newJobs = buildJobsFromFiles(files)
+    const newJobs = await buildJobsFromFiles(files)
+    if (newJobs.length === 0) return
     setJobs(newJobs)
     void runQueue(newJobs)
   }
@@ -199,7 +235,12 @@ export function PhotographerPhotosPage() {
             Arrastra hasta {MAX_BATCH} fotos aquí o haz click para seleccionar.
           </p>
           <p className="font-caption text-caption text-on-surface-variant mt-1">
-            Formatos: JPG/PNG. Máximo {MAX_FILE_MB} MB por foto.
+            Formatos: JPG/PNG. Máximo {MAX_FILE_MB} MB por foto. Mínimo{' '}
+            {MIN_LONG_SIDE_PX} px en el lado más largo (Full HD).
+          </p>
+          <p className="font-caption text-caption text-on-surface-variant mt-1">
+            Si disparas con iPhone, exporta tus fotos como JPEG antes de
+            subirlas (no aceptamos HEIC).
           </p>
           <input
             ref={fileRef}

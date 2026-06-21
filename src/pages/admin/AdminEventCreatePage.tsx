@@ -32,10 +32,11 @@ export function AdminEventCreatePage() {
   const navigate = useNavigate()
   const [saving, setSaving] = useState(false)
 
+  // Cada evento es de un solo día (decisions.md 229-232). Eventos
+  // multi-día se modelan como eventos separados; no exponemos endDate.
   const [form, setForm] = useState({
     title: '',
     date: '',
-    endDate: '',
     retentionUntil: '',
     location: '',
     type: 'Maratón',
@@ -60,7 +61,6 @@ export function AdminEventCreatePage() {
       addEvent({
         title: form.title,
         date: form.date,
-        endDate: form.endDate || undefined,
         retentionUntil,
         displayDate: formatDisplayDate(form.date),
         location: form.location,
@@ -118,25 +118,18 @@ export function AdminEventCreatePage() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <label className="shots-label">Fecha de inicio</label>
+            <label className="shots-label">Fecha del evento</label>
             <Input
               required
               type="date"
               value={form.date}
               onChange={(e) => setForm({ ...form, date: e.target.value })}
             />
+            <p className="font-caption text-caption text-on-surface-variant mt-1">
+              Cada evento corresponde a un solo día. Para una jornada de
+              varios días, crea un evento por día.
+            </p>
           </div>
-          <div>
-            <label className="shots-label">Fecha de fin (opcional)</label>
-            <Input
-              type="date"
-              value={form.endDate}
-              onChange={(e) => setForm({ ...form, endDate: e.target.value })}
-            />
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
             <label className="shots-label">Ciudad / Ubicación</label>
             <Input
