@@ -6,15 +6,49 @@ import { ThemeToggle } from '../ui/ThemeToggle'
 import { useAuth } from '../../hooks/useAuth'
 import { mockAdminUser } from '../../lib/mocks'
 
-const navItems = [
-  { to: '/admin', label: 'Dashboard', icon: 'dashboard', end: true },
-  { to: '/admin/eventos', label: 'Eventos', icon: 'event' },
-  { to: '/admin/fotos', label: 'Fotos', icon: 'photo_library' },
-  { to: '/admin/fotografos', label: 'Fotógrafos', icon: 'people' },
-  { to: '/admin/cupones', label: 'Cupones', icon: 'local_offer' },
-  { to: '/admin/ventas', label: 'Ventas', icon: 'attach_money' },
-  { to: '/admin/ordenes', label: 'Órdenes', icon: 'receipt_long' },
-  { to: '/admin/metricas', label: 'Métricas', icon: 'bar_chart' },
+interface NavItem {
+  to: string
+  label: string
+  icon: string
+  end?: boolean
+}
+
+interface NavSection {
+  title?: string
+  items: NavItem[]
+}
+
+const navSections: NavSection[] = [
+  {
+    items: [{ to: '/admin', label: 'Dashboard', icon: 'dashboard', end: true }],
+  },
+  {
+    title: 'Catálogo',
+    items: [
+      { to: '/admin/eventos', label: 'Eventos', icon: 'event' },
+      { to: '/admin/fotos', label: 'Fotos', icon: 'photo_library' },
+    ],
+  },
+  {
+    title: 'Equipo',
+    items: [
+      { to: '/admin/fotografos', label: 'Fotógrafos', icon: 'people' },
+    ],
+  },
+  {
+    title: 'Comercial',
+    items: [
+      { to: '/admin/cupones', label: 'Cupones', icon: 'local_offer' },
+      { to: '/admin/ventas', label: 'Ventas', icon: 'attach_money' },
+      { to: '/admin/ordenes', label: 'Órdenes', icon: 'receipt_long' },
+    ],
+  },
+  {
+    title: 'Análisis',
+    items: [
+      { to: '/admin/metricas', label: 'Métricas', icon: 'bar_chart' },
+    ],
+  },
 ]
 
 export function AdminLayout() {
@@ -40,23 +74,32 @@ export function AdminLayout() {
           </p>
         </div>
 
-        <nav className="flex-1 overflow-y-auto py-4 px-3 space-y-1">
-          {navItems.map((item) => (
-            <NavLink
-              key={item.to}
-              to={item.to}
-              end={item.end}
-              className={({ isActive }) =>
-                `flex items-center gap-3 px-4 py-3 font-label-bold text-label-bold uppercase tracking-wider transition-colors ${
-                  isActive
-                    ? 'bg-primary-container text-on-primary-container'
-                    : 'text-on-surface hover:bg-surface-container-high'
-                }`
-              }
-            >
-              <Icon name={item.icon} className="text-xl" />
-              {item.label}
-            </NavLink>
+        <nav className="flex-1 overflow-y-auto py-4 px-3 space-y-6">
+          {navSections.map((section, idx) => (
+            <div key={section.title ?? `section-${idx}`} className="space-y-1">
+              {section.title && (
+                <p className="px-4 pb-2 font-caption text-caption text-on-surface-variant uppercase tracking-widest">
+                  {section.title}
+                </p>
+              )}
+              {section.items.map((item) => (
+                <NavLink
+                  key={item.to}
+                  to={item.to}
+                  end={item.end}
+                  className={({ isActive }) =>
+                    `flex items-center gap-3 px-4 py-3 font-label-bold text-label-bold uppercase tracking-wider transition-colors ${
+                      isActive
+                        ? 'bg-primary-container text-on-primary-container'
+                        : 'text-on-surface hover:bg-surface-container-high'
+                    }`
+                  }
+                >
+                  <Icon name={item.icon} className="text-xl" />
+                  {item.label}
+                </NavLink>
+              ))}
+            </div>
           ))}
         </nav>
 
@@ -108,25 +151,34 @@ export function AdminLayout() {
 
       {/* Mobile Menu */}
       {mobileOpen && (
-        <div className="lg:hidden fixed inset-0 top-16 bg-background z-30 p-4">
-          <nav className="space-y-1">
-            {navItems.map((item) => (
-              <NavLink
-                key={item.to}
-                to={item.to}
-                end={item.end}
-                onClick={() => setMobileOpen(false)}
-                className={({ isActive }) =>
-                  `flex items-center gap-3 px-4 py-3 font-label-bold text-label-bold uppercase tracking-wider transition-colors ${
-                    isActive
-                      ? 'bg-primary-container text-on-primary-container'
-                      : 'text-on-surface hover:bg-surface-container-high'
-                  }`
-                }
-              >
-                <Icon name={item.icon} className="text-xl" />
-                {item.label}
-              </NavLink>
+        <div className="lg:hidden fixed inset-0 top-16 bg-background z-30 p-4 overflow-y-auto">
+          <nav className="space-y-6">
+            {navSections.map((section, idx) => (
+              <div key={section.title ?? `m-section-${idx}`} className="space-y-1">
+                {section.title && (
+                  <p className="px-4 pb-2 font-caption text-caption text-on-surface-variant uppercase tracking-widest">
+                    {section.title}
+                  </p>
+                )}
+                {section.items.map((item) => (
+                  <NavLink
+                    key={item.to}
+                    to={item.to}
+                    end={item.end}
+                    onClick={() => setMobileOpen(false)}
+                    className={({ isActive }) =>
+                      `flex items-center gap-3 px-4 py-3 font-label-bold text-label-bold uppercase tracking-wider transition-colors ${
+                        isActive
+                          ? 'bg-primary-container text-on-primary-container'
+                          : 'text-on-surface hover:bg-surface-container-high'
+                      }`
+                    }
+                  >
+                    <Icon name={item.icon} className="text-xl" />
+                    {item.label}
+                  </NavLink>
+                ))}
+              </div>
             ))}
           </nav>
           <button

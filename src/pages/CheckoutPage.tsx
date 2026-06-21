@@ -209,7 +209,7 @@ export function CheckoutPage() {
                   <dd>− {formatPrice(totals.discount)}</dd>
                 </div>
               )}
-              <div className="flex justify-between font-headline-md text-headline-md pt-2 border-t border-surface-variant">
+              <div className="flex justify-between gap-4 font-headline-md text-headline-md pt-2 border-t border-surface-variant">
                 <dt>Total a pagar</dt>
                 <dd className="text-primary">{formatPrice(totals.total)}</dd>
               </div>

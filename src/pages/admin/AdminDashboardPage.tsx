@@ -115,14 +115,14 @@ export function AdminDashboardPage() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <section className="lg:col-span-2 bg-surface border border-surface-variant p-6">
+        <section className="lg:col-span-2 bg-surface border border-surface-variant p-6 h-fit">
           <h2 className="font-headline-md text-headline-md text-on-surface mb-6 uppercase">
             Ingresos últimos 7 días
           </h2>
           <SimpleBarChart data={last7Days} valuePrefix="$" />
         </section>
 
-        <section className="bg-surface border border-surface-variant p-6">
+        <section className="bg-surface border border-surface-variant p-6 h-fit">
           <h2 className="font-headline-md text-headline-md text-on-surface mb-6 uppercase">
             Retención próxima a vencer
           </h2>
@@ -165,7 +165,7 @@ export function AdminDashboardPage() {
           )}
         </section>
 
-        <section className="bg-surface border border-surface-variant p-6">
+        <section className="bg-surface border border-surface-variant p-6 h-fit">
           <h2 className="font-headline-md text-headline-md text-on-surface mb-6 uppercase">
             Cupones por cerrarse
           </h2>
@@ -203,8 +203,8 @@ export function AdminDashboardPage() {
         </section>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <section className="bg-surface border border-surface-variant p-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <section className="lg:col-span-2 bg-surface border border-surface-variant p-6">
           <h2 className="font-headline-md text-headline-md text-on-surface mb-6 uppercase">
             Eventos con más ventas
           </h2>

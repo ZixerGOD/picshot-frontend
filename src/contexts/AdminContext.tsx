@@ -17,7 +17,9 @@ import {
 } from '../lib/mocks'
 import { AdminContext } from '../hooks/useAdmin'
 
-const STORAGE_KEY = 'picshot-admin-demo'
+// Bumpear la versión invalida el demo en localStorage cuando cambian los mocks
+// (ej. al migrar nombres España → Ecuador).
+const STORAGE_KEY = 'picshot-admin-demo-v3'
 
 interface AdminState {
   events: EventItem[]

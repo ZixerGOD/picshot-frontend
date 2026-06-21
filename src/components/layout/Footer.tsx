@@ -8,7 +8,7 @@ interface FooterProps {
 export function Footer({ variant = 'simple' }: FooterProps) {
   const detailed = variant === 'detailed'
   const year = new Date().getFullYear()
-  const copyright = `© ${year} Picshot Professional Sports Photography. All rights reserved.`
+  const copyright = `© ${year} Picshot · Fotografía deportiva profesional. Todos los derechos reservados.`
 
   return (
     <footer className="bg-surface-container-lowest border-t border-surface-variant w-full py-16">
@@ -17,7 +17,7 @@ export function Footer({ variant = 'simple' }: FooterProps) {
           <Logo className="h-7" />
           <p className="font-body-md text-body-md text-on-surface-variant max-w-sm">
             {detailed
-              ? 'Capturando el rendimiento máximo. Plataforma líder en fotografía deportiva profesional.'
+              ? 'Capturando el momento exacto. Plataforma de fotografía deportiva profesional en Ecuador.'
               : copyright}
           </p>
           {detailed && (
@@ -34,16 +34,16 @@ export function Footer({ variant = 'simple' }: FooterProps) {
                 Legal
               </span>
               <Link
-                to="/privacidad"
-                className="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors"
-              >
-                Privacidad
-              </Link>
-              <Link
                 to="/terminos"
                 className="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors"
               >
                 Términos
+              </Link>
+              <Link
+                to="/privacidad"
+                className="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors"
+              >
+                Privacidad
               </Link>
               <Link
                 to="/cookies"
@@ -55,7 +55,7 @@ export function Footer({ variant = 'simple' }: FooterProps) {
                 to="/politica-biometrica"
                 className="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors"
               >
-                Política biométrica
+                Reconocimiento facial
               </Link>
             </div>
             <div className="flex flex-col gap-4">
@@ -82,16 +82,16 @@ export function Footer({ variant = 'simple' }: FooterProps) {
         ) : (
           <nav className="flex flex-wrap gap-6 sm:gap-12 mt-8 md:mt-0">
             <Link
-              to="/privacidad"
-              className="font-label-bold text-label-bold text-on-surface-variant hover:text-primary transition-colors"
-            >
-              Privacidad
-            </Link>
-            <Link
               to="/terminos"
               className="font-label-bold text-label-bold text-on-surface-variant hover:text-primary transition-colors"
             >
               Términos
+            </Link>
+            <Link
+              to="/privacidad"
+              className="font-label-bold text-label-bold text-on-surface-variant hover:text-primary transition-colors"
+            >
+              Privacidad
             </Link>
             <Link
               to="/cookies"
@@ -103,7 +103,7 @@ export function Footer({ variant = 'simple' }: FooterProps) {
               to="/politica-biometrica"
               className="font-label-bold text-label-bold text-on-surface-variant hover:text-primary transition-colors"
             >
-              Política biométrica
+              Reconocimiento facial
             </Link>
           </nav>
         )}
