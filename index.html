@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#ffffff" />
+    <meta
+      name="description"
+      content="Picshot - Encuentra y compra tus mejores fotos de eventos deportivos. Maratones, ciclismo, triatlón, MTB y más."
+    />
+    <meta
+      name="keywords"
+      content="fotos deportivas, maratón, ciclismo, triatlón, MTB, fotografía deportiva, eventos deportivos, picshot"
+    />
+    <meta name="author" content="Picshot" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://picshotec.com" />
+    <meta property="og:title" content="Picshot - Encuentra tus fotos" />
+    <meta
+      property="og:description"
+      content="Encuentra y compra tus mejores fotos de eventos deportivos."
+    />
+    <meta property="og:image" content="https://picshotec.com/logos/picshot-logo-negro-transparente.png" />
+
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content="https://picshotec.com" />
+    <meta property="twitter:title" content="Picshot - Encuentra tus fotos" />
+    <meta
+      property="twitter:description"
+      content="Encuentra y compra tus mejores fotos de eventos deportivos."
+    />
+    <meta property="twitter:image" content="https://picshotec.com/logos/picshot-logo-negro-transparente.png" />
+
+    <title>Picshot - Encuentra tus fotos</title>
+
+    <script>
+      (function () {
+        const theme = localStorage.getItem('picshot-theme')
+        if (theme === 'dark') {
+          document.documentElement.classList.add('dark')
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#000000')
+        } else {
+          document.documentElement.classList.remove('dark')
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      })()
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

@@ -1,0 +1,87 @@
+import { Link } from 'react-router-dom'
+import { Logo } from '../ui/Logo'
+
+interface FooterProps {
+  variant?: 'simple' | 'detailed'
+}
+
+export function Footer({ variant = 'simple' }: FooterProps) {
+  const detailed = variant === 'detailed'
+
+  return (
+    <footer className="bg-surface-container-lowest border-t border-surface-variant w-full py-16">
+      <div className="shots-container flex flex-col md:flex-row justify-between items-start gap-gutter">
+        <div className="flex flex-col gap-4">
+          <Logo className="h-7" />
+          <p className="font-body-md text-body-md text-on-surface-variant max-w-sm">
+            {detailed
+              ? 'Capturando el rendimiento máximo. Plataforma líder en fotografía deportiva profesional.'
+              : '© 2024 Picshot Professional Sports Photography. All rights reserved.'}
+          </p>
+          {detailed && (
+            <p className="font-caption text-caption text-tertiary-container mt-4">
+              © 2024 Picshot Professional Sports Photography. All rights reserved.
+            </p>
+          )}
+        </div>
+
+        {detailed ? (
+          <nav className="flex flex-col md:flex-row gap-8 md:gap-16">
+            <div className="flex flex-col gap-4">
+              <span className="font-label-bold text-label-bold text-on-surface uppercase">
+                Legal
+              </span>
+              <Link
+                to="#"
+                className="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors"
+              >
+                Privacidad
+              </Link>
+              <Link
+                to="#"
+                className="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors"
+              >
+                Términos
+              </Link>
+              <Link
+                to="#"
+                className="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors"
+              >
+                Cookies
+              </Link>
+            </div>
+            <div className="flex flex-col gap-4">
+              <span className="font-label-bold text-label-bold text-on-surface uppercase">
+                Empresa
+              </span>
+              <Link
+                to="#"
+                className="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors"
+              >
+                Soporte
+              </Link>
+              <Link
+                to="/contacto"
+                className="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors"
+              >
+                Contacto
+              </Link>
+            </div>
+          </nav>
+        ) : (
+          <nav className="flex flex-wrap gap-6 sm:gap-12 mt-8 md:mt-0">
+            {['Privacidad', 'Términos', 'Cookies', 'Soporte'].map((item) => (
+              <Link
+                key={item}
+                to="#"
+                className="font-label-bold text-label-bold text-on-surface-variant hover:text-primary transition-colors"
+              >
+                {item}
+              </Link>
+            ))}
+          </nav>
+        )}
+      </div>
+    </footer>
+  )
+}

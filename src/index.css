@@ -1,0 +1,223 @@
+@import '@fontsource/inter/latin-400.css';
+@import '@fontsource/inter/latin-500.css';
+@import '@fontsource/inter/latin-700.css';
+@import '@fontsource/inter/latin-ext-400.css';
+@import '@fontsource/inter/latin-ext-500.css';
+@import '@fontsource/inter/latin-ext-700.css';
+@import '@fontsource/montserrat/latin-700.css';
+@import '@fontsource/montserrat/latin-800.css';
+@import '@fontsource/montserrat/latin-900.css';
+@import '@fontsource/montserrat/latin-ext-700.css';
+@import '@fontsource/montserrat/latin-ext-800.css';
+@import '@fontsource/montserrat/latin-ext-900.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+  font-family: 'Material Symbols Outlined';
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+  src: url('/fonts/material-symbols-outlined.woff2') format('woff2');
+}
+
+@layer base {
+  :root {
+    --color-background: 255 255 255;
+    --color-on-background: 26 26 26;
+    --color-surface: 250 250 250;
+    --color-on-surface: 26 26 26;
+    --color-surface-container: 245 245 245;
+    --color-surface-container-low: 240 240 240;
+    --color-surface-container-lowest: 255 255 255;
+    --color-surface-container-high: 232 232 232;
+    --color-surface-container-highest: 208 208 208;
+    --color-surface-variant: 224 224 224;
+    --color-on-surface-variant: 85 85 85;
+    --color-primary: 220 38 38;
+    --color-on-primary: 255 255 255;
+    --color-primary-container: 220 38 38;
+    --color-on-primary-container: 255 255 255;
+    --color-inverse-primary: 153 27 27;
+    --color-secondary: 245 245 245;
+    --color-on-secondary: 26 26 26;
+    --color-secondary-container: 238 238 238;
+    --color-on-secondary-container: 26 26 26;
+    --color-secondary-fixed: 26 26 26;
+    --color-on-secondary-fixed: 245 245 245;
+    --color-on-secondary-fixed-variant: 190 190 190;
+    --color-tertiary: 90 90 90;
+    --color-on-tertiary: 255 255 255;
+    --color-tertiary-container: 110 110 110;
+    --color-on-tertiary-container: 255 255 255;
+    --color-outline: 208 208 208;
+    --color-outline-variant: 224 224 224;
+    --color-error: 220 38 38;
+    --color-on-error: 255 255 255;
+    --color-error-container: 127 29 29;
+    --color-on-error-container: 255 255 255;
+  }
+
+  .dark {
+    --color-background: 0 0 0;
+    --color-on-background: 226 226 226;
+    --color-surface: 19 19 19;
+    --color-on-surface: 226 226 226;
+    --color-surface-container: 31 31 31;
+    --color-surface-container-low: 27 27 27;
+    --color-surface-container-lowest: 14 14 14;
+    --color-surface-container-high: 42 42 42;
+    --color-surface-container-highest: 53 53 53;
+    --color-surface-variant: 53 53 53;
+    --color-on-surface-variant: 230 189 184;
+    --color-primary: 255 180 171;
+    --color-on-primary: 105 0 5;
+    --color-primary-container: 220 38 38;
+    --color-on-primary-container: 255 246 245;
+    --color-inverse-primary: 191 7 21;
+    --color-secondary: 198 198 199;
+    --color-on-secondary: 47 49 49;
+    --color-secondary-container: 69 71 71;
+    --color-on-secondary-container: 180 181 181;
+    --color-secondary-fixed: 31 31 31;
+    --color-on-secondary-fixed: 226 226 226;
+    --color-on-secondary-fixed-variant: 160 160 160;
+    --color-tertiary: 200 200 200;
+    --color-tertiary-container: 170 170 170;
+    --color-on-tertiary: 20 20 20;
+    --color-on-tertiary-container: 20 20 20;
+    --color-outline: 172 136 132;
+    --color-outline-variant: 92 64 60;
+    --color-error: 255 180 171;
+    --color-on-error: 105 0 5;
+    --color-error-container: 147 0 10;
+    --color-on-error-container: 255 255 255;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-background text-on-background antialiased;
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+
+  ::selection {
+    @apply bg-primary-container text-on-primary-container;
+  }
+
+  input[type='date'] {
+    color-scheme: light dark;
+  }
+}
+
+@layer components {
+  .shots-container {
+    @apply w-full max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop;
+  }
+
+  .shots-btn-primary {
+    @apply inline-flex items-center justify-center gap-2 bg-primary-container text-on-primary-container
+           font-label-bold text-label-bold uppercase tracking-widest
+           py-3 px-6 rounded-none
+           hover:bg-inverse-primary active:scale-[0.98]
+           transition-colors duration-200;
+  }
+
+  .shots-btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 bg-transparent text-on-background
+           font-label-bold text-label-bold uppercase tracking-widest
+           py-3 px-6 rounded-none border-2 border-on-background
+           hover:bg-on-background hover:text-background active:scale-[0.98]
+           transition-colors duration-200;
+  }
+
+  .shots-btn-outline {
+    @apply inline-flex items-center justify-center gap-2 bg-transparent text-on-surface
+           font-label-bold text-label-bold uppercase tracking-widest
+           py-3 px-6 rounded-none border-2 border-surface-variant
+           hover:border-primary hover:text-primary active:scale-[0.98]
+           transition-colors duration-200;
+  }
+
+  .shots-input {
+    @apply w-full bg-surface-container-lowest border border-surface-variant text-on-background
+           font-body-md text-body-md p-4 rounded-none
+           placeholder:text-on-surface-variant/70
+           focus:border-primary-container focus:ring-1 focus:ring-primary-container focus:outline-none
+           transition-all duration-200;
+  }
+
+  .shots-select {
+    @apply w-full bg-surface-container-lowest border border-surface-variant text-on-background
+           font-body-md text-body-md p-4 rounded-none appearance-none
+           focus:border-primary-container focus:ring-1 focus:ring-primary-container focus:outline-none
+           transition-all duration-200;
+  }
+
+  .shots-textarea {
+    @apply w-full bg-surface-container-lowest border border-surface-variant text-on-background
+           font-body-md text-body-md p-4 rounded-none resize-none
+           placeholder:text-on-surface-variant/70
+           focus:border-primary-container focus:ring-1 focus:ring-primary-container focus:outline-none
+           transition-all duration-200;
+  }
+
+  .shots-label {
+    @apply block font-label-bold text-label-bold text-on-surface mb-2;
+  }
+
+  .shots-card {
+    @apply bg-surface-container-lowest border border-surface-variant rounded-none
+           hover:border-surface-highest transition-colors duration-300;
+  }
+
+  .shots-card-event {
+    @apply bg-surface-container-lowest border border-surface-variant rounded-none
+           flex flex-col overflow-hidden
+           hover:border-primary-container/50 transition-colors duration-300;
+  }
+
+  .shots-badge {
+    @apply inline-flex items-center px-3 py-1 font-caption text-caption uppercase tracking-wider;
+  }
+
+  .shots-badge-primary {
+    @apply shots-badge bg-primary-container text-on-primary-container;
+  }
+
+  .shots-badge-secondary {
+    @apply shots-badge bg-surface/80 backdrop-blur-sm text-on-surface border border-surface-variant;
+  }
+
+  .shots-laser-line {
+    @apply absolute top-0 left-0 w-full h-[1px] bg-primary-container shadow-[0_0_8px_rgba(220,38,38,0.8)];
+  }
+
+  .shots-section {
+    @apply py-16 md:py-24;
+  }
+
+  .shots-section-header {
+    @apply font-headline-lg-mobile text-headline-lg-mobile md:font-headline-lg md:text-headline-lg text-on-surface uppercase tracking-tight;
+  }
+}
+
+@layer utilities {
+  .text-gradient-accent {
+    @apply bg-gradient-to-r from-primary-container to-primary bg-clip-text text-transparent;
+  }
+}
+
+.material-symbols-outlined {
+  font-family: 'Material Symbols Outlined';
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  font-display: block;
+}
+
+.icon-fill {
+  font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
