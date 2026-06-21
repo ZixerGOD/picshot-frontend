@@ -75,6 +75,10 @@ export interface Purchase {
   resolution?: string
   bib?: string
   purchasedAt: string
+  /** Estado de la orden Payphone asociada a esta compra. */
+  orderStatus?: OrderStatus
+  /** Fecha estimada de borrado por retención (6 meses post-compra por defecto). */
+  retentionUntil?: string
 }
 
 // ===== CARRITO =====

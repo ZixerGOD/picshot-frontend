@@ -6,6 +6,7 @@ import { EventGalleryPage } from './pages/EventGalleryPage'
 import { ContactPage } from './pages/ContactPage'
 import { WorkWithUsPage } from './pages/WorkWithUsPage'
 import { MyPurchasesPage } from './pages/MyPurchasesPage'
+import { PurchaseDetailPage } from './pages/PurchaseDetailPage'
 import { LoginPage } from './pages/LoginPage'
 import { CartPage } from './pages/CartPage'
 import { CheckoutPage } from './pages/CheckoutPage'
@@ -139,6 +140,16 @@ export default function App() {
               <RequireAuth>
                 <PublicLayout>
                   <MyPurchasesPage />
+                </PublicLayout>
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/mis-compras/:orderId"
+            element={
+              <RequireAuth>
+                <PublicLayout>
+                  <PurchaseDetailPage />
                 </PublicLayout>
               </RequireAuth>
             }
