@@ -27,6 +27,27 @@ export function AdminDashboardPage() {
     .filter((c) => c.isActive && c.usedCount >= c.maxUses * 0.8)
     .slice(0, 5)
 
+  function percentDelta(curr: number, prev: number): string | undefined {
+    if (prev === 0) return curr > 0 ? '+100%' : undefined
+    const pct = ((curr - prev) / prev) * 100
+    const sign = pct >= 0 ? '+' : ''
+    return `${sign}${pct.toFixed(0)}%`
+  }
+
+  const last14 = analytics.slice(-14)
+  const recentWeek = last14.slice(-7)
+  const previousWeek = last14.slice(0, 7)
+  const sumRevenue = (arr: typeof analytics) =>
+    arr.reduce((sum, d) => sum + d.revenue, 0)
+  const sumSales = (arr: typeof analytics) =>
+    arr.reduce((sum, d) => sum + d.sales, 0)
+  const sumVisits = (arr: typeof analytics) =>
+    arr.reduce((sum, d) => sum + d.visits, 0)
+
+  const revenueTrend = percentDelta(sumRevenue(recentWeek), sumRevenue(previousWeek))
+  const salesTrend = percentDelta(sumSales(recentWeek), sumSales(previousWeek))
+  const visitsTrend = percentDelta(sumVisits(recentWeek), sumVisits(previousWeek))
+
   const activePhotographers = photographers.filter((p) => p.isActive).slice(0, 5)
 
   const now = Date.now()
@@ -69,22 +90,22 @@ export function AdminDashboardPage() {
           label="Ingresos totales"
           value={`$${stats.totalRevenue.toLocaleString(undefined, { maximumFractionDigits: 0 })}`}
           icon="payments"
-          trend="12%"
-          trendUp
+          trend={revenueTrend}
+          trendUp={revenueTrend?.startsWith('+')}
         />
         <StatsCard
           label="Ventas"
           value={stats.totalSales.toLocaleString()}
           icon="shopping_cart"
-          trend="8%"
-          trendUp
+          trend={salesTrend}
+          trendUp={salesTrend?.startsWith('+')}
         />
         <StatsCard
           label="Visitas (30d)"
           value={stats.totalVisits.toLocaleString()}
           icon="visibility"
-          trend="5%"
-          trendUp
+          trend={visitsTrend}
+          trendUp={visitsTrend?.startsWith('+')}
         />
         <StatsCard
           label="Eventos activos"

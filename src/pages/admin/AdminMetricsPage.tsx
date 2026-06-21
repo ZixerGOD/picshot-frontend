@@ -30,30 +30,47 @@ export function AdminMetricsPage() {
       .slice(0, 6)
   }, [sales, events])
 
-  const trafficSources = [
-    { label: 'Orgánico', value: 45 },
-    { label: 'Redes', value: 25 },
-    { label: 'Directo', value: 15 },
-    { label: 'Email', value: 10 },
-    { label: 'Referido', value: 5 },
-  ]
+  const totalVisits = useMemo(
+    () => analytics.reduce((sum, d) => sum + d.visits, 0),
+    [analytics],
+  )
+  const totalSales = useMemo(
+    () => analytics.reduce((sum, d) => sum + d.sales, 0),
+    [analytics],
+  )
+
+  const conversion = totalVisits > 0 ? (totalSales / totalVisits) * 100 : 0
+
+  function trendBetween(arr: typeof analytics, key: keyof typeof analytics[0]) {
+    const last14 = arr.slice(-14)
+    const recent = last14.slice(-7).reduce((s, d) => s + (d[key] as number), 0)
+    const prev = last14.slice(0, 7).reduce((s, d) => s + (d[key] as number), 0)
+    if (prev === 0) return recent > 0 ? '+100%' : undefined
+    const pct = ((recent - prev) / prev) * 100
+    const sign = pct >= 0 ? '+' : ''
+    return `${sign}${pct.toFixed(0)}%`
+  }
+
+  const visitsTrend = trendBetween(analytics, 'visits')
+  const conversionTrend = trendBetween(analytics, 'sales')
 
   return (
     <div className="space-y-8">
       <div>
         <h1 className="font-headline-lg text-headline-lg text-on-surface uppercase">Métricas</h1>
         <p className="font-body-md text-body-md text-on-surface-variant mt-1">
-          Datos de tráfico y conversión. Integración futura con Google Analytics.
+          Datos de tráfico y conversión. Pendiente: integrar Google Analytics o
+          una solución equivalente para tráfico real.
         </p>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatsCard
           label="Visitas totales"
-          value={analytics.reduce((sum, d) => sum + d.visits, 0).toLocaleString()}
+          value={totalVisits.toLocaleString()}
           icon="visibility"
-          trend="14%"
-          trendUp
+          trend={visitsTrend}
+          trendUp={visitsTrend?.startsWith('+')}
         />
         <StatsCard
           label="Páginas vistas"
@@ -67,10 +84,10 @@ export function AdminMetricsPage() {
         />
         <StatsCard
           label="Tasa de conversión"
-          value="3.2%"
+          value={`${conversion.toFixed(1)}%`}
           icon="trending_up"
-          trend="0.4%"
-          trendUp
+          trend={conversionTrend}
+          trendUp={conversionTrend?.startsWith('+')}
         />
       </div>
 
@@ -102,7 +119,15 @@ export function AdminMetricsPage() {
           <h2 className="font-headline-md text-headline-md text-on-surface mb-6 uppercase">
             Fuentes de tráfico
           </h2>
-          <SimpleBarChart data={trafficSources} colorClass="bg-surface-container-highest" />
+          <div className="flex flex-col items-center text-center gap-3 py-10">
+            <span className="shots-badge bg-primary-container/30 text-primary">
+              Pendiente de integración
+            </span>
+            <p className="font-body-md text-body-md text-on-surface-variant max-w-sm">
+              Disponible cuando conectemos Google Analytics. Hasta entonces
+              evitamos mostrar datos inventados.
+            </p>
+          </div>
         </section>
       </div>
     </div>

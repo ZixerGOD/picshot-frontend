@@ -38,8 +38,6 @@ export function PhotographerDashboardPage() {
           label="Tus ganancias"
           value={`$${totalEarnings.toLocaleString(undefined, { maximumFractionDigits: 0 })}`}
           icon="payments"
-          trend="8%"
-          trendUp
         />
         <StatsCard label="Tus fotos" value={totalPhotos.toLocaleString()} icon="photo_library" />
         <StatsCard label="Ventas generadas" value={totalSales.toLocaleString()} icon="shopping_cart" />

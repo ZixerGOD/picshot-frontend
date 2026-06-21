@@ -23,7 +23,7 @@ import {
 } from './auth-tokens'
 
 const API_URL = import.meta.env.VITE_API_URL || ''
-const USE_MOCKS = !API_URL
+export const USE_MOCKS = !API_URL
 
 const TOKEN_KEY = 'picshot-auth-token'
 

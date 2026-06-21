@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import type { Location } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
+import { USE_MOCKS } from '../lib/api'
 import type { UserRole } from '../lib/types'
 import { Input } from '../components/ui/Input'
 import { Button } from '../components/ui/Button'
@@ -138,26 +139,28 @@ export function LoginPage() {
             </Button>
           </form>
 
-          <div className="mt-8">
-            <p className="font-caption text-caption text-on-surface-variant uppercase tracking-widest mb-3">
-              Cuentas de demostración
-            </p>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-              {demoAccounts.map((account) => (
-                <button
-                  key={account.email}
-                  type="button"
-                  onClick={() => fillDemo(account)}
-                  className="flex items-center gap-2 border border-surface-variant p-3 text-on-surface hover:border-primary hover:text-primary transition-colors"
-                >
-                  <Icon name={account.icon} className="text-lg" />
-                  <span className="font-label-bold text-label-bold uppercase tracking-wider">
-                    {account.label}
-                  </span>
-                </button>
-              ))}
+          {USE_MOCKS && (
+            <div className="mt-8">
+              <p className="font-caption text-caption text-on-surface-variant uppercase tracking-widest mb-3">
+                Cuentas de demostración
+              </p>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                {demoAccounts.map((account) => (
+                  <button
+                    key={account.email}
+                    type="button"
+                    onClick={() => fillDemo(account)}
+                    className="flex items-center gap-2 border border-surface-variant p-3 text-on-surface hover:border-primary hover:text-primary transition-colors"
+                  >
+                    <Icon name={account.icon} className="text-lg" />
+                    <span className="font-label-bold text-label-bold uppercase tracking-wider">
+                      {account.label}
+                    </span>
+                  </button>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
 
           <div className="mt-6 flex flex-col gap-2 text-center font-body-md text-body-md text-on-surface-variant">
             <Link to="/recuperar-contrasena" className="text-primary hover:underline">
