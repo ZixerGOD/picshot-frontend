@@ -4,16 +4,14 @@ import type { EventItem, Photo, PhotoFilter } from '../../lib/types'
 import { getEventById, getEventPhotos, searchPhotosByFace } from '../../lib/api'
 import { PhotoCard } from '../../components/events/PhotoCard'
 import { SelfieSearchModal } from '../../components/events/SelfieSearchModal'
-import {
-  BiometricConsentModal,
-  hasBiometricConsent,
-} from '../../components/events/BiometricConsentModal'
+import { BiometricConsentModal } from '../../components/events/BiometricConsentModal'
+import { hasBiometricConsent } from '../../components/events/biometric-consent-storage'
 import { CartToast } from '../../components/events/CartToast'
+import { EventAIDisclaimerModal } from '../../components/events/EventAIDisclaimerModal'
 import {
-  EventAIDisclaimerModal,
   hasEventAIConsent,
   recordEventAIConsent,
-} from '../../components/events/EventAIDisclaimerModal'
+} from '../../components/events/event-ai-consent-storage'
 import { useCart } from '../../hooks/useCart'
 import { useAuth } from '../../hooks/useAuth'
 import { Icon } from '../../components/ui/Icon'

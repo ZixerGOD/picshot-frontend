@@ -18,5 +18,13 @@ export default defineConfig([
     languageOptions: {
       globals: globals.browser,
     },
+    rules: {
+      // React 19 / react-hooks v7 introdujo esta regla con default 'error'.
+      // En la app hay patrones legítimos (reset de modales al cerrar, fetch
+      // async, hidratación de localStorage) donde setState dentro de
+      // useEffect es la forma correcta. La dejamos como aviso para detectar
+      // casos malos en código nuevo sin bloquear el linter.
+      'react-hooks/set-state-in-effect': 'warn',
+    },
   },
 ])

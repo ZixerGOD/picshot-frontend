@@ -6,51 +6,8 @@ import { Icon } from '../ui/Icon'
  * Disclaimer obligatorio al entrar a un evento por primera vez con sesión
  * iniciada. Es DISTINTO al consentimiento puntual de cámara/selfie: cubre
  * los términos del uso de IA y reconocimiento facial dentro del evento.
- * Se persiste por combinación (userId, eventId) en localStorage.
- *
- * Spec: business-rules.md:48 — "Must accept AI/facial recognition terms
- * (mandatory consent)" como paso del flujo de acceso al evento.
+ * Los helpers de storage viven en `event-ai-consent-storage.ts`.
  */
-
-const STORAGE_KEY = 'picshot-event-ai-consent'
-
-interface ConsentRecord {
-  [userEventKey: string]: { acceptedAt: string }
-}
-
-function loadAll(): ConsentRecord {
-  try {
-    const raw = window.localStorage.getItem(STORAGE_KEY)
-    return raw ? (JSON.parse(raw) as ConsentRecord) : {}
-  } catch {
-    return {}
-  }
-}
-
-function persistAll(record: ConsentRecord) {
-  try {
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(record))
-  } catch {
-    // ignore
-  }
-}
-
-export function hasEventAIConsent(
-  userId: string | undefined,
-  eventId: string,
-): boolean {
-  if (!userId) return false
-  return Boolean(loadAll()[`${userId}:${eventId}`])
-}
-
-export function recordEventAIConsent(
-  userId: string,
-  eventId: string,
-): void {
-  const all = loadAll()
-  all[`${userId}:${eventId}`] = { acceptedAt: new Date().toISOString() }
-  persistAll(all)
-}
 
 interface EventAIDisclaimerModalProps {
   open: boolean
@@ -68,6 +25,7 @@ export function EventAIDisclaimerModal({
   const [accepted, setAccepted] = useState(false)
 
   useEffect(() => {
+    // Reset al cerrar el modal.
     if (!open) setAccepted(false)
   }, [open])
 

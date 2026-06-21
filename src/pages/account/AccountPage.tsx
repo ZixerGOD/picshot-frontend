@@ -6,7 +6,7 @@ import { Footer } from '../../components/layout/Footer'
 import {
   hasBiometricConsent,
   revokeBiometricConsent,
-} from '../../components/events/BiometricConsentModal'
+} from '../../components/events/biometric-consent-storage'
 
 export function AccountPage() {
   const { user, updateUser, logout } = useAuth()

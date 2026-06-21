@@ -1,26 +1,11 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Icon } from '../ui/Icon'
-
-const STORAGE_KEY = 'picshot-cookies-consent'
-
-type Choice = 'all' | 'essential'
-
-interface Stored {
-  choice: Choice
-  decidedAt: string
-}
-
-export function getCookieChoice(): Choice | null {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY)
-    if (!raw) return null
-    const parsed = JSON.parse(raw) as Stored
-    return parsed.choice ?? null
-  } catch {
-    return null
-  }
-}
+import {
+  getCookieChoice,
+  setCookieChoice,
+  type CookieChoice,
+} from './cookies-storage'
 
 export function CookieBanner() {
   const [visible, setVisible] = useState(false)
@@ -33,13 +18,8 @@ export function CookieBanner() {
     }
   }, [])
 
-  function decide(choice: Choice) {
-    try {
-      const payload: Stored = { choice, decidedAt: new Date().toISOString() }
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(payload))
-    } catch {
-      // ignore
-    }
+  function decide(choice: CookieChoice) {
+    setCookieChoice(choice)
     setVisible(false)
   }
 

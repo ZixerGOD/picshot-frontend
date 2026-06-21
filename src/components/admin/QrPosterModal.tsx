@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import QRCode from 'qrcode'
 import { Icon } from '../ui/Icon'
 
@@ -42,12 +42,6 @@ export function QrPosterModal({
 
   useEffect(() => {
     if (!open) return
-    void render()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open, backgroundUrl, position, showOverlay, publicUrl])
-
-  useEffect(() => {
-    if (!open) return
     const original = document.body.style.overflow
     document.body.style.overflow = 'hidden'
     return () => {
@@ -74,7 +68,7 @@ export function QrPosterModal({
     })
   }
 
-  async function render() {
+  const render = useCallback(async () => {
     const canvas = canvasRef.current
     if (!canvas) return
     setRendering(true)
@@ -248,7 +242,12 @@ export function QrPosterModal({
     }
 
     setRendering(false)
-  }
+  }, [backgroundUrl, eventDate, eventTitle, position, publicUrl, showOverlay])
+
+  useEffect(() => {
+    if (!open) return
+    void render()
+  }, [open, render])
 
   function handlePickFile() {
     fileRef.current?.click()

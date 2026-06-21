@@ -1,28 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Icon } from '../ui/Icon'
-
-const STORAGE_KEY = 'picshot-biometric-consent'
-
-interface ConsentRecord {
-  acceptedAt: string
-}
-
-export function hasBiometricConsent(): boolean {
-  try {
-    return Boolean(window.localStorage.getItem(STORAGE_KEY))
-  } catch {
-    return false
-  }
-}
-
-export function revokeBiometricConsent(): void {
-  try {
-    window.localStorage.removeItem(STORAGE_KEY)
-  } catch {
-    // ignore
-  }
-}
+import { recordBiometricConsent } from './biometric-consent-storage'
 
 interface BiometricConsentModalProps {
   open: boolean
@@ -38,6 +17,7 @@ export function BiometricConsentModal({
   const [accepted, setAccepted] = useState(false)
 
   useEffect(() => {
+    // Reset al cerrar: cuando vuelvas a abrir el modal, el checkbox arranca sin marcar.
     if (!open) setAccepted(false)
   }, [open])
 
@@ -63,12 +43,7 @@ export function BiometricConsentModal({
 
   function handleConfirm() {
     if (!accepted) return
-    const record: ConsentRecord = { acceptedAt: new Date().toISOString() }
-    try {
-      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(record))
-    } catch {
-      // ignore
-    }
+    recordBiometricConsent()
     onAccept()
   }
 

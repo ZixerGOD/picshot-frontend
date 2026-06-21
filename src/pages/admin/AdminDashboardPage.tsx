@@ -1,3 +1,4 @@
+import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useAdmin } from '../../hooks/useAdmin'
 import { StatsCard } from '../../components/admin/StatsCard'
@@ -50,19 +51,24 @@ export function AdminDashboardPage() {
 
   const activePhotographers = photographers.filter((p) => p.isActive).slice(0, 5)
 
-  const now = Date.now()
-  const retentionWatch = events
-    .filter((e) => e.retentionUntil)
-    .map((e) => ({
-      ...e,
-      retentionDays: Math.ceil(
-        (new Date(e.retentionUntil as string).getTime() - now) /
-          (1000 * 60 * 60 * 24),
-      ),
-    }))
-    .filter((e) => e.retentionDays <= 60)
-    .sort((a, b) => a.retentionDays - b.retentionDays)
-    .slice(0, 5)
+  // Calculamos "ahora" una sola vez al montar; suficiente para el dashboard.
+  const [now] = useState(() => Date.now())
+  const retentionWatch = useMemo(
+    () =>
+      events
+        .filter((e) => e.retentionUntil)
+        .map((e) => ({
+          ...e,
+          retentionDays: Math.ceil(
+            (new Date(e.retentionUntil as string).getTime() - now) /
+              (1000 * 60 * 60 * 24),
+          ),
+        }))
+        .filter((e) => e.retentionDays <= 60)
+        .sort((a, b) => a.retentionDays - b.retentionDays)
+        .slice(0, 5),
+    [events, now],
+  )
 
   return (
     <div className="space-y-10">
