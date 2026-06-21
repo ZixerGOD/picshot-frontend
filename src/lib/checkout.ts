@@ -121,7 +121,13 @@ export function createOrder(input: {
   items: CartItem[]
   coupon: CartCoupon | null
   totals: CartTotals
+  idempotencyKey: string
 }): Order {
+  const orders = readOrders()
+  // Si ya existe una orden con la misma idempotency key, devolverla en vez
+  // de duplicar (docs/checkout.md:80-81).
+  const duplicate = orders.find((o) => o.idempotencyKey === input.idempotencyKey)
+  if (duplicate) return duplicate
   const now = new Date()
   const expires = new Date(now.getTime() + PAYMENT_WINDOW_MIN * 60_000)
   const order: Order = {
@@ -133,8 +139,8 @@ export function createOrder(input: {
     status: 'awaiting_payment',
     createdAt: now.toISOString(),
     expiresAt: expires.toISOString(),
+    idempotencyKey: input.idempotencyKey,
   }
-  const orders = readOrders()
   orders.push(order)
   writeOrders(orders)
   return order

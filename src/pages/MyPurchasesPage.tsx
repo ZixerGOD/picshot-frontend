@@ -10,6 +10,7 @@ import {
 import { Icon } from '../components/ui/Icon'
 import { Footer } from '../components/layout/Footer'
 import { formatPrice } from '../lib/format'
+import { getOrder } from '../lib/checkout'
 
 interface EventGroup {
   eventId: string
@@ -132,9 +133,9 @@ export function MyPurchasesPage() {
               <Icon name="schedule" className="text-primary mt-0.5" />
               <p className="font-body-md text-body-md text-on-surface">
                 Tus fotos quedan disponibles para descargar durante 6 meses
-                desde la fecha de compra. Te avisaremos por correo una semana
-                antes de que se borren. El badge sobre cada foto indica los
-                días que faltan.
+                desde la fecha de compra. Te avisaremos por correo un mes y
+                una semana antes de que se borren. El badge sobre cada foto
+                indica los días que faltan.
               </p>
             </aside>
             <div className="space-y-16">
@@ -192,7 +193,11 @@ function PurchaseGroup({ group }: { group: EventGroup }) {
   }
 
   async function downloadSelected() {
-    const targets = group.purchases.filter((p) => selected.has(p.id))
+    const targets = group.purchases.filter((p) => {
+      if (!selected.has(p.id)) return false
+      const status = p.orderStatus ?? getOrder(p.orderId)?.status
+      return status !== 'refunded' && status !== 'reversed'
+    })
     if (targets.length === 0) return
     if (
       targets.length >= 4 &&
@@ -302,16 +307,22 @@ function PurchaseGroup({ group }: { group: EventGroup }) {
             purchase.retentionUntil ?? retentionDateFrom(purchase.purchasedAt)
           const daysLeft = daysUntil(retention)
           const isSelected = selected.has(purchase.id)
+          const orderStatus =
+            purchase.orderStatus ?? getOrder(purchase.orderId)?.status
+          const isRefunded =
+            orderStatus === 'refunded' || orderStatus === 'reversed'
           return (
             <article
               key={purchase.id}
               className={`group bg-surface-container-lowest border overflow-hidden transition-colors flex flex-col ${
                 isSelected ? 'border-primary' : 'border-surface-variant'
-              }`}
+              } ${isRefunded ? 'opacity-60' : ''}`}
             >
               <div
-                className="relative aspect-[4/3] cursor-pointer"
-                onClick={() => toggle(purchase.id)}
+                className={`relative aspect-[4/3] ${
+                  isRefunded ? 'cursor-not-allowed' : 'cursor-pointer'
+                }`}
+                onClick={() => !isRefunded && toggle(purchase.id)}
               >
                 <img
                   src={purchase.url}
@@ -319,21 +330,30 @@ function PurchaseGroup({ group }: { group: EventGroup }) {
                   className="absolute inset-0 w-full h-full object-cover"
                   loading="lazy"
                 />
-                <div className="absolute top-3 left-3 z-10">
-                  <span
-                    className={`flex items-center justify-center w-7 h-7 border-2 backdrop-blur-sm ${
-                      isSelected
-                        ? 'bg-primary border-primary text-on-primary'
-                        : 'bg-background/70 border-surface-variant text-transparent'
-                    }`}
-                  >
-                    <Icon name="check" className="text-base" />
-                  </span>
-                </div>
-                <div className="absolute top-3 right-3 shots-badge bg-primary-container/90 text-on-primary-container">
-                  <Icon name="schedule" className="text-base mr-1" />
-                  {daysLeft}d
-                </div>
+                {!isRefunded && (
+                  <div className="absolute top-3 left-3 z-10">
+                    <span
+                      className={`flex items-center justify-center w-7 h-7 border-2 backdrop-blur-sm ${
+                        isSelected
+                          ? 'bg-primary border-primary text-on-primary'
+                          : 'bg-background/70 border-surface-variant text-transparent'
+                      }`}
+                    >
+                      <Icon name="check" className="text-base" />
+                    </span>
+                  </div>
+                )}
+                {isRefunded ? (
+                  <div className="absolute top-3 right-3 shots-badge bg-primary-container text-on-primary-container">
+                    <Icon name="undo" className="text-base mr-1" />
+                    Reembolsada
+                  </div>
+                ) : (
+                  <div className="absolute top-3 right-3 shots-badge bg-primary-container/90 text-on-primary-container">
+                    <Icon name="schedule" className="text-base mr-1" />
+                    {daysLeft}d
+                  </div>
+                )}
               </div>
 
               <div className="p-3 flex items-center justify-between gap-3 border-t border-surface-variant">
@@ -354,6 +374,16 @@ function PurchaseGroup({ group }: { group: EventGroup }) {
                     Orden {purchase.orderId}
                   </Link>
                 </div>
+                {isRefunded ? (
+                  <span
+                    aria-label="Esta orden fue reembolsada"
+                    title="Esta orden fue reembolsada"
+                    className="inline-flex items-center gap-1 bg-surface-container text-on-surface-variant font-label-bold text-label-bold px-3 py-2 shrink-0 cursor-not-allowed"
+                  >
+                    <Icon name="block" />
+                    <span className="hidden sm:inline text-xs">Reembolsada</span>
+                  </span>
+                ) : (
                 <a
                   href={generateSignedDownload(purchase.url).url}
                   download={`${purchase.photoId}.jpg`}
@@ -364,6 +394,7 @@ function PurchaseGroup({ group }: { group: EventGroup }) {
                   <Icon name="download" />
                   <span className="hidden sm:inline text-xs">Descargar</span>
                 </a>
+                )}
               </div>
             </article>
           )

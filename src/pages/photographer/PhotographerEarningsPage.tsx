@@ -16,6 +16,21 @@ function truncate(text: string, max: number) {
 export function PhotographerEarningsPage() {
   const { sales, events, totalEarnings, totalSales } = usePhotographer()
 
+  // decisions.md:348-352 — mostramos gross/net de Payphone para que el
+  // fotógrafo entienda qué se cobró antes de su comisión.
+  const grossTotal = useMemo(
+    () => sales.reduce((sum, s) => sum + s.finalAmount, 0),
+    [sales],
+  )
+  const payphoneTotal = useMemo(
+    () => sales.reduce((sum, s) => sum + (s.payphoneFee ?? 0), 0),
+    [sales],
+  )
+  const netTotal = useMemo(
+    () => sales.reduce((sum, s) => sum + (s.netAmount ?? s.finalAmount), 0),
+    [sales],
+  )
+
   const earningsByEvent = useMemo(() => {
     return events
       .map((e) => {
@@ -56,23 +71,33 @@ export function PhotographerEarningsPage() {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <StatsCard
-          label="Ganancias totales"
-          value={`$${totalEarnings.toLocaleString(undefined, { maximumFractionDigits: 0 })}`}
+          label="Bruto del evento"
+          value={`$${grossTotal.toLocaleString(undefined, { maximumFractionDigits: 0 })}`}
           icon="payments"
         />
         <StatsCard
-          label="Ventas"
-          value={totalSales.toLocaleString()}
-          icon="shopping_cart"
+          label="Comisión Payphone"
+          value={`$${payphoneTotal.toLocaleString(undefined, { maximumFractionDigits: 0 })}`}
+          icon="credit_card"
         />
         <StatsCard
-          label="Ganancia promedio"
-          value={`$${totalSales ? (totalEarnings / totalSales).toFixed(2) : '0.00'}`}
-          icon="trending_up"
+          label="Neto post-Payphone"
+          value={`$${netTotal.toLocaleString(undefined, { maximumFractionDigits: 0 })}`}
+          icon="account_balance"
+        />
+        <StatsCard
+          label="Tu ganancia"
+          value={`$${totalEarnings.toLocaleString(undefined, { maximumFractionDigits: 0 })}`}
+          icon="savings"
         />
       </div>
+      <p className="font-caption text-caption text-on-surface-variant -mt-4">
+        Payphone retiene 5.75% sobre el bruto. Tu comisión se calcula sobre
+        el neto. Ventas: {totalSales.toLocaleString()} · Promedio:{' '}
+        ${(totalSales ? totalEarnings / totalSales : 0).toFixed(2)}
+      </p>
 
       <section className="bg-surface border border-surface-variant p-6">
         <div className="flex items-end justify-between gap-4 mb-6 flex-wrap">
@@ -117,8 +142,14 @@ export function PhotographerEarningsPage() {
             },
             {
               key: 'amount',
-              header: 'Venta',
+              header: 'Bruto',
               render: (s) => `$${s.finalAmount.toFixed(2)}`,
+            },
+            {
+              key: 'net',
+              header: 'Neto',
+              render: (s) =>
+                `$${(s.netAmount ?? s.finalAmount).toFixed(2)}`,
             },
             {
               key: 'commission',

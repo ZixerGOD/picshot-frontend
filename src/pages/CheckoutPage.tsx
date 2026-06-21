@@ -25,6 +25,15 @@ export function CheckoutPage() {
   const [step, setStep] = useState<CheckoutStep>('review')
   const [outcome, setOutcome] = useState<Outcome>('success')
 
+  // UUID por intento de checkout (docs/checkout.md:80-81). Si el comprador
+  // hace double submit el backend usa esta clave para no crear dos órdenes.
+  const [idempotencyKey] = useState(() => {
+    if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+      return crypto.randomUUID()
+    }
+    return `cko-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`
+  })
+
   // Si el usuario ya tiene una orden en `awaiting_payment` vigente, no le
   // permitimos crear otra (decisions.md: prevent double payment).
   const pendingOrder = user ? getActivePendingOrderFor(user.email) : null
@@ -146,6 +155,7 @@ export function CheckoutPage() {
       items,
       coupon,
       totals,
+      idempotencyKey,
     })
     const settled = await simulatePayphone(order.id, { outcome })
     if (settled.status === 'confirmed') {

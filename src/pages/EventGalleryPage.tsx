@@ -264,8 +264,18 @@ export function EventGalleryPage() {
   return (
     <>
       {/* Header */}
-      <header className="relative bg-surface-container-low border-b border-surface-container-highest pt-32 pb-16">
-        <div className="shots-container">
+      <header className="relative bg-surface-container-low border-b border-surface-container-highest pt-32 pb-16 overflow-hidden">
+        {(event.bannerImage || event.image) && (
+          <>
+            <img
+              src={event.bannerImage ?? event.image}
+              alt=""
+              className="absolute inset-0 w-full h-full object-cover opacity-20"
+            />
+            <div className="absolute inset-0 bg-gradient-to-r from-surface-container-low via-surface-container-low/80 to-transparent" />
+          </>
+        )}
+        <div className="shots-container relative">
           <div className="flex flex-col md:flex-row justify-between items-end gap-gutter">
             <div>
               <div className="flex items-center gap-2 text-primary font-label-bold text-label-bold mb-4 uppercase tracking-widest">
@@ -278,6 +288,11 @@ export function EventGalleryPage() {
               <h1 className="font-headline-lg-mobile md:font-display-lg text-headline-lg-mobile md:text-display-lg uppercase text-on-surface text-balance max-w-2xl">
                 {event.title}
               </h1>
+              {event.description && (
+                <p className="mt-4 font-body-md text-body-md text-on-surface-variant max-w-2xl">
+                  {event.description}
+                </p>
+              )}
             </div>
             <div className="flex gap-4">
               <div className="bg-surface-container border border-surface-variant p-4 text-center min-w-[120px]">

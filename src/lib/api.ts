@@ -27,6 +27,11 @@ const API_URL = import.meta.env.VITE_API_URL || ''
 export const USE_MOCKS = !API_URL
 
 const TOKEN_KEY = 'picshot-auth-token'
+const TOKEN_EXPIRES_KEY = 'picshot-auth-token-expires'
+
+/** TTL del token según docs/security.md y decisions.md:288-291. */
+export const TOKEN_TTL_DAYS_DEFAULT = 7
+export const TOKEN_TTL_DAYS_REMEMBER = 30
 
 export function getToken(): string | null {
   try {
@@ -36,13 +41,38 @@ export function getToken(): string | null {
   }
 }
 
-export function setToken(token: string | null) {
+export function setToken(token: string | null, ttlDays?: number) {
   try {
-    if (token) localStorage.setItem(TOKEN_KEY, token)
-    else localStorage.removeItem(TOKEN_KEY)
+    if (token) {
+      localStorage.setItem(TOKEN_KEY, token)
+      if (ttlDays != null) {
+        const expiresAt = Date.now() + ttlDays * 24 * 60 * 60 * 1000
+        localStorage.setItem(TOKEN_EXPIRES_KEY, String(expiresAt))
+      }
+    } else {
+      localStorage.removeItem(TOKEN_KEY)
+      localStorage.removeItem(TOKEN_EXPIRES_KEY)
+    }
   } catch {
     // ignore
   }
+}
+
+export function getTokenExpiresAt(): number | null {
+  try {
+    const raw = localStorage.getItem(TOKEN_EXPIRES_KEY)
+    if (!raw) return null
+    const value = Number(raw)
+    return Number.isFinite(value) ? value : null
+  } catch {
+    return null
+  }
+}
+
+export function isTokenExpired(): boolean {
+  const exp = getTokenExpiresAt()
+  if (exp == null) return false
+  return Date.now() >= exp
 }
 
 /** Cabeceras base + Authorization si hay sesión. */

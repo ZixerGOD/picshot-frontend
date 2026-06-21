@@ -178,6 +178,12 @@ export interface Order {
   createdAt: string
   expiresAt: string
   payphone?: PayphoneTransaction
+  /**
+   * UUID generado por el frontend al iniciar el intento de checkout.
+   * El backend lo recibe en el header Idempotency-Key y evita duplicar la
+   * orden si el comprador hace double submit (docs/checkout.md:80-81).
+   */
+  idempotencyKey?: string
 }
 
 // ===== AUTH =====

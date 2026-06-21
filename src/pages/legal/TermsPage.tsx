@@ -34,9 +34,15 @@ export function TermsPage() {
         4. Compras y pagos
       </h2>
       <p>
-        Los pagos se procesan a través de Payphone. Las fotos quedan disponibles
-        para descargar durante seis meses. Si una transacción no se confirma en
-        cinco minutos, se reversa automáticamente.
+        Los pagos se procesan a través de Payphone. Las fotos quedan
+        disponibles para descargar durante seis meses. Si una transacción no
+        se confirma en cinco minutos, se reversa automáticamente.
+      </p>
+      <p>
+        Las compras son finales. No procesamos reembolsos desde la plataforma:
+        si tienes un problema con una compra, escríbenos a{' '}
+        <strong>soporte@picshotec.com</strong> y revisamos cada caso de forma
+        manual.
       </p>
 
       <h2 className="font-headline-md text-headline-md text-on-surface uppercase tracking-tight border-l-2 border-primary pl-3 mt-2">
@@ -67,6 +73,16 @@ export function TermsPage() {
         Podemos actualizar estos términos por motivos legales o de servicio.
         Avisaremos por correo o dentro de la plataforma cuando los cambios sean
         relevantes.
+      </p>
+
+      <h2 className="font-headline-md text-headline-md text-on-surface uppercase tracking-tight border-l-2 border-primary pl-3 mt-2">
+        8. Responsable
+      </h2>
+      <p>
+        PicShot es desarrollada por <strong>Devmaniacs</strong> y operada por
+        el cliente, quien asume la responsabilidad legal por los derechos de
+        imagen, el consentimiento de los participantes y el cumplimiento de
+        las leyes locales de protección de datos.
       </p>
     </LegalLayout>
   )

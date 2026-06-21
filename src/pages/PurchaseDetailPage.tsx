@@ -112,6 +112,16 @@ export function PurchaseDetailPage() {
           </div>
         </header>
 
+        {(order?.status === 'refunded' || order?.status === 'reversed') && (
+          <div className="mb-8 flex items-start gap-3 border border-primary-container/60 bg-primary-container/15 p-4">
+            <Icon name="undo" className="text-primary-container mt-0.5" />
+            <p className="font-body-md text-body-md text-on-surface">
+              Esta orden fue reembolsada. Las descargas de estas fotos quedan
+              desactivadas. Si tienes dudas, escribe a soporte@picshotec.com.
+            </p>
+          </div>
+        )}
+
         {order?.payphone && (
           <section className="bg-surface-container-lowest border border-surface-variant p-4 sm:p-6 mb-8">
             <h2 className="font-headline-md text-headline-md text-on-surface uppercase mb-4">

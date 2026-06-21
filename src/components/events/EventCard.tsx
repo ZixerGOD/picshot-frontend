@@ -12,7 +12,7 @@ export function EventCard({ event }: EventCardProps) {
     <article className="shots-card-event group">
       <div className="relative h-64 overflow-hidden">
         <img
-          src={event.image}
+          src={event.coverPhoto ?? event.image}
           alt={event.title}
           className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700 ease-out"
         />
