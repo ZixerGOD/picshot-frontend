@@ -1,6 +1,6 @@
-# SHOTS — Frontend
+# Picshot — Frontend
 
-Frontend navegable de la plataforma de fotografía deportiva **SHOTS**. Construido con React, TypeScript, Vite y Tailwind CSS.
+Frontend navegable de la plataforma de fotografía deportiva **Picshot**. Construido con React, TypeScript, Vite y Tailwind CSS.
 
 ## Stack
 
@@ -8,32 +8,51 @@ Frontend navegable de la plataforma de fotografía deportiva **SHOTS**. Construi
 - **Vite**
 - **React Router**
 - **Tailwind CSS 3**
-- **Material Symbols** (iconografía de Google Fonts)
+- **Material Symbols** (iconografía local)
 - **Fetch API** para llamadas REST
 
 ## Requisitos
 
-- Node.js >= 18
-- npm o yarn
+- **Node.js >= 20**
+- **pnpm 11** (gestor de paquetes oficial del proyecto)
+
+> Este proyecto usa **pnpm** como gestor único. No mezcles con `npm` ni `yarn`: el `engine-strict` del `.npmrc` y el campo `packageManager` de `package.json` bloquean otros gestores.
+
+### Instalar pnpm
+
+Si no tienes pnpm, actívalo con corepack (incluido en Node 20):
+
+```bash
+corepack enable
+corepack prepare pnpm@11 --activate
+```
+
+O instálalo de forma global:
+
+```bash
+npm install -g pnpm@11
+```
 
 ## Instalación
 
 ```bash
-cd frontend
-npm install
+pnpm install
 ```
 
 ## Scripts
 
 ```bash
 # Levantar entorno de desarrollo
-npm run dev
+pnpm dev
 
 # Build de producción
-npm run build
+pnpm build
 
 # Previsualizar build local
-npm run preview
+pnpm preview
+
+# Linter
+pnpm lint
 ```
 
 ## Estructura
@@ -41,17 +60,26 @@ npm run preview
 ```txt
 src/
   components/
-    layout/        # Navbar, Footer
+    layout/        # Navbar, Footer, CookieBanner, UserMenu
     ui/            # Botones, inputs, badges, iconos
-    events/        # EventCard, PhotoCard
-  pages/           # Home, Catálogo, Galería, Contacto, Trabaja con nosotros
+    events/        # EventCard, PhotoCard, SelfieSearchModal, CartToast
+    auth/          # RequireAuth, AuthLayout
+    admin/         # AdminLayout, AdminTable, PackEditor, QrPosterModal
+    photographer/  # PhotographerLayout, StatsCard
+  pages/           # públicas, auth, admin/*, photographer/*, legal/*
+  contexts/        # AuthProvider, CartProvider, AdminContext, PhotographerContext, ThemeProvider
+  hooks/           # useAuth, useCart, useAdmin, usePhotographer, useTheme
   lib/
     api.ts         # Capa de llamadas al backend (con mocks integrados)
     mocks.ts       # Datos temporales para probar la UI
     types.ts       # Tipos compartidos
+    checkout.ts    # Estado de órdenes y simulación Payphone
+    packs.ts       # Catálogo y resolución de paquetes
+    downloads.ts   # Helpers de signed URLs y retención
+    auth-tokens.ts # Tokens de verificación/reset en memoria
+    format.ts      # Formato de precio y fechas (locale es-EC)
     images.ts      # Helper de imágenes placeholder
-  styles/
-    global.css     # Tokens y clases utilitarias globales
+  index.css        # Tokens, layers y clases utilitarias globales
 ```
 
 ## Modo mock
@@ -60,7 +88,7 @@ Si la variable `VITE_API_URL` no está definida, el frontend funciona con datos 
 
 ```bash
 # Modo mock (sin backend)
-npm run dev
+pnpm dev
 ```
 
 ## Conectar con el backend
@@ -85,4 +113,4 @@ VITE_API_URL=http://localhost:3000/api
 
 - Las imágenes actuales son placeholders de `picsum.photos`. Reemplázalas por el CDN o bucket real cuando el backend esté listo.
 - Los formularios de contacto y staff tienen feedback visual inmediato; en modo mock simulan un envío con delay.
-- La búsqueda por selfie usa un `input type="file"` y simula el escaneo visual; luego conecta con el endpoint de reconocimiento facial.
+- La búsqueda por selfie captura desde la cámara (`getUserMedia`) con fallback a subir un archivo; luego conecta con el endpoint de reconocimiento facial.

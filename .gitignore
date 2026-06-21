@@ -12,6 +12,11 @@ dist
 dist-ssr
 *.local
 
+# Lockfiles de otros gestores: este repo usa pnpm exclusivamente
+package-lock.json
+yarn.lock
+bun.lockb
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

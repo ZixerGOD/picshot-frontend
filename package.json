@@ -9,10 +9,12 @@
     "pnpm": ">=11"
   },
   "scripts": {
+    "preinstall": "npx --yes only-allow pnpm",
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "typecheck": "tsc -b --noEmit"
   },
   "dependencies": {
     "@fontsource/inter": "^5.2.8",
