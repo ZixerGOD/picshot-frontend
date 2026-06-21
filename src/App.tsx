@@ -8,6 +8,8 @@ import { WorkWithUsPage } from './pages/WorkWithUsPage'
 import { MyPurchasesPage } from './pages/MyPurchasesPage'
 import { LoginPage } from './pages/LoginPage'
 import { CartPage } from './pages/CartPage'
+import { CheckoutPage } from './pages/CheckoutPage'
+import { CheckoutResultPage } from './pages/CheckoutResultPage'
 import { RequireAuth } from './components/auth/RequireAuth'
 import { CartProvider } from './contexts/CartContext'
 import { AdminProvider } from './contexts/AdminContext'
@@ -89,6 +91,46 @@ export default function App() {
               <PublicLayout>
                 <CartPage />
               </PublicLayout>
+            }
+          />
+          <Route
+            path="/checkout"
+            element={
+              <RequireAuth>
+                <PublicLayout>
+                  <CheckoutPage />
+                </PublicLayout>
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/checkout/success"
+            element={
+              <RequireAuth>
+                <PublicLayout>
+                  <CheckoutResultPage variant="success" />
+                </PublicLayout>
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/checkout/error"
+            element={
+              <RequireAuth>
+                <PublicLayout>
+                  <CheckoutResultPage variant="error" />
+                </PublicLayout>
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/checkout/pending"
+            element={
+              <RequireAuth>
+                <PublicLayout>
+                  <CheckoutResultPage variant="pending" />
+                </PublicLayout>
+              </RequireAuth>
             }
           />
           <Route
