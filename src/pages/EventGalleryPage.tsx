@@ -8,6 +8,7 @@ import {
   BiometricConsentModal,
   hasBiometricConsent,
 } from '../components/events/BiometricConsentModal'
+import { CartToast } from '../components/events/CartToast'
 import { useCart } from '../hooks/useCart'
 import { Icon } from '../components/ui/Icon'
 import { Footer } from '../components/layout/Footer'
@@ -36,6 +37,23 @@ export function EventGalleryPage() {
   const [activeFilter, setActiveFilter] = useState<PhotoFilter>('all')
 
   const { addItem, isInCart } = useCart()
+  const [toast, setToast] = useState<{ url: string } | null>(null)
+  const toastTimerRef = useRef<number | null>(null)
+
+  function handleAddToCart(photo: Photo) {
+    addItem(photo, eventId)
+    setToast({ url: photo.url })
+    if (toastTimerRef.current) window.clearTimeout(toastTimerRef.current)
+    toastTimerRef.current = window.setTimeout(() => {
+      setToast(null)
+    }, 3000)
+  }
+
+  useEffect(() => {
+    return () => {
+      if (toastTimerRef.current) window.clearTimeout(toastTimerRef.current)
+    }
+  }, [])
 
   const [selfieModalOpen, setSelfieModalOpen] = useState(false)
   const [pendingSelfie, setPendingSelfie] = useState<File | null>(null)
@@ -369,7 +387,7 @@ export function EventGalleryPage() {
                   key={photo.id}
                   photo={photo}
                   size={idx === 0 ? 'large' : 'normal'}
-                  onAdd={(p) => addItem(p, eventId)}
+                  onAdd={handleAddToCart}
                   inCart={isInCart(photo.id)}
                 />
               ))}
@@ -409,6 +427,8 @@ export function EventGalleryPage() {
         onAccept={handleConsentAccepted}
         onCancel={handleConsentCancel}
       />
+
+      <CartToast visible={!!toast} photoUrl={toast?.url} />
     </>
   )
 }

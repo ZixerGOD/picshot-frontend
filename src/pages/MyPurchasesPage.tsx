@@ -18,6 +18,8 @@ interface EventGroup {
   total: number
 }
 
+const PREVIEW_LIMIT = 6
+
 export function MyPurchasesPage() {
   const [purchases, setPurchases] = useState<Purchase[]>([])
   const [events, setEvents] = useState<EventItem[]>([])
@@ -70,7 +72,9 @@ export function MyPurchasesPage() {
           {!loading && totalPhotos > 0 && (
             <div className="flex flex-wrap gap-8 mt-8">
               <div>
-                <div className="font-headline-md text-headline-md text-primary">{totalPhotos}</div>
+                <div className="font-headline-md text-headline-md text-primary">
+                  {totalPhotos}
+                </div>
                 <div className="font-caption text-caption text-on-surface-variant uppercase tracking-wider mt-1">
                   Fotos compradas
                 </div>
@@ -121,124 +125,252 @@ export function MyPurchasesPage() {
           </div>
         ) : (
           <>
-          <aside
-            role="status"
-            className="flex items-start gap-3 border border-surface-variant bg-surface-container-lowest p-4 mb-12"
-          >
-            <Icon name="schedule" className="text-primary mt-0.5" />
-            <p className="font-body-md text-body-md text-on-surface">
-              Tus fotos quedan disponibles para descargar durante 6 meses desde
-              la fecha de compra. El badge sobre cada foto te indica los días
-              que faltan para que se eliminen.
-            </p>
-          </aside>
-          <div className="space-y-16">
-            {groups.map((group) => (
-              <section key={group.eventId}>
-                <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8 border-b border-surface-container-highest pb-4">
-                  <div>
-                    {group.event && (
-                      <div className="flex items-center gap-2 text-on-surface-variant font-label-bold text-label-bold mb-2 uppercase tracking-widest">
-                        <Icon name="calendar_month" fill className="text-base" />
-                        <span>{group.event.displayDate}</span>
-                        <span className="mx-1 text-surface-container-highest">|</span>
-                        <Icon name="location_on" fill className="text-base" />
-                        <span>{group.event.location}</span>
-                      </div>
-                    )}
-                    <h2 className="font-headline-md text-headline-md text-on-surface">
-                      {group.event?.title ?? 'Evento'}
-                    </h2>
-                  </div>
-                  <div className="flex items-center gap-4">
-                    <div className="text-right">
-                      <div className="font-headline-md text-headline-md text-primary">
-                        {formatPrice(group.total)}
-                      </div>
-                      <div className="font-caption text-caption text-on-surface-variant uppercase tracking-wider">
-                        {group.purchases.length}{' '}
-                        {group.purchases.length === 1 ? 'foto' : 'fotos'}
-                      </div>
-                    </div>
-                    <Link
-                      to={`/eventos/${group.eventId}`}
-                      className="shots-btn-outline px-4 py-2"
-                    >
-                      Buscar más fotos de este evento
-                    </Link>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-base">
-                  {group.purchases.map((purchase) => {
-                    const retention =
-                      purchase.retentionUntil ??
-                      retentionDateFrom(purchase.purchasedAt)
-                    const daysLeft = daysUntil(retention)
-                    return (
-                      <article
-                        key={purchase.id}
-                        className="group relative bg-surface-container-lowest border border-surface-variant overflow-hidden aspect-[4/3]"
-                      >
-                        <img
-                          src={purchase.url}
-                          alt={`Foto comprada ${purchase.photoId}`}
-                          className="absolute inset-0 w-full h-full object-cover"
-                        />
-                        <div className="absolute top-3 right-3 shots-badge bg-primary-container/90 text-on-primary-container">
-                          <Icon name="schedule" className="text-base mr-1" />
-                          {daysLeft}d
-                        </div>
-                        <div className="absolute inset-0 bg-background/85 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-between p-4">
-                          <div className="flex justify-between items-start">
-                            {purchase.bib && (
-                              <span className="font-label-bold text-label-bold text-on-surface-variant uppercase tracking-widest">
-                                Dorsal {purchase.bib}
-                              </span>
-                            )}
-                            <span className="shots-badge bg-primary-container text-on-primary-container">
-                              <Icon name="check" className="text-base mr-1" />
-                              Comprada
-                            </span>
-                          </div>
-                          <div className="flex justify-between items-end gap-4">
-                            <div>
-                              {purchase.resolution && (
-                                <div className="font-body-md text-body-md text-on-background">
-                                  {purchase.resolution}
-                                </div>
-                              )}
-                              <Link
-                                to={`/mis-compras/${purchase.orderId}`}
-                                className="font-caption text-caption text-primary hover:underline"
-                              >
-                                Orden {purchase.orderId}
-                              </Link>
-                            </div>
-                            <a
-                              href={generateSignedDownload(purchase.url).url}
-                              download
-                              target="_blank"
-                              rel="noreferrer"
-                              className="flex items-center gap-2 bg-primary-container text-on-primary-container hover:bg-inverse-primary transition-colors font-label-bold text-label-bold px-4 py-2"
-                            >
-                              <Icon name="download" />
-                              Descargar
-                            </a>
-                          </div>
-                        </div>
-                      </article>
-                    )
-                  })}
-                </div>
-              </section>
-            ))}
-          </div>
+            <aside
+              role="status"
+              className="flex items-start gap-3 border border-surface-variant bg-surface-container-lowest p-4 mb-12"
+            >
+              <Icon name="schedule" className="text-primary mt-0.5" />
+              <p className="font-body-md text-body-md text-on-surface">
+                Tus fotos quedan disponibles para descargar durante 6 meses
+                desde la fecha de compra. El badge sobre cada foto indica los
+                días que faltan.
+              </p>
+            </aside>
+            <div className="space-y-16">
+              {groups.map((group) => (
+                <PurchaseGroup key={group.eventId} group={group} />
+              ))}
+            </div>
           </>
         )}
       </main>
 
       <Footer variant="simple" />
     </>
+  )
+}
+
+function PurchaseGroup({ group }: { group: EventGroup }) {
+  const [expanded, setExpanded] = useState(false)
+  const [selected, setSelected] = useState<Set<string>>(new Set())
+  const [downloading, setDownloading] = useState(false)
+
+  const visible = expanded ? group.purchases : group.purchases.slice(0, PREVIEW_LIMIT)
+  const hidden = Math.max(0, group.purchases.length - PREVIEW_LIMIT)
+  const visibleIds = visible.map((p) => p.id)
+  const allVisibleSelected =
+    visible.length > 0 && visibleIds.every((id) => selected.has(id))
+
+  function toggle(id: string) {
+    setSelected((prev) => {
+      const next = new Set(prev)
+      if (next.has(id)) next.delete(id)
+      else next.add(id)
+      return next
+    })
+  }
+
+  function toggleAll() {
+    if (allVisibleSelected) {
+      setSelected((prev) => {
+        const next = new Set(prev)
+        visibleIds.forEach((id) => next.delete(id))
+        return next
+      })
+    } else {
+      setSelected((prev) => {
+        const next = new Set(prev)
+        visibleIds.forEach((id) => next.add(id))
+        return next
+      })
+    }
+  }
+
+  function clear() {
+    setSelected(new Set())
+  }
+
+  async function downloadSelected() {
+    const targets = group.purchases.filter((p) => selected.has(p.id))
+    if (targets.length === 0) return
+    setDownloading(true)
+    for (const purchase of targets) {
+      // Las fotos se descargan una a una; el backend devuelve la versión en
+      // alta resolución vía signed URL — esta pantalla solo carga previews.
+      const signed = generateSignedDownload(purchase.url)
+      const a = document.createElement('a')
+      a.href = signed.url
+      a.download = `${purchase.photoId}.jpg`
+      a.rel = 'noreferrer'
+      a.target = '_blank'
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+      await new Promise((r) => setTimeout(r, 350))
+    }
+    setDownloading(false)
+  }
+
+  return (
+    <section>
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-6 border-b border-surface-container-highest pb-4">
+        <div>
+          {group.event && (
+            <div className="flex items-center gap-2 text-on-surface-variant font-label-bold text-label-bold mb-2 uppercase tracking-widest">
+              <Icon name="calendar_month" fill className="text-base" />
+              <span>{group.event.displayDate}</span>
+              <span className="mx-1 text-surface-container-highest">|</span>
+              <Icon name="location_on" fill className="text-base" />
+              <span>{group.event.location}</span>
+            </div>
+          )}
+          <h2 className="font-headline-md text-headline-md text-on-surface">
+            {group.event?.title ?? 'Evento'}
+          </h2>
+        </div>
+        <div className="flex items-center gap-4">
+          <div className="text-right">
+            <div className="font-headline-md text-headline-md text-primary">
+              {formatPrice(group.total)}
+            </div>
+            <div className="font-caption text-caption text-on-surface-variant uppercase tracking-wider">
+              {group.purchases.length}{' '}
+              {group.purchases.length === 1 ? 'foto' : 'fotos'}
+            </div>
+          </div>
+          <Link
+            to={`/eventos/${group.eventId}`}
+            className="shots-btn-outline px-4 py-2"
+          >
+            Buscar más fotos de este evento
+          </Link>
+        </div>
+      </div>
+
+      <div className="flex flex-wrap items-center gap-3 mb-4">
+        <button
+          type="button"
+          onClick={toggleAll}
+          className="inline-flex items-center gap-2 border border-surface-variant text-on-surface font-label-bold text-label-bold uppercase tracking-widest px-3 py-2 text-xs hover:border-primary hover:text-primary transition-colors"
+        >
+          <Icon name={allVisibleSelected ? 'deselect' : 'select_all'} />
+          {allVisibleSelected ? 'Quitar selección' : 'Seleccionar todas'}
+        </button>
+        {selected.size > 0 && (
+          <>
+            <button
+              type="button"
+              onClick={clear}
+              className="font-label-bold text-label-bold text-on-surface-variant hover:text-primary uppercase tracking-widest text-xs"
+            >
+              Limpiar ({selected.size})
+            </button>
+            <button
+              type="button"
+              onClick={downloadSelected}
+              disabled={downloading}
+              className="shots-btn-primary px-3 py-2 text-xs disabled:opacity-60 ml-auto"
+            >
+              <Icon
+                name={downloading ? 'autorenew' : 'download'}
+                className={downloading ? 'animate-spin' : ''}
+              />
+              {downloading
+                ? 'Descargando…'
+                : `Descargar ${selected.size} ${selected.size === 1 ? 'foto' : 'fotos'}`}
+            </button>
+          </>
+        )}
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-base">
+        {visible.map((purchase) => {
+          const retention =
+            purchase.retentionUntil ?? retentionDateFrom(purchase.purchasedAt)
+          const daysLeft = daysUntil(retention)
+          const isSelected = selected.has(purchase.id)
+          return (
+            <article
+              key={purchase.id}
+              className={`group relative bg-surface-container-lowest border overflow-hidden aspect-[4/3] cursor-pointer transition-colors ${
+                isSelected ? 'border-primary' : 'border-surface-variant'
+              }`}
+              onClick={() => toggle(purchase.id)}
+            >
+              <img
+                src={purchase.url}
+                alt={`Foto comprada ${purchase.photoId}`}
+                className="absolute inset-0 w-full h-full object-cover"
+                loading="lazy"
+              />
+              <div className="absolute top-3 left-3 z-10">
+                <span
+                  className={`flex items-center justify-center w-6 h-6 border-2 ${
+                    isSelected
+                      ? 'bg-primary border-primary text-on-primary'
+                      : 'bg-background/70 border-surface-variant text-transparent'
+                  }`}
+                >
+                  <Icon name="check" className="text-base" />
+                </span>
+              </div>
+              <div className="absolute top-3 right-3 shots-badge bg-primary-container/90 text-on-primary-container">
+                <Icon name="schedule" className="text-base mr-1" />
+                {daysLeft}d
+              </div>
+              <div className="absolute inset-0 bg-background/85 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-between p-4 pointer-events-none">
+                <div className="flex justify-between items-start">
+                  {purchase.bib && (
+                    <span className="font-label-bold text-label-bold text-on-surface-variant uppercase tracking-widest">
+                      Dorsal {purchase.bib}
+                    </span>
+                  )}
+                </div>
+                <div className="flex justify-between items-end gap-4">
+                  <div>
+                    {purchase.resolution && (
+                      <div className="font-body-md text-body-md text-on-background">
+                        {purchase.resolution}
+                      </div>
+                    )}
+                    <Link
+                      to={`/mis-compras/${purchase.orderId}`}
+                      onClick={(e) => e.stopPropagation()}
+                      className="font-caption text-caption text-primary hover:underline pointer-events-auto"
+                    >
+                      Orden {purchase.orderId}
+                    </Link>
+                  </div>
+                  <a
+                    href={generateSignedDownload(purchase.url).url}
+                    download={`${purchase.photoId}.jpg`}
+                    target="_blank"
+                    rel="noreferrer"
+                    onClick={(e) => e.stopPropagation()}
+                    className="flex items-center gap-2 bg-primary-container text-on-primary-container hover:bg-inverse-primary transition-colors font-label-bold text-label-bold px-4 py-2 pointer-events-auto"
+                  >
+                    <Icon name="download" />
+                    Descargar
+                  </a>
+                </div>
+              </div>
+            </article>
+          )
+        })}
+      </div>
+
+      {hidden > 0 && (
+        <div className="mt-6 text-center">
+          <button
+            type="button"
+            onClick={() => setExpanded((v) => !v)}
+            className="inline-flex items-center gap-2 border border-surface-variant text-on-surface font-label-bold text-label-bold uppercase tracking-widest px-5 py-3 hover:border-primary hover:text-primary transition-colors"
+          >
+            <Icon name={expanded ? 'expand_less' : 'expand_more'} />
+            {expanded ? 'Mostrar menos' : `Ver las ${hidden} restantes`}
+          </button>
+        </div>
+      )}
+    </section>
   )
 }
