@@ -4,6 +4,10 @@ import type { EventItem, Photo, PhotoFilter } from '../lib/types'
 import { getEventById, getEventPhotos, searchPhotosByFace } from '../lib/api'
 import { PhotoCard } from '../components/events/PhotoCard'
 import { SelfieSearchModal } from '../components/events/SelfieSearchModal'
+import {
+  BiometricConsentModal,
+  hasBiometricConsent,
+} from '../components/events/BiometricConsentModal'
 import { useCart } from '../hooks/useCart'
 import { Icon } from '../components/ui/Icon'
 import { Footer } from '../components/layout/Footer'
@@ -35,15 +39,47 @@ export function EventGalleryPage() {
 
   const [selfieModalOpen, setSelfieModalOpen] = useState(false)
   const [pendingSelfie, setPendingSelfie] = useState<File | null>(null)
+  const [consentOpen, setConsentOpen] = useState(false)
+  const [pendingMode, setPendingMode] = useState<'camera' | 'upload' | null>(null)
   const selfieFileRef = useRef<HTMLInputElement>(null)
 
+  function ensureConsent(mode: 'camera' | 'upload') {
+    if (hasBiometricConsent()) {
+      if (mode === 'camera') {
+        setPendingSelfie(null)
+        setSelfieModalOpen(true)
+      } else {
+        selfieFileRef.current?.click()
+      }
+      return
+    }
+    setPendingMode(mode)
+    setConsentOpen(true)
+  }
+
+  function handleConsentAccepted() {
+    setConsentOpen(false)
+    const mode = pendingMode
+    setPendingMode(null)
+    if (mode === 'camera') {
+      setPendingSelfie(null)
+      setSelfieModalOpen(true)
+    } else if (mode === 'upload') {
+      selfieFileRef.current?.click()
+    }
+  }
+
+  function handleConsentCancel() {
+    setConsentOpen(false)
+    setPendingMode(null)
+  }
+
   function openSelfieCamera() {
-    setPendingSelfie(null)
-    setSelfieModalOpen(true)
+    ensureConsent('camera')
   }
 
   function openSelfieUpload() {
-    selfieFileRef.current?.click()
+    ensureConsent('upload')
   }
 
   function handleSelfieFile(e: React.ChangeEvent<HTMLInputElement>) {
@@ -366,6 +402,12 @@ export function EventGalleryPage() {
         onClose={closeSelfieModal}
         onSearch={handleSelfieSearch}
         initialFile={pendingSelfie}
+      />
+
+      <BiometricConsentModal
+        open={consentOpen}
+        onAccept={handleConsentAccepted}
+        onCancel={handleConsentCancel}
       />
     </>
   )

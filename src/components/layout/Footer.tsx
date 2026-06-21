@@ -34,22 +34,28 @@ export function Footer({ variant = 'simple' }: FooterProps) {
                 Legal
               </span>
               <Link
-                to="#"
+                to="/privacidad"
                 className="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors"
               >
                 Privacidad
               </Link>
               <Link
-                to="#"
+                to="/terminos"
                 className="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors"
               >
                 Términos
               </Link>
               <Link
-                to="#"
+                to="/cookies"
                 className="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors"
               >
                 Cookies
+              </Link>
+              <Link
+                to="/politica-biometrica"
+                className="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors"
+              >
+                Política biométrica
               </Link>
             </div>
             <div className="flex flex-col gap-4">
@@ -57,30 +63,48 @@ export function Footer({ variant = 'simple' }: FooterProps) {
                 Empresa
               </span>
               <Link
-                to="#"
-                className="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors"
-              >
-                Soporte
-              </Link>
-              <Link
                 to="/contacto"
                 className="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors"
               >
                 Contacto
               </Link>
+              <Link
+                to="/trabaja-con-nosotros"
+                className="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors"
+              >
+                Trabaja con nosotros
+              </Link>
+              <p className="font-caption text-caption text-on-surface-variant">
+                Picshot S.A.S. · RUC 1799999999001 · Quito, Ecuador
+              </p>
             </div>
           </nav>
         ) : (
           <nav className="flex flex-wrap gap-6 sm:gap-12 mt-8 md:mt-0">
-            {['Privacidad', 'Términos', 'Cookies', 'Soporte'].map((item) => (
-              <Link
-                key={item}
-                to="#"
-                className="font-label-bold text-label-bold text-on-surface-variant hover:text-primary transition-colors"
-              >
-                {item}
-              </Link>
-            ))}
+            <Link
+              to="/privacidad"
+              className="font-label-bold text-label-bold text-on-surface-variant hover:text-primary transition-colors"
+            >
+              Privacidad
+            </Link>
+            <Link
+              to="/terminos"
+              className="font-label-bold text-label-bold text-on-surface-variant hover:text-primary transition-colors"
+            >
+              Términos
+            </Link>
+            <Link
+              to="/cookies"
+              className="font-label-bold text-label-bold text-on-surface-variant hover:text-primary transition-colors"
+            >
+              Cookies
+            </Link>
+            <Link
+              to="/politica-biometrica"
+              className="font-label-bold text-label-bold text-on-surface-variant hover:text-primary transition-colors"
+            >
+              Política biométrica
+            </Link>
           </nav>
         )}
       </div>

@@ -16,6 +16,10 @@ import { ForgotPasswordPage } from './pages/ForgotPasswordPage'
 import { ResetPasswordPage } from './pages/ResetPasswordPage'
 import { VerifyEmailPage } from './pages/VerifyEmailPage'
 import { SetPasswordPage } from './pages/SetPasswordPage'
+import { TermsPage } from './pages/legal/TermsPage'
+import { PrivacyPage } from './pages/legal/PrivacyPage'
+import { CookiesPage } from './pages/legal/CookiesPage'
+import { BiometricPolicyPage } from './pages/legal/BiometricPolicyPage'
 import { RequireAuth } from './components/auth/RequireAuth'
 import { CartProvider } from './contexts/CartContext'
 import { AdminProvider } from './contexts/AdminContext'
@@ -95,6 +99,38 @@ export default function App() {
           <Route path="/recuperar-contrasena" element={<ForgotPasswordPage />} />
           <Route path="/reset-password" element={<ResetPasswordPage />} />
           <Route path="/verificar-email" element={<VerifyEmailPage />} />
+          <Route
+            path="/terminos"
+            element={
+              <PublicLayout>
+                <TermsPage />
+              </PublicLayout>
+            }
+          />
+          <Route
+            path="/privacidad"
+            element={
+              <PublicLayout>
+                <PrivacyPage />
+              </PublicLayout>
+            }
+          />
+          <Route
+            path="/cookies"
+            element={
+              <PublicLayout>
+                <CookiesPage />
+              </PublicLayout>
+            }
+          />
+          <Route
+            path="/politica-biometrica"
+            element={
+              <PublicLayout>
+                <BiometricPolicyPage />
+              </PublicLayout>
+            }
+          />
           <Route path="/set-password" element={<SetPasswordPage />} />
           <Route
             path="/carrito"
