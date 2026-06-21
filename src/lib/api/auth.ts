@@ -1,104 +1,8 @@
-import type {
-  AuthSession,
-  AuthUser,
-  ContactRequest,
-  EventItem,
-  LoginCredentials,
-  Photo,
-  Purchase,
-  StaffApplication,
-} from './types'
-import { PASSWORD_POLICY } from './types'
-import {
-  getMockEventById,
-  getMockPhotosByEvent,
-  mockAuthUsers,
-  mockEvents,
-  mockPurchases,
-} from './mocks'
-import {
-  consumeToken,
-  findToken,
-  issueToken,
-  TOKEN_PURPOSE,
-} from './auth-tokens'
-
-const API_URL = import.meta.env.VITE_API_URL || ''
-export const USE_MOCKS = !API_URL
-
-const TOKEN_KEY = 'picshot-auth-token'
-const TOKEN_EXPIRES_KEY = 'picshot-auth-token-expires'
-
-/** TTL del token según docs/security.md y decisions.md:288-291. */
-export const TOKEN_TTL_DAYS_DEFAULT = 7
-export const TOKEN_TTL_DAYS_REMEMBER = 30
-
-export function getToken(): string | null {
-  try {
-    return localStorage.getItem(TOKEN_KEY)
-  } catch {
-    return null
-  }
-}
-
-export function setToken(token: string | null, ttlDays?: number) {
-  try {
-    if (token) {
-      localStorage.setItem(TOKEN_KEY, token)
-      if (ttlDays != null) {
-        const expiresAt = Date.now() + ttlDays * 24 * 60 * 60 * 1000
-        localStorage.setItem(TOKEN_EXPIRES_KEY, String(expiresAt))
-      }
-    } else {
-      localStorage.removeItem(TOKEN_KEY)
-      localStorage.removeItem(TOKEN_EXPIRES_KEY)
-    }
-  } catch {
-    // ignore
-  }
-}
-
-export function getTokenExpiresAt(): number | null {
-  try {
-    const raw = localStorage.getItem(TOKEN_EXPIRES_KEY)
-    if (!raw) return null
-    const value = Number(raw)
-    return Number.isFinite(value) ? value : null
-  } catch {
-    return null
-  }
-}
-
-export function isTokenExpired(): boolean {
-  const exp = getTokenExpiresAt()
-  if (exp == null) return false
-  return Date.now() >= exp
-}
-
-/** Cabeceras base + Authorization si hay sesión. */
-function authHeaders(extra?: HeadersInit): HeadersInit {
-  const token = getToken()
-  return {
-    ...(extra ?? {}),
-    ...(token ? { Authorization: `Bearer ${token}` } : {}),
-  }
-}
-
-function sleep(ms: number) {
-  return new Promise((resolve) => setTimeout(resolve, ms))
-}
-
-async function fetchJson<T>(path: string, options?: RequestInit): Promise<T> {
-  const res = await fetch(`${API_URL}${path}`, {
-    ...options,
-    headers: authHeaders({ 'Content-Type': 'application/json', ...(options?.headers ?? {}) }),
-  })
-  if (!res.ok) {
-    const err = await res.text()
-    throw new Error(err || `Request failed: ${res.status}`)
-  }
-  return res.json() as Promise<T>
-}
+import type { AuthSession, AuthUser, LoginCredentials } from '../types'
+import { PASSWORD_POLICY } from '../types'
+import { mockAuthUsers } from '../mocks'
+import { consumeToken, findToken, issueToken, TOKEN_PURPOSE } from '../auth-tokens'
+import { fetchJson, sleep, USE_MOCKS } from './client'
 
 /**
  * Rate limit visible al usuario: 5 intentos fallidos por 60 segundos.
@@ -121,15 +25,20 @@ export class LoginRateLimitError extends Error {
 function recordLoginFailure() {
   const now = Date.now()
   loginFailures.push(now)
-  // Mantener solo los del último minuto
-  while (loginFailures.length && now - loginFailures[0] > LOGIN_FAILURE_WINDOW_MS) {
+  while (
+    loginFailures.length &&
+    now - loginFailures[0] > LOGIN_FAILURE_WINDOW_MS
+  ) {
     loginFailures.shift()
   }
 }
 
 export function loginRetryAfterSeconds(): number {
   const now = Date.now()
-  while (loginFailures.length && now - loginFailures[0] > LOGIN_FAILURE_WINDOW_MS) {
+  while (
+    loginFailures.length &&
+    now - loginFailures[0] > LOGIN_FAILURE_WINDOW_MS
+  ) {
     loginFailures.shift()
   }
   if (loginFailures.length < LOGIN_FAILURE_LIMIT) return 0
@@ -144,7 +53,8 @@ export async function login(credentials: LoginCredentials): Promise<AuthSession>
     await sleep(700)
     const email = credentials.email.trim().toLowerCase()
     const found = mockAuthUsers.find(
-      (u) => u.email.toLowerCase() === email && u.password === credentials.password,
+      (u) =>
+        u.email.toLowerCase() === email && u.password === credentials.password,
     )
     if (!found) {
       recordLoginFailure()
@@ -315,119 +225,5 @@ export async function setPasswordWithInvite(
   return fetchJson<{ email: string }>('/auth/set-password', {
     method: 'POST',
     body: JSON.stringify({ token, password }),
-  })
-}
-
-export async function getEvents(): Promise<EventItem[]> {
-  if (USE_MOCKS) return mockEvents
-  return fetchJson<EventItem[]>('/events')
-}
-
-export async function getEventById(id: string): Promise<EventItem | null> {
-  if (USE_MOCKS) {
-    const event = getMockEventById(id)
-    return event ?? null
-  }
-  return fetchJson<EventItem | null>(`/events/${id}`)
-}
-
-export async function getEventPhotos(
-  eventId: string,
-  filters?: { bib?: string; filter?: string },
-): Promise<Photo[]> {
-  if (USE_MOCKS) {
-    let photos = getMockPhotosByEvent(eventId)
-    if (filters?.bib) {
-      photos = photos.filter((p) => p.bib === filters.bib)
-    }
-    if (filters?.filter === 'face') {
-      photos = photos.filter((_, i) => i % 2 === 0)
-    }
-    if (filters?.filter === 'favorites') {
-      photos = photos.filter((p) => p.featured)
-    }
-    return photos
-  }
-  const query = new URLSearchParams()
-  if (filters?.bib) query.set('bib', filters.bib)
-  if (filters?.filter) query.set('filter', filters.filter)
-  return fetchJson<Photo[]>(`/events/${eventId}/photos?${query.toString()}`)
-}
-
-/**
- * Error con código del backend del vision-service. El frontend usa el código
- * para mostrar mensajes específicos al usuario (NO_FACE_DETECTED, etc.).
- */
-export class FaceSearchError extends Error {
-  code: string
-  constructor(code: string, message: string) {
-    super(message)
-    this.name = 'FaceSearchError'
-    this.code = code
-  }
-}
-
-export async function searchPhotosByFace(
-  eventId: string,
-  selfie: File | Blob,
-): Promise<Photo[]> {
-  if (USE_MOCKS) {
-    await sleep(2000)
-    // En mock simulamos los errores del vision-service ocasionalmente, así
-    // la UX que ya está construida para esos códigos se puede validar.
-    const roll = Math.random()
-    if (roll < 0.12) {
-      throw new FaceSearchError(
-        'NO_FACE_DETECTED',
-        'No detectamos tu rostro en la selfie.',
-      )
-    }
-    if (roll < 0.18) {
-      throw new FaceSearchError(
-        'MULTIPLE_FACES_DETECTED',
-        'Detectamos más de un rostro en la selfie.',
-      )
-    }
-    return getMockPhotosByEvent(eventId).filter((_, i) => i % 2 === 0)
-  }
-  const formData = new FormData()
-  formData.append('selfie', selfie, 'selfie.jpg')
-  const res = await fetch(`${API_URL}/events/${eventId}/face-search`, {
-    method: 'POST',
-    headers: authHeaders(),
-    body: formData,
-  })
-  if (!res.ok) throw new Error('Face search failed')
-  return res.json()
-}
-
-export async function getMyPurchases(): Promise<Purchase[]> {
-  if (USE_MOCKS) {
-    await sleep(600)
-    return mockPurchases
-  }
-  // El backend identifica al comprador por su sesión/token; aquí no se envía email.
-  return fetchJson<Purchase[]>('/me/purchases')
-}
-
-export async function submitContactRequest(payload: ContactRequest): Promise<{ id: string }> {
-  if (USE_MOCKS) {
-    await sleep(1200)
-    return { id: `contact-${Date.now()}` }
-  }
-  return fetchJson<{ id: string }>('/contact-requests', {
-    method: 'POST',
-    body: JSON.stringify(payload),
-  })
-}
-
-export async function submitStaffApplication(payload: StaffApplication): Promise<{ id: string }> {
-  if (USE_MOCKS) {
-    await sleep(1200)
-    return { id: `staff-${Date.now()}` }
-  }
-  return fetchJson<{ id: string }>('/staff-applications', {
-    method: 'POST',
-    body: JSON.stringify(payload),
   })
 }
