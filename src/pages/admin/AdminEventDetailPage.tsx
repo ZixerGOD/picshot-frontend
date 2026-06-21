@@ -49,6 +49,7 @@ export function AdminEventDetailPage() {
   } = useAdmin()
   const [activeTab, setActiveTab] = useState<Tab>('info')
   const [selectedPhotographer, setSelectedPhotographer] = useState('')
+  const [headerPosterOpen, setHeaderPosterOpen] = useState(false)
 
   const event = useMemo(() => events.find((e) => e.id === eventId), [events, eventId])
 
@@ -112,6 +113,14 @@ export function AdminEventDetailPage() {
             </p>
           </div>
           <div className="flex flex-wrap gap-3">
+            <button
+              type="button"
+              onClick={() => setHeaderPosterOpen(true)}
+              className="shots-btn-primary"
+            >
+              <Icon name="qr_code_2" />
+              Generar QR
+            </button>
             <button
               type="button"
               onClick={() => {
@@ -237,16 +246,7 @@ export function AdminEventDetailPage() {
             }
           />
 
-          <ShareEventBlock
-            eventId={event.id}
-            eventTitle={event.title}
-            eventDate={event.displayDate}
-            backgrounds={[
-              event.bannerImage,
-              event.coverPhoto,
-              event.image,
-            ].filter((u): u is string => Boolean(u))}
-          />
+          <ShareEventBlock eventId={event.id} eventTitle={event.title} />
         </section>
       )}
 
@@ -409,6 +409,21 @@ export function AdminEventDetailPage() {
           />
         </section>
       )}
+
+      <QrPosterModal
+        open={headerPosterOpen}
+        onClose={() => setHeaderPosterOpen(false)}
+        eventTitle={event.title}
+        eventDate={event.displayDate}
+        publicUrl={
+          typeof window !== 'undefined'
+            ? `${window.location.origin}/eventos/${event.id}`
+            : `/eventos/${event.id}`
+        }
+        backgrounds={[event.bannerImage, event.coverPhoto, event.image].filter(
+          (u): u is string => Boolean(u),
+        )}
+      />
     </div>
   )
 }
@@ -472,20 +487,15 @@ function EventPacksSection({ packs, basePrice, onSave }: EventPacksSectionProps)
 function ShareEventBlock({
   eventId,
   eventTitle,
-  eventDate,
-  backgrounds,
 }: {
   eventId: string
   eventTitle: string
-  eventDate: string
-  backgrounds: string[]
 }) {
   const publicUrl =
     typeof window !== 'undefined'
       ? `${window.location.origin}/eventos/${eventId}`
       : `/eventos/${eventId}`
   const [copied, setCopied] = useState(false)
-  const [posterOpen, setPosterOpen] = useState(false)
 
   function copy() {
     navigator.clipboard.writeText(publicUrl).then(() => {
@@ -506,60 +516,38 @@ function ShareEventBlock({
 
   return (
     <div className="pt-6 border-t border-surface-variant">
-      <h3 className="font-headline-md text-headline-md text-on-surface uppercase mb-2">
-        Compartir el evento
+      <h3 className="font-label-bold text-label-bold text-on-surface uppercase tracking-widest mb-3">
+        Enlace público del evento
       </h3>
-      <p className="font-body-md text-body-md text-on-surface-variant mb-4">
-        Comparte la URL con los participantes o genera un póster con QR para
-        imprimir y colocar en la zona del evento. Al escanearlo, el
-        participante llega directo a la galería.
-      </p>
-      <div className="flex flex-col gap-3 max-w-2xl">
-        <div className="flex items-center gap-2">
-          <input
-            type="text"
-            readOnly
-            value={publicUrl}
-            className="shots-input flex-1 min-w-0"
-            onClick={(e) => e.currentTarget.select()}
-          />
-          <button
-            type="button"
-            onClick={copy}
-            className="shots-btn-primary px-3 py-2 text-xs shrink-0"
-          >
-            <Icon name={copied ? 'check' : 'content_copy'} />
-            {copied ? 'Copiado' : 'Copiar'}
-          </button>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          <button
-            type="button"
-            onClick={() => setPosterOpen(true)}
-            className="shots-btn-primary px-4 py-3"
-          >
-            <Icon name="qr_code_2" />
-            Generar QR con póster
-          </button>
-          <button
-            type="button"
-            onClick={shareNative}
-            className="inline-flex items-center justify-center gap-2 border border-surface-variant text-on-surface font-label-bold text-label-bold uppercase tracking-widest px-4 py-3 hover:border-primary hover:text-primary transition-colors"
-          >
-            <Icon name="share" />
-            Compartir
-          </button>
-        </div>
+      <div className="flex flex-col sm:flex-row gap-2 max-w-2xl">
+        <input
+          type="text"
+          readOnly
+          value={publicUrl}
+          className="shots-input flex-1 min-w-0"
+          onClick={(e) => e.currentTarget.select()}
+        />
+        <button
+          type="button"
+          onClick={copy}
+          className="shots-btn-primary px-3 py-2 text-xs shrink-0 justify-center"
+        >
+          <Icon name={copied ? 'check' : 'content_copy'} />
+          {copied ? 'Copiado' : 'Copiar enlace'}
+        </button>
+        <button
+          type="button"
+          onClick={shareNative}
+          className="inline-flex items-center justify-center gap-2 border border-surface-variant text-on-surface font-label-bold text-label-bold uppercase tracking-widest px-3 py-2 text-xs hover:border-primary hover:text-primary transition-colors"
+        >
+          <Icon name="share" />
+          Compartir
+        </button>
       </div>
-
-      <QrPosterModal
-        open={posterOpen}
-        onClose={() => setPosterOpen(false)}
-        eventTitle={eventTitle}
-        eventDate={eventDate}
-        publicUrl={publicUrl}
-        backgrounds={backgrounds}
-      />
+      <p className="font-caption text-caption text-on-surface-variant mt-2">
+        Para imprimir o publicar el QR usa el botón <strong>Generar QR</strong>{' '}
+        en la cabecera del evento.
+      </p>
     </div>
   )
 }

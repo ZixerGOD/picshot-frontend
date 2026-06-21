@@ -114,67 +114,137 @@ export function QrPosterModal({
     if (showOverlay) {
       const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height)
       if (position === 'bottom') {
-        gradient.addColorStop(0, 'rgba(0,0,0,0)')
-        gradient.addColorStop(0.55, 'rgba(0,0,0,0.65)')
-        gradient.addColorStop(1, 'rgba(0,0,0,0.9)')
+        // QR abajo → oscurecer arriba donde va la marca
+        gradient.addColorStop(0, 'rgba(0,0,0,0.85)')
+        gradient.addColorStop(0.35, 'rgba(0,0,0,0.45)')
+        gradient.addColorStop(0.7, 'rgba(0,0,0,0.25)')
+        gradient.addColorStop(1, 'rgba(0,0,0,0.5)')
       } else if (position === 'top') {
-        gradient.addColorStop(0, 'rgba(0,0,0,0.9)')
-        gradient.addColorStop(0.45, 'rgba(0,0,0,0.65)')
-        gradient.addColorStop(1, 'rgba(0,0,0,0)')
+        // QR arriba → oscurecer abajo
+        gradient.addColorStop(0, 'rgba(0,0,0,0.5)')
+        gradient.addColorStop(0.3, 'rgba(0,0,0,0.25)')
+        gradient.addColorStop(0.65, 'rgba(0,0,0,0.45)')
+        gradient.addColorStop(1, 'rgba(0,0,0,0.85)')
       } else {
-        gradient.addColorStop(0, 'rgba(0,0,0,0.3)')
-        gradient.addColorStop(0.5, 'rgba(0,0,0,0.65)')
-        gradient.addColorStop(1, 'rgba(0,0,0,0.3)')
+        // QR centrado → oscurecer arriba y abajo simétrico
+        gradient.addColorStop(0, 'rgba(0,0,0,0.85)')
+        gradient.addColorStop(0.3, 'rgba(0,0,0,0.35)')
+        gradient.addColorStop(0.7, 'rgba(0,0,0,0.35)')
+        gradient.addColorStop(1, 'rgba(0,0,0,0.85)')
       }
       ctx.fillStyle = gradient
       ctx.fillRect(0, 0, canvas.width, canvas.height)
     }
 
     // Tarjeta blanca con el QR
-    const qrSize = 520
-    const padding = 60
+    const qrSize = 540
+    const padding = 56
+    const captionGap = 130
     const cardW = qrSize + padding * 2
-    const cardH = qrSize + padding * 2 + 110
+    const cardH = qrSize + padding * 2 + captionGap
     const cardX = (canvas.width - cardW) / 2
     let cardY: number
-    if (position === 'top') cardY = 80
-    else if (position === 'bottom') cardY = canvas.height - cardH - 80
+    if (position === 'top') cardY = 96
+    else if (position === 'bottom') cardY = canvas.height - cardH - 96
     else cardY = (canvas.height - cardH) / 2
 
+    // Sombra suave bajo la card
+    ctx.save()
+    ctx.shadowColor = 'rgba(0,0,0,0.35)'
+    ctx.shadowBlur = 40
+    ctx.shadowOffsetY = 12
     ctx.fillStyle = '#ffffff'
     ctx.fillRect(cardX, cardY, cardW, cardH)
+    ctx.restore()
+
+    // Acento brand: barra primary arriba de la card
+    const BRAND = '#DC2626'
+    ctx.fillStyle = BRAND
+    ctx.fillRect(cardX, cardY, cardW, 8)
 
     // Generar QR en alta resolución
     const qrDataUrl = await QRCode.toDataURL(publicUrl, {
       width: qrSize,
       margin: 1,
-      errorCorrectionLevel: 'M',
+      errorCorrectionLevel: 'H',
       color: { dark: '#0a0a0a', light: '#ffffff' },
     })
     const qrImg = await loadImage(qrDataUrl)
-    ctx.drawImage(qrImg, cardX + padding, cardY + padding, qrSize, qrSize)
+    ctx.drawImage(qrImg, cardX + padding, cardY + padding + 8, qrSize, qrSize)
 
-    // Texto debajo del QR
-    ctx.fillStyle = '#0a0a0a'
+    // Eyebrow + título debajo del QR
+    const captionBaseY = cardY + padding + 8 + qrSize + 50
     ctx.textAlign = 'center'
-    ctx.font = '600 30px Inter, system-ui, sans-serif'
-    ctx.fillText('ESCANEA Y BUSCA TUS FOTOS', canvas.width / 2, cardY + padding + qrSize + 60)
-    ctx.font = '500 22px Inter, system-ui, sans-serif'
-    ctx.fillStyle = '#666666'
-    ctx.fillText(eventTitle, canvas.width / 2, cardY + padding + qrSize + 95)
 
-    // Marca PICSHOT arriba (en la zona del overlay si el QR está abajo, y viceversa)
+    // Eyebrow
+    ctx.fillStyle = BRAND
+    ctx.font = '700 18px Inter, system-ui, sans-serif'
+    ctx.fillText(
+      'F O T O S   D E L   E V E N T O',
+      canvas.width / 2,
+      captionBaseY,
+    )
+
+    // Línea divisoria corta
+    const lineW = 60
+    ctx.fillStyle = '#0a0a0a'
+    ctx.fillRect(canvas.width / 2 - lineW / 2, captionBaseY + 18, lineW, 2)
+
+    // CTA principal
+    ctx.fillStyle = '#0a0a0a'
+    ctx.font = '800 34px Montserrat, system-ui, sans-serif'
+    ctx.fillText('ESCANÉAME', canvas.width / 2, captionBaseY + 62)
+
+    // Subtítulo amigable
+    ctx.font = '500 22px Inter, system-ui, sans-serif'
+    ctx.fillStyle = '#555555'
+    ctx.fillText(
+      'Encuentra y descarga tus fotos',
+      canvas.width / 2,
+      captionBaseY + 92,
+    )
+
+    // Bloque de marca arriba (cuando el QR no está arriba)
     if (position !== 'top') {
       ctx.textAlign = 'center'
+
+      // PICSHOT con barra brand al lado
+      const brandTextY = 110
+      ctx.font = '900 60px Montserrat, system-ui, sans-serif'
+      const brandText = 'PICSHOT'
+      const brandTextWidth = ctx.measureText(brandText).width
       ctx.fillStyle = '#ffffff'
-      ctx.font = '900 56px Montserrat, system-ui, sans-serif'
-      ctx.fillText('PICSHOT', canvas.width / 2, 100)
-      ctx.font = '500 28px Inter, system-ui, sans-serif'
+      ctx.fillText(brandText, canvas.width / 2, brandTextY)
+
+      // Barra brand debajo del texto PICSHOT
+      const accentY = brandTextY + 14
+      ctx.fillStyle = BRAND
+      ctx.fillRect(
+        canvas.width / 2 - brandTextWidth / 2,
+        accentY,
+        brandTextWidth,
+        4,
+      )
+
+      // Título del evento + fecha
+      ctx.font = '700 26px Inter, system-ui, sans-serif'
+      ctx.fillStyle = 'rgba(255,255,255,0.95)'
+      ctx.fillText(eventTitle.toUpperCase(), canvas.width / 2, brandTextY + 64)
+      ctx.font = '500 20px Inter, system-ui, sans-serif'
+      ctx.fillStyle = 'rgba(255,255,255,0.75)'
+      ctx.fillText(eventDate, canvas.width / 2, brandTextY + 94)
+    } else {
+      // Si el QR está arriba, dejamos PICSHOT + fecha abajo del póster
+      ctx.textAlign = 'center'
+      ctx.font = '800 36px Montserrat, system-ui, sans-serif'
+      ctx.fillStyle = '#ffffff'
+      ctx.fillText('PICSHOT', canvas.width / 2, canvas.height - 120)
+      ctx.font = '500 22px Inter, system-ui, sans-serif'
       ctx.fillStyle = 'rgba(255,255,255,0.85)'
-      ctx.fillText(eventTitle.toUpperCase(), canvas.width / 2, 145)
-      ctx.font = '400 22px Inter, system-ui, sans-serif'
+      ctx.fillText(eventTitle.toUpperCase(), canvas.width / 2, canvas.height - 82)
+      ctx.font = '400 20px Inter, system-ui, sans-serif'
       ctx.fillStyle = 'rgba(255,255,255,0.7)'
-      ctx.fillText(eventDate, canvas.width / 2, 178)
+      ctx.fillText(eventDate, canvas.width / 2, canvas.height - 50)
     }
 
     setRendering(false)
@@ -244,10 +314,17 @@ export function QrPosterModal({
         </header>
 
         <div className="grid grid-cols-1 md:grid-cols-[1fr_280px] gap-0">
-          <div className="p-4 bg-surface-container flex items-center justify-center">
+          <div
+            className="p-4 flex items-center justify-center"
+            style={{
+              backgroundImage:
+                'repeating-conic-gradient(rgba(127,127,127,0.06) 0% 25%, transparent 0% 50%)',
+              backgroundSize: '24px 24px',
+            }}
+          >
             <canvas
               ref={canvasRef}
-              className="max-w-full h-auto border border-surface-variant shadow-xl"
+              className="max-w-full h-auto border border-surface-variant shadow-2xl bg-surface-container-lowest"
               style={{ aspectRatio: '4 / 5', maxHeight: '60vh' }}
             />
           </div>
