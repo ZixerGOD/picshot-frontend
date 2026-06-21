@@ -89,7 +89,7 @@ export function AdminEventDetailPage() {
       <header className="bg-surface border border-surface-variant p-6 md:p-8">
         <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
           <div>
-            <div className="flex items-center gap-3 mb-3">
+            <div className="flex items-center gap-3 mb-3 flex-wrap">
               <span
                 className={`shots-badge ${
                   event.status === 'active'
@@ -104,6 +104,14 @@ export function AdminEventDetailPage() {
               <span className="font-caption text-caption text-on-surface-variant uppercase">
                 {event.type}
               </span>
+              <button
+                type="button"
+                onClick={() => setHeaderPosterOpen(true)}
+                className="inline-flex items-center gap-1.5 border border-surface-variant px-2.5 py-1 text-on-surface hover:border-primary hover:text-primary transition-colors font-label-bold text-label-bold uppercase tracking-widest text-[10px]"
+              >
+                <Icon name="qr_code_2" className="text-base" />
+                Generar QR
+              </button>
             </div>
             <h1 className="font-headline-lg text-headline-lg text-on-surface uppercase">
               {event.title}
@@ -113,14 +121,6 @@ export function AdminEventDetailPage() {
             </p>
           </div>
           <div className="flex flex-wrap gap-3">
-            <button
-              type="button"
-              onClick={() => setHeaderPosterOpen(true)}
-              className="shots-btn-primary"
-            >
-              <Icon name="qr_code_2" />
-              Generar QR
-            </button>
             <button
               type="button"
               onClick={() => {
@@ -139,7 +139,7 @@ export function AdminEventDetailPage() {
                   navigate('/admin/eventos')
                 }
               }}
-              className="shots-btn-secondary border-red-500 text-red-400 hover:bg-red-500 hover:text-on-primary"
+              className="shots-btn-outline border-primary-container/40 text-primary-container hover:bg-primary-container/15 hover:border-primary-container hover:text-primary-container"
             >
               <Icon name="delete" />
               Eliminar
