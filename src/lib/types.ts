@@ -1,11 +1,11 @@
 export interface EventItem {
   id: string
   title: string
-  /** Fecha de inicio del evento (YYYY-MM-DD). */
+  /** Fecha del evento (YYYY-MM-DD). Cada evento es de un solo día
+   *  (decisions.md 229-232); para una jornada multi-día se crean
+   *  eventos separados. */
   date: string
   displayDate: string
-  /** Fecha de fin del evento (YYYY-MM-DD). Opcional para eventos de un día. */
-  endDate?: string
   /** Fecha hasta la que las fotos quedan disponibles (180 días por defecto). */
   retentionUntil?: string
   location: string
