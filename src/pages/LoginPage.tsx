@@ -21,6 +21,13 @@ function homeForRole(role: UserRole): string {
   return '/mis-compras'
 }
 
+// A qué área pertenece una ruta, para no devolver a un rol a una sección ajena.
+function areaForPath(path: string): UserRole {
+  if (path.startsWith('/admin')) return 'admin'
+  if (path.startsWith('/fotografo')) return 'photographer'
+  return 'customer'
+}
+
 // Atajos de demo (modo mock). En backend real se eliminan.
 const demoAccounts: { label: string; email: string; password: string; icon: string }[] = [
   { label: 'Administrador', email: 'admin@picshot.com', password: 'admin123', icon: 'shield_person' },
@@ -45,8 +52,12 @@ export function LoginPage() {
     setLoading(true)
     try {
       const user = await login({ email, password })
+      const from = state.from?.pathname
+      // Volver a la página de origen solo si es del área del propio rol; si no, a su home.
       const target =
-        state.from?.pathname && !state.denied ? state.from.pathname : homeForRole(user.role)
+        from && !state.denied && areaForPath(from) === user.role
+          ? from
+          : homeForRole(user.role)
       navigate(target, { replace: true })
     } catch (err) {
       setError(err instanceof Error ? err.message : 'No se pudo iniciar sesión')
