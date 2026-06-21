@@ -1,5 +1,7 @@
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { mockEvents } from '../lib/mocks'
+import { getEvents } from '../lib/api'
+import type { EventItem } from '../lib/types'
 import { img } from '../lib/images'
 import { EventCard } from '../components/events/EventCard'
 import { Icon } from '../components/ui/Icon'
@@ -27,6 +29,24 @@ const steps = [
 ]
 
 export function HomePage() {
+  const [recentEvents, setRecentEvents] = useState<EventItem[]>([])
+
+  useEffect(() => {
+    let active = true
+    getEvents()
+      .then((events) => {
+        if (!active) return
+        const sorted = [...events].sort((a, b) => b.date.localeCompare(a.date))
+        setRecentEvents(sorted.slice(0, 3))
+      })
+      .catch(() => {
+        if (active) setRecentEvents([])
+      })
+    return () => {
+      active = false
+    }
+  }, [])
+
   return (
     <>
       <main>
@@ -99,9 +119,14 @@ export function HomePage() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-gutter">
-              {mockEvents.slice(0, 3).map((event) => (
+              {recentEvents.map((event) => (
                 <EventCard key={event.id} event={event} />
               ))}
+              {recentEvents.length === 0 && (
+                <p className="col-span-full text-on-surface-variant font-body-md text-body-md">
+                  No hay eventos recientes para mostrar.
+                </p>
+              )}
             </div>
           </div>
         </section>

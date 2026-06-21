@@ -1,6 +1,7 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { mockEvents } from '../lib/mocks'
+import { getEvents } from '../lib/api'
+import type { EventItem } from '../lib/types'
 import { EventCard } from '../components/events/EventCard'
 import { Input } from '../components/ui/Input'
 import { Select } from '../components/ui/Select'
@@ -33,15 +34,48 @@ export function EventsPage() {
   const [date, setDate] = useState('')
   const [type, setType] = useState('')
 
+  const [events, setEvents] = useState<EventItem[]>([])
+  const [loading, setLoading] = useState(true)
+  const [loadError, setLoadError] = useState<string | null>(null)
+
+  useEffect(() => {
+    let active = true
+    setLoading(true)
+    setLoadError(null)
+    getEvents()
+      .then((data) => {
+        if (!active) return
+        setEvents(data)
+      })
+      .catch(() => {
+        if (active) setLoadError('No pudimos cargar los eventos.')
+      })
+      .finally(() => {
+        if (active) setLoading(false)
+      })
+    return () => {
+      active = false
+    }
+  }, [])
+
   const filtered = useMemo(() => {
-    return mockEvents.filter((event) => {
+    return events.filter((event) => {
       const matchesSearch = event.title.toLowerCase().includes(search.toLowerCase())
       const matchesCity = !city || event.location === city
       const matchesType = !type || event.type === type
       const matchesDate = !date || event.date >= date
       return matchesSearch && matchesCity && matchesType && matchesDate
     })
-  }, [search, city, date, type])
+  }, [events, search, city, date, type])
+
+  function clearFilters() {
+    setSearch('')
+    setCity('')
+    setDate('')
+    setType('')
+  }
+
+  const hasActiveFilters = Boolean(search || city || date || type)
 
   return (
     <>
@@ -69,7 +103,7 @@ export function EventsPage() {
             </aside>
           )}
 
-          <section className="bg-surface-container-lowest border border-surface-variant p-6 flex flex-col md:flex-row gap-4">
+          <section className="bg-surface-container-lowest border border-surface-variant p-6 flex flex-col md:flex-row gap-4 md:items-start">
             <Input
               icon="search"
               placeholder="Buscar por nombre..."
@@ -98,18 +132,42 @@ export function EventsPage() {
               onChange={(e) => setType(e.target.value)}
               wrapperClassName="flex-1 md:max-w-[200px]"
             />
-          </section>
-
-          <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-gutter">
-            {filtered.map((event) => (
-              <EventCard key={event.id} event={event} />
-            ))}
-            {filtered.length === 0 && (
-              <p className="col-span-full text-on-surface-variant font-body-md text-body-md">
-                No se encontraron eventos con esos filtros.
-              </p>
+            {hasActiveFilters && (
+              <button
+                type="button"
+                onClick={clearFilters}
+                className="inline-flex items-center justify-center gap-2 border border-surface-variant text-on-surface-variant font-label-bold text-label-bold uppercase tracking-widest px-4 py-2 hover:text-on-surface hover:border-primary transition-colors"
+              >
+                <Icon name="close" className="text-base" />
+                Limpiar
+              </button>
             )}
           </section>
+
+          {loading && (
+            <p className="text-on-surface-variant font-body-md text-body-md text-center py-12">
+              Cargando eventos…
+            </p>
+          )}
+
+          {loadError && !loading && (
+            <p className="text-primary-container font-body-md text-body-md text-center py-12">
+              {loadError}
+            </p>
+          )}
+
+          {!loading && !loadError && (
+            <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-gutter">
+              {filtered.map((event) => (
+                <EventCard key={event.id} event={event} />
+              ))}
+              {filtered.length === 0 && (
+                <p className="col-span-full text-on-surface-variant font-body-md text-body-md">
+                  No se encontraron eventos con esos filtros.
+                </p>
+              )}
+            </section>
+          )}
         </div>
       </main>
 
